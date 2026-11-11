@@ -1,0 +1,111 @@
+/* austit Cloud - 404 und Wartungsmodus, Ergaenzung zu core/css/guest.css */
+
+body#body-login .body-login-container.update,
+body#body-login .guest-content > .guest-box:not(.login-box) {
+	box-sizing: border-box;
+	display: block;
+	width: min(100% - 32px, 520px);
+	max-width: 520px;
+	margin-inline: auto;
+	padding: 32px 36px;
+	border: 1px solid rgba(87, 182, 255, .22);
+	border-radius: 18px;
+	background-color: rgba(18, 30, 46, .92);
+	color: rgba(230, 237, 243, .92);
+	box-shadow: 0 24px 64px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .04);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+body#body-login .body-login-container.update .icon-big,
+body#body-login .guest-content > .guest-box:not(.login-box) .icon-big {
+	filter: invert(1);
+	opacity: .9;
+}
+
+body#body-login .body-login-container.update h2,
+body#body-login .guest-content > .guest-box:not(.login-box) h2 {
+	margin-bottom: 16px;
+	color: #ffffff;
+	font-weight: 600;
+	letter-spacing: -.01em;
+}
+
+body#body-login .body-login-container.update p,
+body#body-login .guest-content > .guest-box:not(.login-box) p {
+	color: rgba(230, 237, 243, .82);
+}
+
+body#body-login .body-login-container.update .button.primary,
+body#body-login .guest-content > .guest-box:not(.login-box) .button.primary {
+	margin-top: 8px;
+}
+
+/* Support-Zeile auf 404 und Wartungsseite */
+body#body-login .body-login-container.update .austit-support,
+body#body-login .guest-content > .guest-box:not(.login-box) .austit-support {
+	margin-top: 18px;
+	font-size: .9rem;
+	color: rgba(230, 237, 243, .68);
+}
+
+body#body-login .body-login-container.update .austit-support a,
+body#body-login .guest-content > .guest-box:not(.login-box) .austit-support a {
+	color: #57b6ff;
+}
+
+/* Wartungsseite: gleicher Hintergrund, gleiches Logo und dunkler Footer wie beim Login */
+body#body-login {
+	background-color: #0f1724 !important;
+	background-image: url('/apps/theming/image/background') !important;
+	background-position: center !important;
+	background-size: cover !important;
+	background-attachment: fixed;
+}
+
+body#body-login .logo {
+	width: 300px;
+	height: 81px;
+	margin-bottom: 8px;
+	background-image: url('/themes/austit/core/img/logo.svg') !important;
+	background-position: center !important;
+	background-repeat: no-repeat !important;
+	background-size: contain !important;
+}
+
+body#body-login footer.guest-box {
+	border: 1px solid rgba(87, 182, 255, .18) !important;
+	background-color: rgba(18, 30, 46, .82) !important;
+	box-shadow: 0 12px 32px rgba(0, 0, 0, .3) !important;
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+body#body-login footer.guest-box .info {
+	color: rgba(230, 237, 243, .82) !important;
+}
+
+body#body-login footer.guest-box .info a,
+body#body-login footer.guest-box .info a.entity-name {
+	color: #57b6ff !important;
+}
+
+@media only screen and (max-width: 512px) {
+	body#body-login .body-login-container.update,
+	body#body-login .guest-content > .guest-box:not(.login-box) {
+		padding: 24px 20px;
+	}
+
+	body#body-login .logo {
+		width: 240px;
+		height: 65px;
+	}
+}
+
+/* AUSTIT: Support-Zeile im Footer auf dunklen Login-/Fehlerseiten */
+body#body-login footer.guest-box .austit-support {
+	color: rgba(230, 237, 243, .68);
+}
+body#body-login footer.guest-box .austit-support a {
+	color: #57b6ff;
+}

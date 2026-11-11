@@ -1,0 +1,38 @@
+# Lokale Entwicklungsumgebung fuer die austit Cloud.
+# Start:  docker compose -f austit-dev/docker-compose.yml up -d
+# Aufruf: http://localhost:8080  (Login: admin / admin)
+name: austit-cloud-dev
+
+services:
+  app:
+    image: nextcloud:35.0.2-apache
+    entrypoint: ["/bin/sh", "/var/www/html/austit-dev/entrypoint.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ..:/var/www/html
+      - ./dev.config.php:/var/www/html/config/dev.config.php:ro
+      - data:/var/www/html/data
+      - custom-apps:/var/www/html/custom_apps
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: nextcloud
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nextcloud -d nextcloud"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  data:
+  custom-apps:
+  db:
