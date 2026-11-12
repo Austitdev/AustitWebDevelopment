@@ -9,6 +9,8 @@
 // Updates laufen ausschliesslich manuell ueber Einstellungen > Verwaltung > Updates.
 $CONFIG = [
 	'theme' => 'austit',
+	'default_language' => 'de',
+	'default_locale' => 'de_DE',
 	// Keine Update-Pruefung bei updates.nextcloud.com, keine Update-Hinweise.
 	'updatechecker' => false,
 	// Der Web-Updater wuerde die austit-Anpassungen mit dem Original ueberschreiben.

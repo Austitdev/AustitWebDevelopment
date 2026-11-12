@@ -54,8 +54,8 @@ class JSResourceLocator extends ResourceLocator {
 			// single l10n strings without having to translate all of them.
 			$found = $this->appendScriptIfExist($this->serverroot, 'core/' . $resource)
 				|| $this->appendScriptIfExist($this->serverroot, $theme_dir . 'core/' . $resource)
-				|| $this->appendScriptIfExist($this->serverroot, $resource)
 				|| $this->appendScriptIfExist($this->serverroot, $theme_dir . $resource)
+				|| $this->appendScriptIfExist($this->serverroot, $resource)
 				|| $this->appendScriptIfExist($appRoot, $resource, $appWebRoot)
 				|| $this->appendScriptIfExist($this->serverroot, $theme_dir . 'apps/' . $resource);
 

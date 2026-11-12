@@ -16,6 +16,8 @@ services:
       - ..:/var/www/html
       - ./dev.config.php:/var/www/html/config/dev.config.php:ro
       - ./austit.config.php:/var/www/html/config/austit.config.php:ro
+      - ./php-austit.ini:/usr/local/etc/php/conf.d/zz-austit.ini:ro
+      - ./apache-austit.conf:/etc/apache2/conf-enabled/zz-austit.conf:ro
       - data:/var/www/html/data
       - custom-apps:/var/www/html/custom_apps
 

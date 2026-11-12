@@ -144,6 +144,30 @@ class JSResourceLocatorTest extends \Test\TestCase {
 		$this->assertCount(0, $resources);
 	}
 
+	public function testThemeTranslationOverridesCoreTranslation(): void {
+		$theme = $this->randomString();
+		$themeL10nDir = \OC::$SERVERROOT . '/themes/' . $theme . '/core/l10n';
+		mkdir($themeL10nDir, 0777, true);
+		touch($themeL10nDir . '/de.js');
+
+		$this->config->method('getSystemValueString')
+			->with('theme', '')
+			->willReturn($theme);
+		$this->appManager->method('getAppPath')
+			->willThrowException(new AppPathNotFoundException());
+		$this->appManager->method('getAppWebPath')
+			->willThrowException(new AppPathNotFoundException());
+
+		$locator = $this->jsResourceLocator();
+		$locator->find(['core/l10n/de']);
+		$resources = $locator->getResources();
+
+		$this->rrmdir(\OC::$SERVERROOT . '/themes/' . $theme);
+
+		$this->assertCount(1, $resources);
+		$this->assertSame('themes/' . $theme . '/core/l10n/de.js', $resources[0][2]);
+	}
+
 	public function testFindModuleJSWithFallback(): void {
 		// First create new apps path, and a symlink to it
 		$apps_dirname = $this->randomString();

@@ -20,6 +20,8 @@ if ! grep -q "'installed' => true" config/config.php 2>/dev/null; then
 	occ config:system:set overwrite.cli.url --value=http://localhost:8080
 fi
 
+php austit-dev/brand-l10n.php /var/www/html austit
+occ app:disable nextcloud_announcements firstrunwizard survey_client || true
 occ app:enable austit_updates
 occ app:enable austit_shell
 

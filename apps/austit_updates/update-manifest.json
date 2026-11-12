@@ -1,7 +1,7 @@
 {
     "baseVersion": "35.0.2",
     "upstreamTag": "v35.0.2",
-    "generatedAt": "2026-11-12T18:16:25+00:00",
+    "generatedAt": "2026-11-12T18:59:11+00:00",
     "files": [
         {
             "path": ".gitattributes",
@@ -73,9 +73,19 @@
             "sha256": "90541cf63ae41216dd947751895233cb10e8e380b7ab06e0c0f1090a57a03962"
         },
         {
+            "path": "lib/private/Template/JSResourceLocator.php",
+            "kind": "modified",
+            "sha256": "9fd639abfc270386acaa4c85bb2f9e2af25ba77435b1ced2d3edc645a0634afb"
+        },
+        {
             "path": "tests/lib/InstallerTest.php",
             "kind": "modified",
             "sha256": "e2d97ff87e55a836aaff04f41cb56b8a0b2495a399fc8b4eef17cd5a35d94187"
+        },
+        {
+            "path": "tests/lib/Template/JSResourceLocatorTest.php",
+            "kind": "modified",
+            "sha256": "dac8164de05614c04315d7cdfdfd0fb81aa75d51078d7c1c953f868364704d1f"
         }
     ]
 }

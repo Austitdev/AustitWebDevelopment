@@ -64,6 +64,8 @@ node_modules/
 !/themes/example
 !/themes/README
 !/themes/austit
+# von austit-dev/brand-l10n.php erzeugt
+/themes/austit/**/l10n/
 
 # Love to people that develop the updater
 /updater

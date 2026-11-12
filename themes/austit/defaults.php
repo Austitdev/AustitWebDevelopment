@@ -10,7 +10,35 @@ class OC_Theme {
 	}
 
 	public function getDocBaseUrl(): string {
-		return 'https://docs.nextcloud.com';
+		return 'https://austit.de';
+	}
+
+	public function buildDocLinkToKey(string $key): string {
+		return 'https://austit.de';
+	}
+
+	public function getProductName(): string {
+		return 'austit Cloud';
+	}
+
+	public function getSyncClientUrl(): string {
+		return 'https://austit.de';
+	}
+
+	public function getiOSClientUrl(): string {
+		return 'https://austit.de';
+	}
+
+	public function getAndroidClientUrl(): string {
+		return 'https://austit.de';
+	}
+
+	public function getFDroidClientUrl(): string {
+		return 'https://austit.de';
+	}
+
+	public function getiTunesAppId(): string {
+		return '';
 	}
 
 	public function getTitle(): string {
