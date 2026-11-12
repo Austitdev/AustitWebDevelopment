@@ -162,7 +162,12 @@
 		})
 		updateCollapse()
 
-		footer.append(settings, collapse)
+		const legal = document.createElement('a')
+		legal.href = shell.legalUrl
+		legal.className = 'austit-sidebar__legal'
+		legal.textContent = 'Lizenzen & Quellcode'
+
+		footer.append(settings, collapse, legal)
 		nav.append(footer)
 		return nav
 	}

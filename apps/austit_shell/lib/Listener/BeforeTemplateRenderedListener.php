@@ -72,6 +72,7 @@ class BeforeTemplateRenderedListener implements IEventListener {
 			'brand' => 'austit',
 			'subtitle' => 'Workspace',
 			'settingsUrl' => $this->urlGenerator->linkToRoute('settings.PersonalSettings.index'),
+			'legalUrl' => $this->urlGenerator->linkToRoute(Application::APP_ID . '.Legal.index'),
 			'quickActions' => $quickActions,
 		];
 	}

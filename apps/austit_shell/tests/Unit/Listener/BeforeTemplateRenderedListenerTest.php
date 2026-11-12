@@ -45,6 +45,7 @@ class BeforeTemplateRenderedListenerTest extends TestCase {
 		$this->assertSame(['Neues Dokument', 'Termin erstellen'], array_column($state['quickActions'], 'label'));
 		$this->assertSame('/cloud/index.php/apps/calendar/', $state['quickActions'][1]['href']);
 		$this->assertSame('/cloud/settings/user', $state['settingsUrl']);
+		$this->assertArrayHasKey('legalUrl', $state);
 	}
 
 	public function testSkipsGuestAndPublicPages(): void {

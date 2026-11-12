@@ -79,11 +79,25 @@ class OC_Theme {
 		];
 	}
 
+	/**
+	 * License and source code page (AGPL), falls back to the public source code page
+	 * when the austit_shell app is not enabled.
+	 */
+	private function getLegalUrl(): string {
+		try {
+			$url = \OCP\Server::get(\OCP\IURLGenerator::class)->linkToRoute('austit_shell.Legal.index');
+		} catch (\Throwable) {
+			$url = '';
+		}
+		return $url !== '' ? $url : 'https://austit.de/quellcode';
+	}
+
 	public function getLongFooter(): string {
 		return '<a href="https://austit.de" target="_blank" rel="noreferrer noopener" class="entity-name">austit Cloud</a> – Deine Daten. Deine Cloud.<br/>'
 			. '<span class="footer__legal-links">'
 			. '<a href="https://austit.de/impressum" class="legal" target="_blank" rel="noreferrer noopener">Impressum</a> · '
-			. '<a href="https://austit.de/datenschutz" class="legal" target="_blank" rel="noreferrer noopener">Datenschutzerklärung</a>'
+			. '<a href="https://austit.de/datenschutz" class="legal" target="_blank" rel="noreferrer noopener">Datenschutzerklärung</a> · '
+			. '<a href="' . htmlspecialchars($this->getLegalUrl()) . '" class="legal">Lizenzen &amp; Quellcode</a>'
 			. '</span><br/>'
 			. '<span class="austit-support">Support: <a href="mailto:info@austit.de">info@austit.de</a> · <a href="https://austit.de">austit.de</a></span>';
 	}

@@ -284,6 +284,23 @@ html.austit-shell #header .header-end {
 	color: var(--austit-text);
 }
 
+.austit-sidebar__legal {
+	padding: 6px 12px 0;
+	color: var(--austit-text-muted) !important;
+	font-size: 11px;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.austit-sidebar__legal:hover,
+.austit-sidebar__legal:focus-visible {
+	text-decoration: underline;
+}
+
+html.austit-shell--collapsed .austit-sidebar__legal {
+	display: none;
+}
+
 html.austit-shell--collapsed .austit-sidebar__collapse svg {
 	transform: scaleX(-1);
 }
