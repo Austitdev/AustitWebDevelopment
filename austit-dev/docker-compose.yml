@@ -21,6 +21,21 @@ services:
       - data:/var/www/html/data
       - custom-apps:/var/www/html/custom_apps
 
+  # Office-Bearbeitung (docx, xlsx, pptx, odt, ...), gleiche Version wie auf dem VPS.
+  collabora:
+    image: collabora/code:26.04.5.1.1
+    environment:
+      aliasgroup1: http://app:80
+      DONT_GEN_SSL_CERT: "1"
+      extra_params: >-
+        --o:ssl.enable=false
+        --o:net.frame_ancestors=localhost:8080
+        --o:help_url=https://austit.de
+        --o:user_interface.brandProductName=AUSTIT
+        --o:user_interface.brandProductURL=https://austit.de
+    ports:
+      - "127.0.0.1:9980:9980"
+
   db:
     image: postgres:16-alpine
     environment:

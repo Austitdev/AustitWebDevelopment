@@ -20,6 +20,22 @@ if ! grep -q "'installed' => true" config/config.php 2>/dev/null; then
 	occ config:system:set overwrite.cli.url --value=http://localhost:8080
 fi
 
+# Dateien im Browser oeffnen: Bilder/Videos, PDF, Text/Markdown und Office ueber Collabora.
+occ app:enable viewer files_pdfviewer text photos
+if [ ! -d custom_apps/richdocuments ]; then
+	occ app:install richdocuments || echo "richdocuments konnte nicht installiert werden (keine Internetverbindung?)"
+fi
+if [ -d custom_apps/richdocuments ]; then
+	occ app:enable richdocuments
+	# Browser erreicht Collabora ueber localhost:9980, Nextcloud und Collabora sich gegenseitig im Docker-Netz.
+	occ config:app:set richdocuments wopi_url --value=http://collabora:9980
+	occ config:app:set richdocuments public_wopi_url --value=http://localhost:9980
+	occ config:app:set richdocuments wopi_callback_url --value=http://app
+	occ config:app:set richdocuments wopi_allowlist --value=172.16.0.0/12,192.168.0.0/16,10.0.0.0/8
+	occ config:system:set trusted_domains 1 --value=app
+	occ config:system:set allow_local_remote_servers --value=true --type=boolean
+fi
+
 php austit-dev/brand-l10n.php /var/www/html austit
 occ app:disable nextcloud_announcements firstrunwizard survey_client || true
 occ app:enable austit_updates
