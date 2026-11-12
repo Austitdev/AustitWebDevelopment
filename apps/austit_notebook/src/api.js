@@ -42,7 +42,12 @@ async function request(method, path, body) {
 export const api = {
 	tree: () => request('GET', '/tree'),
 	createNotebook: (name) => request('POST', '/notebooks', { name }),
-	createSection: (notebookId, name) => request('POST', `/notebooks/${notebookId}/sections`, { name }),
+	createClassNotebook: (name, members) => request('POST', '/class-notebooks', { name, members }),
+	getMembers: (notebookId) => request('GET', `/class-notebooks/${notebookId}/members`),
+	setMembers: (notebookId, members) => request('PUT', `/class-notebooks/${notebookId}/members`, { members }),
+	searchPrincipals: (search) => request('GET', `/principals?search=${encodeURIComponent(search)}`),
+	createSection: (parentId, name) => request('POST', `/containers/${parentId}/sections`, { name }),
+	distributePage: (pageId, section) => request('POST', `/pages/${pageId}/distribute`, { section }),
 	createPage: (sectionId, name) => request('POST', `/sections/${sectionId}/pages`, { name }),
 	rename: (id, name) => request('PATCH', `/nodes/${id}`, { name }),
 	remove: (id) => request('DELETE', `/nodes/${id}`),

@@ -49,10 +49,43 @@ class ApiController extends Controller {
 		return $this->run(fn () => ['id' => $this->service->createNotebook($this->userId(), $name)->getId()], Http::STATUS_CREATED);
 	}
 
+	/**
+	 * @param list<array{type: string, id: string, role: string}> $members
+	 */
 	#[NoAdminRequired]
-	#[FrontpageRoute(verb: 'POST', url: '/api/notebooks/{notebookId}/sections')]
-	public function createSection(int $notebookId, string $name = ''): JSONResponse {
-		return $this->run(fn () => ['id' => $this->service->createSection($this->userId(), $notebookId, $name)->getId()], Http::STATUS_CREATED);
+	#[FrontpageRoute(verb: 'POST', url: '/api/class-notebooks')]
+	public function createClassNotebook(string $name = '', array $members = []): JSONResponse {
+		return $this->run(fn () => ['id' => $this->service->createClassNotebook($this->userId(), $name, $members)->getId()], Http::STATUS_CREATED);
+	}
+
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'GET', url: '/api/class-notebooks/{id}/members')]
+	public function getMembers(int $id): JSONResponse {
+		return $this->run(fn () => ['members' => $this->service->getMembers($this->userId(), $id)]);
+	}
+
+	/**
+	 * @param list<array{type: string, id: string, role: string}> $members
+	 */
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'PUT', url: '/api/class-notebooks/{id}/members')]
+	public function setMembers(int $id, array $members = []): JSONResponse {
+		return $this->run(function () use ($id, $members) {
+			$this->service->setMembers($this->userId(), $id, $members);
+			return [];
+		});
+	}
+
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'GET', url: '/api/principals')]
+	public function principals(string $search = ''): JSONResponse {
+		return $this->run(fn () => ['results' => $this->service->searchPrincipals($search)]);
+	}
+
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'POST', url: '/api/containers/{parentId}/sections')]
+	public function createSection(int $parentId, string $name = ''): JSONResponse {
+		return $this->run(fn () => ['id' => $this->service->createSection($this->userId(), $parentId, $name)->getId()], Http::STATUS_CREATED);
 	}
 
 	#[NoAdminRequired]
@@ -89,6 +122,12 @@ class ApiController extends Controller {
 	#[FrontpageRoute(verb: 'PUT', url: '/api/pages/{id}')]
 	public function savePage(int $id, array $content, string $etag): JSONResponse {
 		return $this->run(fn () => ['etag' => $this->service->writePage($this->userId(), $id, $content, $etag)]);
+	}
+
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'POST', url: '/api/pages/{id}/distribute')]
+	public function distributePage(int $id, string $section = ''): JSONResponse {
+		return $this->run(fn () => ['count' => $this->service->distributePage($this->userId(), $id, $section)]);
 	}
 
 	#[NoAdminRequired]

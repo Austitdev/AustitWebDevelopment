@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\AustitNotebook\Tests\Unit\Service;
 
+use OCA\AustitNotebook\Db\ClassNotebookStore;
 use OCA\AustitNotebook\Service\ConflictException;
 use OCA\AustitNotebook\Service\NotebookException;
 use OCA\AustitNotebook\Service\NotebookService;
@@ -16,6 +17,8 @@ use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\IGroupManager;
+use OCP\IUserManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
@@ -36,7 +39,13 @@ class NotebookServiceTest extends TestCase {
 				? substr($path, strlen('/alice/files/Notizbücher'))
 				: null,
 		);
-		$this->service = new NotebookService($this->rootFolder);
+		$this->root->method('get')->willReturn($this->createMock(Folder::class));
+		$this->service = new NotebookService(
+			$this->rootFolder,
+			$this->createMock(ClassNotebookStore::class),
+			$this->createMock(IUserManager::class),
+			$this->createMock(IGroupManager::class),
+		);
 	}
 
 	public static function names(): array {

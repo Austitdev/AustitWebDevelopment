@@ -5,6 +5,7 @@
 <template>
 	<div class="nb-page">
 		<Toolbar
+			:read-only="readOnly"
 			:tool="tool"
 			:color="toolColor"
 			:size="toolSize"
@@ -24,7 +25,7 @@
 		<div
 			ref="viewport"
 			class="nb-canvas"
-			:class="['nb-canvas--' + tool, { 'nb-canvas--panning': gestureType === 'pan' }]"
+			:class="['nb-canvas--' + (readOnly ? 'readonly' : tool), { 'nb-canvas--panning': gestureType === 'pan' }]"
 			:style="paperStyle"
 			@pointerdown="onPointerDown"
 			@pointermove="onPointerMove"
@@ -38,7 +39,9 @@
 					<TextBlock
 						v-if="element.type === 'text'"
 						:element="element"
+						:editable="!readOnly"
 						:autofocus="element.id === autofocusId"
+						:initial-text="element.id === autofocusId ? pendingInput : ''"
 						:selected="selectedElementIds.has(element.id)"
 						@change="(doc) => onTextChange(element, doc)"
 						@focus="onEditorFocus"
@@ -85,7 +88,7 @@
 				</svg>
 			</div>
 
-			<p v-if="page.elements.length === 0 && page.strokes.length === 0" class="nb-hint">
+			<p v-if="!readOnly && page.elements.length === 0 && page.strokes.length === 0" class="nb-hint">
 				Irgendwo klicken und schreiben, mit dem Stift zeichnen oder Bilder hineinziehen.
 			</p>
 		</div>
@@ -119,6 +122,7 @@ import Toolbar from './Toolbar.vue'
 const props = defineProps({
 	pageId: { type: Number, required: true },
 	initialContent: { type: Object, required: true },
+	readOnly: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['change', 'error'])
@@ -137,6 +141,9 @@ const toolSettings = reactive({
 })
 const heights = reactive({})
 const autofocusId = ref(null)
+// Keys typed between creating a text block and its editor being ready.
+const pendingInput = ref('')
+let awaitingEditor = false
 const activeEditor = shallowRef(null)
 const editorTick = ref(0)
 const currentStroke = ref(null)
@@ -329,6 +336,11 @@ function onPointerDown(event) {
 		return
 	}
 
+	if (props.readOnly) {
+		startPan(event)
+		return
+	}
+
 	// Text blocks and images handle their own pointer events in the text tool.
 	if (tool.value === 'text' && event.button !== 1 && event.target.closest('.nb-element')) {
 		return
@@ -391,7 +403,7 @@ function startPan(event) {
 }
 
 function startElementGesture(event, element, type) {
-	if (gesture || tool.value !== 'text') {
+	if (gesture || tool.value !== 'text' || props.readOnly) {
 		return
 	}
 	beginChange()
@@ -561,6 +573,8 @@ function createTextBlock(x, y) {
 	const element = { id: uid(), type: 'text', x, y: round(y - 12), width: 360, doc: null }
 	page.value.elements.push(element)
 	autofocusId.value = element.id
+	pendingInput.value = ''
+	awaitingEditor = true
 	endChange(true)
 }
 
@@ -570,6 +584,8 @@ function onTextChange(element, doc) {
 }
 
 function onEditorFocus(editor) {
+	awaitingEditor = false
+	pendingInput.value = ''
 	activeEditor.value = editor
 	editor.on('transaction', bumpEditorTick)
 }
@@ -642,6 +658,9 @@ function onFilePicked(event) {
 }
 
 function onDrop(event) {
+	if (props.readOnly) {
+		return
+	}
 	const point = toWorld(event.clientX, event.clientY)
 	for (const file of event.dataTransfer?.files ?? []) {
 		if (file.type.startsWith('image/')) {
@@ -657,12 +676,17 @@ function isTyping(event) {
 }
 
 function onKeyDown(event) {
+	if (awaitingEditor && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+		event.preventDefault()
+		pendingInput.value += event.key
+		return
+	}
 	if (event.code === 'Space' && !isTyping(event)) {
 		spaceDown = true
 		event.preventDefault()
 		return
 	}
-	if (isTyping(event)) {
+	if (isTyping(event) || props.readOnly) {
 		return
 	}
 	const mod = event.ctrlKey || event.metaKey
@@ -690,7 +714,7 @@ function onKeyUp(event) {
 }
 
 function onPaste(event) {
-	if (isTyping(event)) {
+	if (isTyping(event) || props.readOnly) {
 		return
 	}
 	for (const item of event.clipboardData?.items ?? []) {

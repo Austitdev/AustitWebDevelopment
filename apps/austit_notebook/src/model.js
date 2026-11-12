@@ -171,3 +171,28 @@ export function isEmptyDoc(doc) {
 	}
 	return doc.content.every((node) => node.type === 'paragraph' && (!node.content || node.content.length === 0))
 }
+
+/**
+ * All sections of a notebook from the tree API, flattened, with the container they belong to.
+ * Personal notebooks have sections directly, class notebooks group them by area and student.
+ */
+export function flattenSections(notebook) {
+	if (!notebook) {
+		return []
+	}
+	if (Array.isArray(notebook.sections)) {
+		return notebook.sections.map((section) => ({ section, group: null, student: null }))
+	}
+	const result = []
+	for (const group of notebook.groups ?? []) {
+		for (const section of group.sections ?? []) {
+			result.push({ section, group, student: null })
+		}
+		for (const student of group.students ?? []) {
+			for (const section of student.sections ?? []) {
+				result.push({ section, group, student })
+			}
+		}
+	}
+	return result
+}

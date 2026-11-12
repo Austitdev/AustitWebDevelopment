@@ -25,11 +25,13 @@
 				class="nb-nav-item__label"
 				:aria-current="active ? 'true' : undefined"
 				@click="$emit('select')"
-				@dblclick="startEditing">
+				@dblclick="editable && startEditing()">
 				{{ node.name }}
+				<span v-if="badge" class="nb-nav-item__badge">{{ badge }}</span>
 			</button>
-			<button type="button" class="nb-nav-item__action" title="Umbenennen" :aria-label="node.name + ' umbenennen'" @click="startEditing">✎</button>
-			<button type="button" class="nb-nav-item__action" title="Löschen" :aria-label="node.name + ' löschen'" @click="confirming = true">🗑</button>
+			<slot name="actions" />
+			<button v-if="editable" type="button" class="nb-nav-item__action" title="Umbenennen" :aria-label="node.name + ' umbenennen'" @click="startEditing">✎</button>
+			<button v-if="deletable" type="button" class="nb-nav-item__action" title="Löschen" :aria-label="node.name + ' löschen'" @click="confirming = true">🗑</button>
 		</template>
 	</div>
 </template>
@@ -41,6 +43,9 @@ const props = defineProps({
 	node: { type: Object, required: true },
 	kind: { type: String, required: true },
 	active: { type: Boolean, default: false },
+	editable: { type: Boolean, default: true },
+	deletable: { type: Boolean, default: true },
+	badge: { type: String, default: null },
 })
 
 const emit = defineEmits(['select', 'rename', 'remove'])

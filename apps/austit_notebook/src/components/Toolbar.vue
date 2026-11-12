@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="nb-toolbar" role="toolbar" aria-label="Werkzeuge" @mousedown.prevent>
-		<div class="nb-toolbar__group">
+		<div v-if="!readOnly" class="nb-toolbar__group">
 			<button
 				v-for="item in tools"
 				:key="item.id"
@@ -22,7 +22,7 @@
 			</button>
 		</div>
 
-		<div v-if="tool === 'pen' || tool === 'highlighter'" class="nb-toolbar__group">
+		<div v-if="!readOnly && (tool === 'pen' || tool === 'highlighter')" class="nb-toolbar__group">
 			<button
 				v-for="c in palette"
 				:key="c"
@@ -46,7 +46,7 @@
 			</button>
 		</div>
 
-		<div v-if="editor" class="nb-toolbar__group">
+		<div v-if="!readOnly && editor" class="nb-toolbar__group">
 			<button
 				v-for="f in formats"
 				:key="f.id"
@@ -62,10 +62,10 @@
 		</div>
 
 		<div class="nb-toolbar__group nb-toolbar__group--end">
-			<button type="button" class="nb-tool" title="Rückgängig (Strg+Z)" aria-label="Rückgängig" :disabled="!canUndo" @click="$emit('undo')">
+			<button v-if="!readOnly" type="button" class="nb-tool" title="Rückgängig (Strg+Z)" aria-label="Rückgängig" :disabled="!canUndo" @click="$emit('undo')">
 				<svg viewBox="0 0 24 24" aria-hidden="true" v-html="ICONS.undo" />
 			</button>
-			<button type="button" class="nb-tool" title="Wiederholen (Strg+Y)" aria-label="Wiederholen" :disabled="!canRedo" @click="$emit('redo')">
+			<button v-if="!readOnly" type="button" class="nb-tool" title="Wiederholen (Strg+Y)" aria-label="Wiederholen" :disabled="!canRedo" @click="$emit('redo')">
 				<svg viewBox="0 0 24 24" aria-hidden="true" v-html="ICONS.redo" />
 			</button>
 			<button type="button" class="nb-tool" title="Verkleinern" aria-label="Verkleinern" @click="$emit('zoom', -1)">−</button>
@@ -89,6 +89,7 @@ const props = defineProps({
 	canUndo: { type: Boolean, default: false },
 	canRedo: { type: Boolean, default: false },
 	zoom: { type: Number, default: 1 },
+	readOnly: { type: Boolean, default: false },
 })
 
 defineEmits(['update:tool', 'update:color', 'update:size', 'insert-image', 'undo', 'redo', 'zoom'])

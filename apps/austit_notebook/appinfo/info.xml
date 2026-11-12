@@ -9,7 +9,7 @@
 	<name>Notizbücher</name>
 	<summary>Digitale Notizbücher mit freier Fläche für Text, Bilder und Handschrift</summary>
 	<description>Notizbücher mit Abschnitten und Seiten. Jede Seite ist eine unbegrenzte Fläche, auf der Text, Bilder und Stiftzeichnungen frei platziert werden.</description>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<licence>agpl</licence>
 	<author>austit.de</author>
 	<namespace>AustitNotebook</namespace>

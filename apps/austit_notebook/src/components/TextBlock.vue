@@ -8,9 +8,9 @@
 		class="nb-element nb-text"
 		:class="{ 'nb-element--focused': focused, 'nb-element--selected': selected }"
 		:style="{ left: element.x + 'px', top: element.y + 'px', width: element.width + 'px' }">
-		<div class="nb-handle" title="Verschieben" @pointerdown.stop.prevent="$emit('drag-start', $event)" />
+		<div v-if="editable" class="nb-handle" title="Verschieben" @pointerdown.stop.prevent="$emit('drag-start', $event)" />
 		<EditorContent v-if="editor" :editor="editor" class="nb-text__content" />
-		<div class="nb-resize nb-resize--x" title="Breite ändern" @pointerdown.stop.prevent="$emit('resize-start', $event)" />
+		<div v-if="editable" class="nb-resize nb-resize--x" title="Breite ändern" @pointerdown.stop.prevent="$emit('resize-start', $event)" />
 	</div>
 </template>
 
@@ -27,6 +27,8 @@ import { isEmptyDoc } from '../model.js'
 const props = defineProps({
 	element: { type: Object, required: true },
 	autofocus: { type: Boolean, default: false },
+	editable: { type: Boolean, default: true },
+	initialText: { type: String, default: '' },
 	selected: { type: Boolean, default: false },
 })
 
@@ -41,6 +43,7 @@ let resizeObserver = null
 onMounted(() => {
 	editor.value = new Editor({
 		content: props.element.doc ?? '',
+		editable: props.editable,
 		extensions: [
 			StarterKit.configure({ link: { openOnClick: false, autolink: true } }),
 			TaskList,
@@ -69,7 +72,11 @@ onMounted(() => {
 
 	// Focus synchronously so that typing right after the click is not lost.
 	if (props.autofocus) {
+		const text = props.initialText
 		editor.value.commands.focus('end')
+		if (text) {
+			editor.value.commands.insertContent(text)
+		}
 	}
 
 	resizeObserver = new ResizeObserver(() => {

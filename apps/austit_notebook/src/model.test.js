@@ -7,6 +7,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
 	eraseAt,
+	flattenSections,
 	isEmptyDoc,
 	moveSelection,
 	normalizePage,
@@ -88,4 +89,21 @@ test('isEmptyDoc', () => {
 	assert.equal(isEmptyDoc(null), true)
 	assert.equal(isEmptyDoc({ type: 'doc', content: [{ type: 'paragraph' }] }), true)
 	assert.equal(isEmptyDoc({ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }] }), false)
+})
+
+test('flattenSections handles personal and class notebooks', () => {
+	const personal = { sections: [{ id: 1, pages: [] }, { id: 2, pages: [] }] }
+	assert.deepEqual(flattenSections(personal).map((e) => e.section.id), [1, 2])
+
+	const classNotebook = {
+		groups: [
+			{ area: 'library', sections: [{ id: 10, pages: [] }] },
+			{ area: 'students', students: [{ uid: 'max', sections: [{ id: 20, pages: [] }] }, { uid: 'lena', sections: [{ id: 30, pages: [] }] }] },
+		],
+	}
+	const flat = flattenSections(classNotebook)
+	assert.deepEqual(flat.map((e) => e.section.id), [10, 20, 30])
+	assert.equal(flat[1].student.uid, 'max')
+	assert.equal(flat[0].group.area, 'library')
+	assert.deepEqual(flattenSections(null), [])
 })
