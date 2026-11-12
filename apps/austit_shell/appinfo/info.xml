@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+ - SPDX-FileCopyrightText: 2026 austit.de
+ - SPDX-License-Identifier: AGPL-3.0-or-later
+ -->
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>austit_shell</id>
+	<name>austit Workspace</name>
+	<summary>Oberfläche der austit Cloud</summary>
+	<description>Seitenleiste, Kopfzeile und Startseite der austit Cloud im Workspace-Stil.</description>
+	<version>1.0.0</version>
+	<licence>agpl</licence>
+	<author>austit.de</author>
+	<namespace>AustitShell</namespace>
+	<category>customization</category>
+	<bugs>https://austit.de</bugs>
+	<dependencies>
+		<nextcloud min-version="35" max-version="35"/>
+	</dependencies>
+</info>

@@ -1,0 +1,566 @@
+/**
+ * SPDX-FileCopyrightText: 2026 austit.de
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* ---------- Tokens ---------- */
+
+body#body-user,
+body#body-settings {
+	--austit-sidebar-width: 200px;
+	--austit-rail-width: 64px;
+	--austit-sw: var(--austit-sidebar-width);
+	--austit-radius: 12px;
+	--austit-radius-small: 8px;
+	--austit-accent: #2563eb;
+	--austit-accent-hover: #1d4ed8;
+	--austit-accent-text: #ffffff;
+	--austit-bg: #f5f7fb;
+	--austit-surface: #ffffff;
+	--austit-surface-hover: #eef2f8;
+	--austit-sidebar-bg: #ffffff;
+	--austit-border: #e2e8f0;
+	--austit-text: #0f172a;
+	--austit-text-muted: #5b6678;
+	--header-height: 64px;
+}
+
+/* Dark: explicit choice or system preference with the default theme */
+body#body-user[data-theme-dark],
+body#body-settings[data-theme-dark] {
+	--austit-bg: #0b1120;
+	--austit-surface: #111a2b;
+	--austit-surface-hover: #172338;
+	--austit-sidebar-bg: #0d1526;
+	--austit-border: #1e2a3f;
+	--austit-text: #e6edf6;
+	--austit-text-muted: #8b98ad;
+	--color-main-background: #0b1120;
+	--color-main-background-rgb: 11, 17, 32;
+	--color-main-background-blur: rgba(13, 21, 38, .9);
+	--color-background-hover: #172338;
+	--color-background-dark: #131d30;
+	--color-background-darker: #1a263b;
+	--color-border: #1e2a3f;
+	--color-border-dark: #2a3953;
+}
+
+@media (prefers-color-scheme: dark) {
+	body#body-user[data-theme-default],
+	body#body-settings[data-theme-default] {
+		--austit-bg: #0b1120;
+		--austit-surface: #111a2b;
+		--austit-surface-hover: #172338;
+		--austit-sidebar-bg: #0d1526;
+		--austit-border: #1e2a3f;
+		--austit-text: #e6edf6;
+		--austit-text-muted: #8b98ad;
+		--color-main-background: #0b1120;
+		--color-main-background-rgb: 11, 17, 32;
+		--color-main-background-blur: rgba(13, 21, 38, .9);
+		--color-background-hover: #172338;
+		--color-background-dark: #131d30;
+		--color-background-darker: #1a263b;
+		--color-border: #1e2a3f;
+		--color-border-dark: #2a3953;
+	}
+}
+
+html.austit-shell--collapsed body {
+	--austit-sw: var(--austit-rail-width);
+}
+
+/* ---------- Page frame ---------- */
+
+html.austit-shell body#body-user,
+html.austit-shell body#body-settings {
+	background: var(--austit-bg) !important;
+	background-image: none !important;
+}
+
+html.austit-shell #content {
+	margin: 0;
+	margin-top: var(--header-height);
+	margin-inline-start: var(--austit-sw);
+	width: calc(100% - var(--austit-sw));
+	height: calc(100% - var(--header-height) - env(safe-area-inset-bottom));
+	border-radius: 0;
+	background-color: var(--austit-bg);
+	transition: margin .2s ease, width .2s ease;
+}
+
+/* ---------- Header ---------- */
+
+html.austit-shell #header:not(.header-guest) {
+	inset-inline-start: var(--austit-sw);
+	width: calc(100% - var(--austit-sw));
+	padding: 0 24px;
+	align-items: center;
+	background: var(--austit-bg);
+	border-bottom: 1px solid var(--austit-border);
+	/* Header icons sit on the page background, not on the primary color */
+	--color-background-plain: var(--austit-bg);
+	--color-background-plain-text: var(--austit-text);
+	transition: inset-inline-start .2s ease, width .2s ease;
+}
+
+html.austit-shell #header .header-start {
+	display: none;
+}
+
+html.austit-shell #header .header-center {
+	flex: 1 1 auto;
+	justify-content: flex-start;
+	max-width: 560px;
+}
+
+html.austit-shell #header .header-center #unified-search,
+html.austit-shell #header .header-center > * {
+	width: 100%;
+}
+
+html.austit-shell #header .header-center input {
+	height: 40px;
+	border-radius: var(--austit-radius-small);
+	border: 1px solid var(--austit-border);
+	background-color: var(--austit-surface);
+	color: var(--austit-text);
+}
+
+html.austit-shell #header .header-end {
+	flex: 1 0 auto;
+	gap: 8px;
+}
+
+#austit-menu-toggle {
+	display: none;
+}
+
+/* ---------- Sidebar ---------- */
+
+#austit-sidebar {
+	position: fixed;
+	inset-block: 0;
+	inset-inline-start: 0;
+	z-index: 2001;
+	display: flex;
+	flex-direction: column;
+	width: var(--austit-sw);
+	padding: 16px 12px;
+	box-sizing: border-box;
+	background: var(--austit-sidebar-bg);
+	border-inline-end: 1px solid var(--austit-border);
+	color: var(--austit-text);
+	overflow: hidden auto;
+	transition: width .2s ease, transform .2s ease;
+}
+
+.austit-sidebar__brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 8px 20px;
+	color: inherit !important;
+	text-decoration: none;
+}
+
+.austit-sidebar__mark {
+	display: grid;
+	place-items: center;
+	flex: 0 0 32px;
+	height: 32px;
+	border-radius: var(--austit-radius-small);
+	background: var(--austit-accent);
+	color: var(--austit-accent-text);
+	font-weight: 700;
+	font-size: 16px;
+}
+
+.austit-sidebar__brand-text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+	white-space: nowrap;
+}
+
+.austit-sidebar__brand-text strong {
+	font-size: 15px;
+	text-transform: capitalize;
+}
+
+.austit-sidebar__brand-text small {
+	color: var(--austit-text-muted);
+	font-size: 11px;
+}
+
+.austit-sidebar__list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.austit-sidebar__item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 40px;
+	padding: 0 12px;
+	border-radius: var(--austit-radius-small);
+	color: var(--austit-text) !important;
+	font-size: 14px;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color .15s ease;
+}
+
+.austit-sidebar__item:hover,
+.austit-sidebar__item:focus-visible {
+	background: var(--austit-surface-hover);
+}
+
+.austit-sidebar__item:focus-visible,
+.austit-sidebar__collapse:focus-visible,
+#austit-menu-toggle:focus-visible {
+	outline: 2px solid var(--austit-accent);
+	outline-offset: 2px;
+}
+
+.austit-sidebar__item--active,
+.austit-sidebar__item--active:hover {
+	background: var(--austit-accent);
+	color: var(--austit-accent-text) !important;
+	font-weight: 600;
+}
+
+.austit-sidebar__label {
+	flex: 1 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.austit-sidebar__badge {
+	min-width: 20px;
+	padding: 1px 6px;
+	border-radius: 10px;
+	background: var(--austit-surface-hover);
+	color: var(--austit-text);
+	font-size: 11px;
+	font-weight: 600;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+.austit-sidebar__item--active .austit-sidebar__badge {
+	background: rgba(255, 255, 255, .25);
+	color: inherit;
+}
+
+.austit-sidebar__footer {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin-top: auto;
+	padding-top: 12px;
+}
+
+.austit-sidebar__collapse {
+	display: flex;
+	align-items: center;
+	min-height: 36px;
+	margin: 0;
+	padding: 0 12px;
+	border: 0;
+	border-radius: var(--austit-radius-small);
+	background: transparent;
+	color: var(--austit-text-muted);
+	cursor: pointer;
+}
+
+.austit-sidebar__collapse:hover {
+	background: var(--austit-surface-hover);
+	color: var(--austit-text);
+}
+
+html.austit-shell--collapsed .austit-sidebar__collapse svg {
+	transform: scaleX(-1);
+}
+
+/* Collapsed rail */
+html.austit-shell--collapsed .austit-sidebar__label,
+html.austit-shell--collapsed .austit-sidebar__brand-text {
+	display: none;
+}
+
+html.austit-shell--collapsed .austit-sidebar__item,
+html.austit-shell--collapsed .austit-sidebar__collapse,
+html.austit-shell--collapsed .austit-sidebar__brand {
+	justify-content: center;
+	padding-inline: 0;
+}
+
+html.austit-shell--collapsed .austit-sidebar__item {
+	position: relative;
+}
+
+html.austit-shell--collapsed .austit-sidebar__badge {
+	position: absolute;
+	top: 2px;
+	inset-inline-end: 2px;
+	min-width: 16px;
+	padding: 0 4px;
+	background: var(--austit-accent);
+	color: var(--austit-accent-text);
+	font-size: 10px;
+}
+
+/* ---------- Icons ---------- */
+
+.austit-icon {
+	display: inline-flex;
+	flex: 0 0 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.austit-icon svg {
+	width: 100%;
+	height: 100%;
+}
+
+.austit-icon--mask {
+	background-color: currentColor;
+	-webkit-mask: var(--austit-icon-url) center / contain no-repeat;
+	mask: var(--austit-icon-url) center / contain no-repeat;
+}
+
+/* ---------- Buttons ---------- */
+
+.austit-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 40px;
+	padding: 0 16px;
+	border: 1px solid var(--austit-border);
+	border-radius: var(--austit-radius-small);
+	background: var(--austit-surface);
+	color: var(--austit-text) !important;
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color .15s ease, border-color .15s ease;
+}
+
+.austit-button:hover {
+	background: var(--austit-surface-hover);
+}
+
+.austit-button--primary {
+	border-color: var(--austit-accent);
+	background: var(--austit-accent);
+	color: var(--austit-accent-text) !important;
+}
+
+.austit-button--primary:hover {
+	border-color: var(--austit-accent-hover);
+	background: var(--austit-accent-hover);
+}
+
+/* ---------- Start page (dashboard) ---------- */
+
+html.austit-shell #app-dashboard {
+	width: 100%;
+	padding: 32px 28px;
+	box-sizing: border-box;
+	background: var(--austit-bg) !important;
+	color: var(--austit-text);
+}
+
+html.austit-shell #app-dashboard > h2 {
+	margin: 0 0 20px;
+	color: var(--austit-text);
+	font-size: 30px;
+	font-weight: 700;
+	text-align: start;
+	text-shadow: none;
+}
+
+.austit-dashboard__date {
+	margin: 0 0 4px;
+	color: var(--austit-text-muted);
+	font-size: 13px;
+}
+
+.austit-dashboard__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 24px;
+}
+
+html.austit-shell #app-dashboard .statuses {
+	justify-content: flex-start;
+	margin: 0 0 20px;
+}
+
+html.austit-shell #app-dashboard .statuses li {
+	--color-background-plain-text: var(--austit-text);
+}
+
+html.austit-shell #app-dashboard .panels {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 20px;
+	max-width: none;
+	margin: 0;
+}
+
+html.austit-shell #app-dashboard .panels > div {
+	width: auto;
+	margin: 0;
+}
+
+html.austit-shell #app-dashboard .panel {
+	width: auto;
+	height: 100%;
+	margin: 0;
+	border: 1px solid var(--austit-border);
+	border-radius: var(--austit-radius);
+	background: var(--austit-surface);
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	box-shadow: none;
+}
+
+html.austit-shell #app-dashboard .panel--header h2 {
+	color: var(--austit-text);
+	font-size: 15px;
+	font-weight: 700;
+}
+
+html.austit-shell #app-dashboard .footer .button,
+html.austit-shell #app-dashboard .footer button {
+	border: 1px solid var(--austit-border);
+	background: var(--austit-surface);
+	color: var(--austit-text);
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+
+/* ---------- Files ---------- */
+
+html.austit-shell #app-content-vue .files-list {
+	--row-height: 52px;
+}
+
+html.austit-shell .files-list__table {
+	border-collapse: separate;
+}
+
+html.austit-shell .files-list__thead th {
+	color: var(--austit-text-muted);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 1024px) {
+	body#body-user,
+	body#body-settings {
+		--austit-sw: var(--austit-rail-width);
+	}
+
+	.austit-sidebar__label,
+	.austit-sidebar__brand-text,
+	.austit-sidebar__collapse {
+		display: none !important;
+	}
+
+	.austit-sidebar__item,
+	.austit-sidebar__brand {
+		justify-content: center;
+		padding-inline: 0;
+	}
+}
+
+@media (max-width: 600px) {
+	body#body-user,
+	body#body-settings {
+		--austit-sw: 0px;
+	}
+
+	html.austit-shell #header:not(.header-guest) {
+		padding: 0 12px;
+	}
+
+	#austit-menu-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 40px;
+		height: 40px;
+		margin: 0 8px 0 0;
+		padding: 0;
+		border: 0;
+		border-radius: var(--austit-radius-small);
+		background: transparent;
+		color: var(--austit-text);
+	}
+
+	#austit-sidebar {
+		width: 240px;
+		transform: translateX(-100%);
+		box-shadow: 0 16px 48px rgba(0, 0, 0, .35);
+	}
+
+	[dir='rtl'] #austit-sidebar {
+		transform: translateX(100%);
+	}
+
+	html.austit-shell--open #austit-sidebar {
+		transform: none;
+	}
+
+	/* The off-canvas menu always shows labels */
+	html.austit-shell--open .austit-sidebar__label,
+	html.austit-shell--open .austit-sidebar__brand-text {
+		display: initial !important;
+	}
+
+	html.austit-shell--open .austit-sidebar__item,
+	html.austit-shell--open .austit-sidebar__brand {
+		justify-content: flex-start;
+		padding-inline: 12px;
+	}
+
+	html.austit-shell--open .austit-shell__backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 2000;
+		background: rgba(0, 0, 0, .45);
+	}
+
+	html.austit-shell #app-dashboard {
+		padding: 20px 16px;
+	}
+
+	html.austit-shell #app-dashboard > h2 {
+		font-size: 24px;
+	}
+
+	html.austit-shell #app-dashboard .panels {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#austit-sidebar,
+	html.austit-shell #content,
+	html.austit-shell #header:not(.header-guest) {
+		transition: none;
+	}
+}

@@ -21,5 +21,6 @@ if ! grep -q "'installed' => true" config/config.php 2>/dev/null; then
 fi
 
 occ app:enable austit_updates
+occ app:enable austit_shell
 
 exec apache2-foreground

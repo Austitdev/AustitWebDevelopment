@@ -18,6 +18,7 @@ node_modules/
 # ignore all apps except core ones
 /apps*/*
 !/apps/admin_audit
+!/apps/austit_shell
 !/apps/austit_updates
 !/apps/appstore
 !/apps/cloud_federation_api
