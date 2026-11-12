@@ -1,0 +1,81 @@
+{
+    "baseVersion": "35.0.2",
+    "upstreamTag": "v35.0.2",
+    "generatedAt": "2026-11-12T18:16:25+00:00",
+    "files": [
+        {
+            "path": ".gitattributes",
+            "kind": "modified",
+            "sha256": "877b1272a27bb93da8019545c1e4829c55d92a9f3c611b6a9dd9d79f581d4d1b"
+        },
+        {
+            "path": ".gitignore",
+            "kind": "modified",
+            "sha256": "76acfa20aea0d474e1cae6b9cec4478344e4b966c58401c54c255c697789dfed"
+        },
+        {
+            "path": "core/css/guest.css",
+            "kind": "theme-override",
+            "sha256": "15cec759addb7dc9aa18964435fc4ef41e2b29d7f117d8e9a9db4e30c75e60a3",
+            "source": "themes/austit/core/css/guest.css"
+        },
+        {
+            "path": "core/css/server.css",
+            "kind": "theme-override",
+            "sha256": "09a7a33fb11e3505cb88bab01258e27cfbca8bf53f177c097a7fa8214afc9d8c",
+            "source": "themes/austit/core/css/server.css"
+        },
+        {
+            "path": "core/img/favicon-touch.png",
+            "kind": "theme-override",
+            "sha256": "88ee0ec5e6b1ca971772e0904297258e31dbfaa5dd3d540aeefc2009ab37b7fd",
+            "source": "themes/austit/core/img/favicon-touch.png"
+        },
+        {
+            "path": "core/img/favicon.svg",
+            "kind": "theme-override",
+            "sha256": "8eeb3144ce5e71ce14594ae246a70298bbd3439569c62035682c8757d7ea9ed8",
+            "source": "themes/austit/core/img/favicon.svg"
+        },
+        {
+            "path": "core/img/logo/logo.svg",
+            "kind": "theme-override",
+            "sha256": "7b762288d5b7bf4d5d3fd83c5caac1792dc525f1aab4b70968cb9fb9a113867f",
+            "source": "themes/austit/core/img/logo/logo.svg"
+        },
+        {
+            "path": "core/templates/404.php",
+            "kind": "theme-override",
+            "sha256": "38a29fcf25774bd11b55088933560c87cdc2a4c5284af6649c79c4d0ce0e27d6",
+            "source": "themes/austit/core/templates/404.php"
+        },
+        {
+            "path": "core/templates/429.php",
+            "kind": "theme-override",
+            "sha256": "3b37cfd2d1a120a7473d3ed7945b2878602343d6e779b8a308d9b3ff8854af85",
+            "source": "themes/austit/core/templates/429.php"
+        },
+        {
+            "path": "core/templates/error.php",
+            "kind": "theme-override",
+            "sha256": "c491c0b55bdfe17a2bbebbdbdadd513eb2d87bd9044498e399439daa702a4b65",
+            "source": "themes/austit/core/templates/error.php"
+        },
+        {
+            "path": "core/templates/update.user.php",
+            "kind": "theme-override",
+            "sha256": "f8c2264453bd9e2a16162bab19410c53710bd622cd49f4aa4056c07168bb790e",
+            "source": "themes/austit/core/templates/update.user.php"
+        },
+        {
+            "path": "lib/private/Installer.php",
+            "kind": "modified",
+            "sha256": "90541cf63ae41216dd947751895233cb10e8e380b7ab06e0c0f1090a57a03962"
+        },
+        {
+            "path": "tests/lib/InstallerTest.php",
+            "kind": "modified",
+            "sha256": "e2d97ff87e55a836aaff04f41cb56b8a0b2495a399fc8b4eef17cd5a35d94187"
+        }
+    ]
+}

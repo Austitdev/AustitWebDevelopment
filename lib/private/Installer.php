@@ -360,6 +360,11 @@ class Installer {
 	 * @return string|false false or the version number of the update
 	 */
 	public function isUpdateAvailable($appId, $allowUnstable = false): string|false {
+		$blockedApps = $this->config->getSystemValue('app_update_blocklist', []);
+		if (is_array($blockedApps) && in_array($appId, $blockedApps, true)) {
+			return false;
+		}
+
 		if ($this->isInstanceReadyForUpdates === null) {
 			$installPath = $this->getInstallPath();
 			if ($installPath === null) {

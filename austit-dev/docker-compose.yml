@@ -15,6 +15,7 @@ services:
     volumes:
       - ..:/var/www/html
       - ./dev.config.php:/var/www/html/config/dev.config.php:ro
+      - ./austit.config.php:/var/www/html/config/austit.config.php:ro
       - data:/var/www/html/data
       - custom-apps:/var/www/html/custom_apps
 

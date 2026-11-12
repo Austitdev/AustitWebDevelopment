@@ -148,6 +148,19 @@ class InstallerTest extends TestCase {
 		$this->assertSame($updateAvailable, $installer->isUpdateAvailable('files'), 'Cached result should be returned and fetcher should be only called once');
 	}
 
+	public function testIsUpdateAvailableForBlockedApp(): void {
+		$this->config
+			->method('getSystemValue')
+			->with('app_update_blocklist', [])
+			->willReturn(['spreed']);
+		$this->appFetcher
+			->expects($this->never())
+			->method('get');
+
+		$installer = $this->getInstaller();
+		$this->assertFalse($installer->isUpdateAvailable('spreed'));
+	}
+
 	public function testDownloadAppWithRevokedCertificate(): void {
 		$this->expectException(\Exception::class);
 		$this->expectExceptionMessage('Certificate "4112" has been revoked');

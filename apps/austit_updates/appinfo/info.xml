@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+ - SPDX-FileCopyrightText: 2026 austit.de
+ - SPDX-License-Identifier: AGPL-3.0-or-later
+ -->
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>austit_updates</id>
+	<name>austit Updates</name>
+	<summary>Manuelle Update-Prüfung für die austit Cloud</summary>
+	<description>Sucht nur auf Knopfdruck nach neuen Nextcloud-Versionen und zeigt, welche angepassten Dateien der austit Cloud von einem Update betroffen sind.</description>
+	<version>1.0.0</version>
+	<licence>agpl</licence>
+	<author>austit.de</author>
+	<namespace>AustitUpdates</namespace>
+	<category>tools</category>
+	<bugs>https://austit.de</bugs>
+	<dependencies>
+		<nextcloud min-version="35" max-version="35"/>
+	</dependencies>
+
+	<settings>
+		<admin>OCA\AustitUpdates\Settings\Admin</admin>
+		<admin-section>OCA\AustitUpdates\Settings\Section</admin-section>
+	</settings>
+</info>

@@ -20,4 +20,6 @@ if ! grep -q "'installed' => true" config/config.php 2>/dev/null; then
 	occ config:system:set overwrite.cli.url --value=http://localhost:8080
 fi
 
+occ app:enable austit_updates
+
 exec apache2-foreground
