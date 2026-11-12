@@ -1,0 +1,27 @@
+{
+  "name": "austit-notebook",
+  "version": "0.1.0",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "test": "node --test \"src/**/*.test.js\""
+  },
+  "dependencies": {
+    "@tiptap/extension-highlight": "3.33.1",
+    "@tiptap/extension-list": "3.33.1",
+    "@tiptap/extension-table": "3.33.1",
+    "@tiptap/extension-text-style": "3.33.1",
+    "@tiptap/pm": "3.33.1",
+    "@tiptap/starter-kit": "3.33.1",
+    "@tiptap/vue-3": "3.33.1",
+    "perfect-freehand": "1.2.3",
+    "vue": "3.5.45"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "6.0.11",
+    "vite": "8.3.8"
+  }
+}

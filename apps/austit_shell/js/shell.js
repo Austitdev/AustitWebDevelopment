@@ -41,6 +41,7 @@
 		photos: ['image', 'Fotos'],
 		deck: ['board', null],
 		notes: ['note', 'Notizen'],
+		austit_notebook: ['note', 'Notizbücher'],
 		forms: ['form', 'Formulare'],
 		activity: ['activity', 'Aktivität'],
 	}
