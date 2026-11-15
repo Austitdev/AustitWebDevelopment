@@ -4,6 +4,12 @@
 $CONFIG = [
 	'debug' => true,
 	'loglevel' => 0,
+	'memcache.local' => '\\OC\\Memcache\\APCu',
+	'memcache.locking' => '\\OC\\Memcache\\Redis',
+	'redis' => [
+		'host' => 'redis',
+		'port' => 6379,
+	],
 	// Windows-Bind-Mounts melden immer 0777, daher die Rechtepruefung abschalten.
 	'check_data_directory_permissions' => false,
 	'apps_paths' => [

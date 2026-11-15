@@ -10,16 +10,29 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     ports:
       - "127.0.0.1:8080:80"
-    volumes:
+    volumes: &app-volumes
       - ..:/var/www/html
       - ./dev.config.php:/var/www/html/config/dev.config.php:ro
       - ./austit.config.php:/var/www/html/config/austit.config.php:ro
       - ./php-austit.ini:/usr/local/etc/php/conf.d/zz-austit.ini:ro
       - ./apache-austit.conf:/etc/apache2/conf-enabled/zz-austit.conf:ro
+      - ./apache-dev.conf:/etc/apache2/conf-enabled/zz-austit-dev.conf:ro
       - data:/var/www/html/data
       - custom-apps:/var/www/html/custom_apps
+
+  # Hintergrundaufgaben jede Minute. Talk bietet den Nachrichtenablauf nur im Cron-Modus an,
+  # und abgelaufene Nachrichten und Dateien werden von diesen Aufgaben geloescht.
+  cron:
+    image: nextcloud:35.0.2-apache
+    entrypoint: ["/bin/sh", "/var/www/html/austit-dev/cron.sh"]
+    depends_on:
+      - app
+      - redis
+    volumes: *app-volumes
 
   # Office-Bearbeitung (docx, xlsx, pptx, odt, ...), gleiche Version wie auf dem VPS.
   collabora:
@@ -49,6 +62,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
 
 volumes:
   data:
