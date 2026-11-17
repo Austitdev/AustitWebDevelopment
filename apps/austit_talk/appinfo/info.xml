@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+ - SPDX-FileCopyrightText: 2026 austit.de
+ - SPDX-License-Identifier: AGPL-3.0-or-later
+ -->
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>austit_talk</id>
+	<name>austit Talk</name>
+	<summary>Geheime Unterhaltungen und Talk-Administration für ausgewählte Benutzer</summary>
+	<description>Dateien, die in eine geheime Unterhaltung geteilt werden, liegen verschlüsselt auf dem Server, sind nur im Chat sichtbar und nicht in den Dateien, lassen sich nicht weiter teilen und werden nach Ablauf der eingestellten Zeit gelöscht. Außerdem stellt die App eine fest definierte Auswahl an Talk-Administrationseinstellungen über die OCS-API bereit, freigegeben pro Benutzer, und nimmt Absturzberichte der austit-Talk-App an. Ersetzt austit_talk_admin und austit_talk_secret.</description>
+	<version>1.0.0</version>
+	<licence>agpl</licence>
+	<author mail="info@austit.de" homepage="https://austit.de">austit</author>
+	<namespace>AustitTalk</namespace>
+	<category>social</category>
+	<bugs>https://austit.de</bugs>
+	<dependencies>
+		<nextcloud min-version="35" max-version="35"/>
+	</dependencies>
+	<background-jobs>
+		<job>OCA\AustitTalk\BackgroundJob\ExpireJob</job>
+	</background-jobs>
+	<repair-steps>
+		<install>
+			<step>OCA\AustitTalk\Migration\MigrateLegacyApps</step>
+		</install>
+		<post-migration>
+			<step>OCA\AustitTalk\Migration\MigrateLegacyApps</step>
+		</post-migration>
+	</repair-steps>
+</info>

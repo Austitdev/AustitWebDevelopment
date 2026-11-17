@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * SPDX-FileCopyrightText: 2026 austit.de
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+?>
+<div id="austit-talk" class="at-shell">
+	<div class="at-loading" role="status">austit Talk wird geladen …</div>
+</div>
