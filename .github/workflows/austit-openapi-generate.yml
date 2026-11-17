@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2026 austit.de
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: austit openapi generate
+
+on:
+  push:
+    branches: ['vibe/austit-openapi-039ccd']
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up php
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          extensions: ctype, curl, dom, fileinfo, gd, json, libxml, mbstring, openssl, pcntl, pdo, posix, session, simplexml, xml, xmlreader, xmlwriter, zip, zlib
+          coverage: none
+          ini-file: development
+
+      - name: Set up dependencies
+        run: composer i
+
+      - name: Generate specifications
+        run: |
+          specs=()
+          for path in core apps/*; do
+            if [ ! -f "$path/.noopenapi" ] && [[ "$(git check-ignore "$path")" != "$path" ]]; then
+              composer exec generate-spec "$path" "$path/openapi.json"
+              if [[ "$(basename "$path")" != "core" ]]; then
+                if [ -f "$path/openapi-full.json" ]; then
+                  specs+=("$path/openapi-full.json")
+                else
+                  specs+=("$path/openapi.json")
+                fi
+              fi
+            fi
+          done
+          composer exec merge-specs -- --core core/openapi-full.json --merged openapi.json "${specs[@]}"
+
+      - name: Commit changed specifications
+        run: |
+          git config user.name "austit-ci"
+          git config user.email "ci@austit.de"
+          git add openapi.json core/openapi.json core/openapi-full.json 'apps/*/openapi*.json' || true
+          git diff --cached --quiet && echo "Nothing to commit" && exit 0
+          git commit -m "chore(openapi): Spezifikationen der austit-Apps generieren"
+          git push
