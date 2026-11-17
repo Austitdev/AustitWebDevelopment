@@ -11,6 +11,7 @@ namespace OCA\AustitTalk\Controller;
 
 use OCA\AustitTalk\Service\SecretService;
 use OCA\AustitTalk\Service\TalkRooms;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSException;
@@ -37,7 +38,7 @@ class RoomController extends OCSController {
 	 * Tells whether a conversation is a secret conversation and whether the user moderates it
 	 *
 	 * @param string $token token of the conversation
-	 * @return DataResponse<array{token: string, secret: bool, lease: int, isModerator: bool}>
+	 * @return DataResponse<Http::STATUS_OK, array{token: string, secret: bool, lease: int, isModerator: bool}, array{}>
 	 */
 	#[NoAdminRequired]
 	public function getRoom(string $token): DataResponse {
@@ -67,7 +68,7 @@ class RoomController extends OCSController {
 	 *
 	 * @param string $token token of the conversation
 	 * @param ?string $lease seconds the messages and shared files of the conversation stay, 0 lifts the protection
-	 * @return DataResponse<array{token: string, secret: bool, lease: int, isModerator: bool}>
+	 * @return DataResponse<Http::STATUS_OK, array{token: string, secret: bool, lease: int, isModerator: bool}, array{}>
 	 */
 	#[NoAdminRequired]
 	public function setRoom(string $token, ?string $lease = null): DataResponse {

@@ -11,6 +11,7 @@ namespace OCA\AustitTalk\Controller;
 
 use OCA\AustitTalk\Service\AccessService;
 use OCA\AustitTalk\Service\AuditService;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSException;
@@ -34,7 +35,7 @@ class AccessController extends OCSController {
 	/**
 	 * Tells the requesting user which Talk administration rights they have
 	 *
-	 * @return DataResponse<array{userId: string, isAdmin: bool, canUseSettings: bool, canManageAccess: bool}>
+	 * @return DataResponse<Http::STATUS_OK, array{userId: string, isAdmin: bool, canUseSettings: bool, canManageAccess: bool}, array{}>
 	 */
 	#[NoAdminRequired]
 	public function me(): DataResponse {
@@ -61,7 +62,7 @@ class AccessController extends OCSController {
 	 * Lists the Talk administrators and whether they may use the Talk administration
 	 *
 	 * @param string $search only users whose id or display name contain this are listed
-	 * @return DataResponse<list<array{id: string, displayName: string, allowed: bool}>>
+	 * @return DataResponse<Http::STATUS_OK, list<array{id: string, displayName: string, allowed: bool}>, array{}>
 	 */
 	public function users(string $search = ''): DataResponse {
 		$this->requireAllowed();
@@ -92,7 +93,7 @@ class AccessController extends OCSController {
 	 *
 	 * @param ?string $userId id of the administrator whose access is changed
 	 * @param ?string $allowed whether the administrator may use the Talk administration
-	 * @return DataResponse<array{userId: string, allowed: bool}>
+	 * @return DataResponse<Http::STATUS_OK, array{userId: string, allowed: bool}, array{}>
 	 */
 	public function setUser(?string $userId = null, ?string $allowed = null): DataResponse {
 		$this->requireAllowed();

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\AustitTalk\Controller;
 
 use OCA\AustitTalk\Service\AccessService;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSException;
@@ -32,7 +33,7 @@ class GroupController extends OCSController {
 	/**
 	 * Lists the groups for the Talk administration settings
 	 *
-	 * @return DataResponse<list<array{id: string, name: string}>>
+	 * @return DataResponse<Http::STATUS_OK, list<array{id: string, name: string}>, array{}>
 	 */
 	#[NoAdminRequired]
 	public function index(): DataResponse {

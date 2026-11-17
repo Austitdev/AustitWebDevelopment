@@ -29,7 +29,21 @@ jobs:
         run: composer i
 
       - name: Generate specifications
-        run: bash build/openapi-checker.sh || echo "Specifications regenerated"
+        run: |
+          specs=()
+          for path in core apps/*; do
+            if [ ! -f "$path/.noopenapi" ] && [[ "$(git check-ignore "$path")" != "$path" ]]; then
+              composer exec generate-spec "$path" "$path/openapi.json"
+              if [[ "$(basename "$path")" != "core" ]]; then
+                if [ -f "$path/openapi-full.json" ]; then
+                  specs+=("$path/openapi-full.json")
+                else
+                  specs+=("$path/openapi.json")
+                fi
+              fi
+            fi
+          done
+          composer exec merge-specs -- --core core/openapi-full.json --merged openapi.json "${specs[@]}"
 
       - name: Commit changed specifications
         run: |

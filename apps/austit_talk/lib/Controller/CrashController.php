@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\AustitTalk\Controller;
 
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
@@ -44,7 +45,7 @@ class CrashController extends OCSController {
 	 * Stores a crash report of the austit Talk Android app
 	 *
 	 * @param ?string $stacktrace stack trace of the crash
-	 * @return DataResponse<array{stored: bool}>
+	 * @return DataResponse<Http::STATUS_OK, array{stored: bool}, array{}>
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 30, period: 3600)]
