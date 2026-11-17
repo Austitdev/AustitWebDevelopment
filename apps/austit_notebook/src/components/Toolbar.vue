@@ -62,6 +62,12 @@
 		</div>
 
 		<div class="nb-toolbar__group nb-toolbar__group--end">
+			<label class="nb-template">
+				<span>Vorlage</span>
+				<select :value="template" aria-label="Seitenvorlage" @change="$emit('update:template', $event.target.value)">
+					<option v-for="item in templates" :key="item.id" :value="item.id">{{ item.name }}</option>
+				</select>
+			</label>
 			<button v-if="!readOnly" type="button" class="nb-tool" title="Rückgängig (Strg+Z)" aria-label="Rückgängig" :disabled="!canUndo" @click="$emit('undo')">
 				<svg viewBox="0 0 24 24" aria-hidden="true" v-html="ICONS.undo" />
 			</button>
@@ -90,9 +96,11 @@ const props = defineProps({
 	canRedo: { type: Boolean, default: false },
 	zoom: { type: Number, default: 1 },
 	readOnly: { type: Boolean, default: false },
+	template: { type: String, default: 'grid' },
+	templates: { type: Array, default: () => [] },
 })
 
-defineEmits(['update:tool', 'update:color', 'update:size', 'insert-image', 'undo', 'redo', 'zoom'])
+defineEmits(['update:tool', 'update:color', 'update:size', 'update:template', 'insert-image', 'undo', 'redo', 'zoom'])
 
 const ICONS = {
 	text: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',

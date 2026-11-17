@@ -7,6 +7,7 @@
 	'use strict'
 
 	const STORAGE_KEY = 'austit-shell-collapsed'
+	const READY_CLASS = 'austit-shell--ready'
 
 	/** Outline icons (24px grid, stroke based) */
 	const ICONS = {
@@ -95,7 +96,7 @@
 		const brand = document.createElement('a')
 		brand.className = 'austit-sidebar__brand'
 		brand.href = (apps.find((app) => app.id === 'dashboard') || apps[0] || { href: '/' }).href
-		brand.innerHTML = '<span class="austit-sidebar__mark" aria-hidden="true">A</span><span class="austit-sidebar__brand-text"><strong></strong><small></small></span>'
+		brand.innerHTML = '<span class="austit-sidebar__mark" aria-hidden="true"></span><span class="austit-sidebar__brand-text"><strong></strong><small></small></span>'
 		brand.querySelector('strong').textContent = shell.brand
 		brand.querySelector('small').textContent = shell.subtitle
 		nav.append(brand)
@@ -247,7 +248,9 @@
 		}
 		document.documentElement.classList.add('austit-shell')
 
-		document.body.prepend(buildSidebar(shell, apps))
+		const sidebar = buildSidebar(shell, apps)
+		document.body.prepend(sidebar)
+		prefetchNavigation(sidebar)
 		header.prepend(buildMobileToggle())
 
 		const backdrop = document.createElement('div')
@@ -258,9 +261,51 @@
 		enhanceDashboard(shell)
 	}
 
+	function prefetchNavigation(sidebar) {
+		const prefetched = new Set()
+		let timer = null
+		const prefetch = (link) => {
+			const url = new URL(link.href, window.location.href)
+			if (url.origin !== window.location.origin || prefetched.has(url.href) || url.href === window.location.href) {
+				return
+			}
+			prefetched.add(url.href)
+			const hint = document.createElement('link')
+			hint.rel = 'prefetch'
+			hint.as = 'document'
+			hint.href = url.href
+			document.head.append(hint)
+		}
+		const schedule = (event) => {
+			const link = event.target.closest('a[href]')
+			if (!link) {
+				return
+			}
+			clearTimeout(timer)
+			timer = window.setTimeout(() => prefetch(link), 120)
+		}
+		sidebar.addEventListener('pointerover', schedule)
+		sidebar.addEventListener('focusin', schedule)
+	}
+
+	/** Hides the loading screen (the shell.css overlay shown while the ready class is missing). */
+	function reveal() {
+		window.requestAnimationFrame(() => document.documentElement.classList.add(READY_CLASS))
+	}
+
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', init)
 	} else {
 		init()
 	}
+
+	// DOMContentLoaded fires after all deferred scripts, so the app is mounted below the loading screen by then.
+	if (document.readyState === 'complete') {
+		reveal()
+	} else {
+		document.addEventListener('DOMContentLoaded', reveal)
+		window.addEventListener('load', reveal)
+	}
+	// A page restored from the back/forward cache still carries the state it was left in.
+	window.addEventListener('pageshow', (event) => event.persisted && reveal())
 })()

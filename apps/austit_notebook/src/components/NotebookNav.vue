@@ -7,7 +7,7 @@
 		<section class="nb-nav__column">
 			<header class="nb-nav__header">
 				<h2>Notizbücher</h2>
-				<button type="button" class="nb-icon-button" title="Neues Notizbuch" aria-label="Neues Notizbuch" @click="$emit('create-notebook')">+</button>
+				<button type="button" class="nb-icon-button" title="Neues Notizbuch" aria-label="Neues Notizbuch" @click="$emit('create-notebook')"><NbIcon name="plus" /></button>
 			</header>
 			<ul class="nb-nav__list">
 				<li v-for="notebook in notebooks" :key="notebook.id">
@@ -22,7 +22,7 @@
 						@rename="(name) => $emit('rename', { id: notebook.id, name })"
 						@remove="$emit('remove', { id: notebook.id })">
 						<template v-if="notebook.kind === 'class' && notebook.canManage" #actions>
-							<button type="button" class="nb-nav-item__action" title="Mitglieder" :aria-label="'Mitglieder von ' + notebook.name" @click="$emit('members', notebook)">👥</button>
+							<button type="button" class="nb-nav-item__action" title="Mitglieder" :aria-label="'Mitglieder von ' + notebook.name" @click="$emit('members', notebook)"><NbIcon name="users" /></button>
 						</template>
 					</NavItem>
 
@@ -30,7 +30,7 @@
 						<!-- Personal notebook: sections directly -->
 						<template v-if="notebook.kind === 'personal'">
 							<SectionList :sections="notebook.sections" :section-id="sectionId" @select="selectSection(notebook, $event)" @rename="$emit('rename', $event)" @remove="$emit('remove', $event)" />
-							<button type="button" class="nb-nav__add" @click="$emit('create', { type: 'section', parentId: notebook.id })">+ Abschnitt</button>
+							<button type="button" class="nb-nav__add" @click="$emit('create', { type: 'section', parentId: notebook.id })"><NbIcon name="plus" /> Abschnitt hinzufügen</button>
 						</template>
 
 						<!-- Class notebook: areas, and one area per student for teachers -->
@@ -41,24 +41,25 @@
 									<span v-if="!group.canWrite" class="nb-nav__readonly">nur lesen</span>
 								</h3>
 								<template v-if="group.students">
-									<p v-if="group.students.length === 0" class="nb-nav__empty">Noch keine Schüler:innen. Über 👥 hinzufügen.</p>
+									<p v-if="group.students.length === 0" class="nb-nav__empty">Noch keine Schüler:innen. Über „Mitglieder“ hinzufügen.</p>
 									<div v-for="student in group.students" :key="student.id" class="nb-nav__student">
 										<button
 											type="button"
 											class="nb-nav__student-toggle"
 											:aria-expanded="isStudentOpen(student)"
 											@click="toggleStudent(student)">
-											{{ isStudentOpen(student) ? '▾' : '▸' }} {{ student.name }}
+											<NbIcon name="chevron" :class="{ 'nb-icon--open': isStudentOpen(student) }" />
+											{{ student.name }}
 										</button>
 										<template v-if="isStudentOpen(student)">
 											<SectionList :sections="student.sections" :section-id="sectionId" @select="selectSection(notebook, $event)" @rename="$emit('rename', $event)" @remove="$emit('remove', $event)" />
-											<button type="button" class="nb-nav__add" @click="$emit('create', { type: 'section', parentId: student.id })">+ Abschnitt</button>
+											<button type="button" class="nb-nav__add" @click="$emit('create', { type: 'section', parentId: student.id })"><NbIcon name="plus" /> Abschnitt hinzufügen</button>
 										</template>
 									</div>
 								</template>
 								<template v-else>
 									<SectionList :sections="group.sections" :section-id="sectionId" @select="selectSection(notebook, $event)" @rename="$emit('rename', $event)" @remove="$emit('remove', $event)" />
-									<button v-if="group.canWrite" type="button" class="nb-nav__add" @click="$emit('create', { type: 'section', parentId: group.id })">+ Abschnitt</button>
+									<button v-if="group.canWrite" type="button" class="nb-nav__add" @click="$emit('create', { type: 'section', parentId: group.id })"><NbIcon name="plus" /> Abschnitt hinzufügen</button>
 								</template>
 							</div>
 						</template>
@@ -78,7 +79,7 @@
 					title="Neue Seite"
 					aria-label="Neue Seite"
 					@click="$emit('create', { type: 'page', parentId: current.section.id })">
-					+
+					<NbIcon name="plus" />
 				</button>
 			</header>
 			<ul class="nb-nav__list">
@@ -103,6 +104,7 @@
 import { computed, reactive, watch } from 'vue'
 import { flattenSections } from '../model.js'
 import NavItem from './NavItem.vue'
+import NbIcon from './NbIcon.vue'
 import SectionList from './SectionList.vue'
 
 const props = defineProps({

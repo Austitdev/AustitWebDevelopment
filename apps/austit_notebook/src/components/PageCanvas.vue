@@ -6,17 +6,20 @@
 	<div class="nb-page">
 		<Toolbar
 			:read-only="readOnly"
+			:templates="templates"
 			:tool="tool"
 			:color="toolColor"
 			:size="toolSize"
 			:editor="activeEditor"
 			:editor-tick="editorTick"
-			:can-undo="undoStack.length > 0"
-			:can-redo="redoStack.length > 0"
+			:can-undo="canUndo"
+			:can-redo="canRedo"
 			:zoom="view.zoom"
+			:template="template"
 			@update:tool="setTool"
 			@update:color="setColor"
 			@update:size="setSize"
+			@update:template="template = $event"
 			@insert-image="fileInput.click()"
 			@undo="undo"
 			@redo="redo"
@@ -25,13 +28,19 @@
 		<div
 			ref="viewport"
 			class="nb-canvas"
-			:class="['nb-canvas--' + (readOnly ? 'readonly' : tool), { 'nb-canvas--panning': gestureType === 'pan' }]"
+			:class="[
+				'nb-canvas--' + (readOnly ? 'readonly' : tool),
+				'nb-canvas--template-' + template,
+				{ 'nb-canvas--panning': gestureType === 'pan' },
+			]"
 			:style="paperStyle"
 			@pointerdown="onPointerDown"
 			@pointermove="onPointerMove"
 			@pointerup="onPointerUp"
 			@pointercancel="onPointerUp"
+			@pointerleave="sync.setCursor(null)"
 			@wheel="onWheel"
+			@contextmenu.prevent.stop="openContextMenu"
 			@dragover.prevent
 			@drop.prevent="onDrop">
 			<div class="nb-world" :style="{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.zoom})` }">
@@ -44,7 +53,7 @@
 						:initial-text="element.id === autofocusId ? pendingInput : ''"
 						:selected="selectedElementIds.has(element.id)"
 						@change="(doc) => onTextChange(element, doc)"
-						@focus="onEditorFocus"
+						@focus="(editor) => onEditorFocus(editor, element)"
 						@blur="onEditorBlur"
 						@remove="removeElement(element.id)"
 						@height="(h) => heights[element.id] = h"
@@ -66,12 +75,16 @@
 						:d="pathFor(stroke)"
 						:fill="stroke.color"
 						:fill-opacity="TOOLS[stroke.tool]?.opacity ?? 1"
-						:class="{ 'nb-ink--selected': selectedStrokeIds.has(stroke.id) }" />
+						:class="{
+							'nb-ink--selected': selectedStrokeIds.has(stroke.id),
+							'nb-ink--black': stroke.color === '#1f2937' || stroke.color === '#000000',
+						}" />
 					<path
 						v-if="currentStroke"
 						:d="strokePath(currentStroke, false)"
 						:fill="currentStroke.color"
-						:fill-opacity="TOOLS[currentStroke.tool].opacity" />
+						:fill-opacity="TOOLS[currentStroke.tool].opacity"
+						:class="{ 'nb-ink--black': currentStroke.color === '#1f2937' || currentStroke.color === '#000000' }" />
 					<polyline
 						v-if="lassoPoints.length > 1"
 						class="nb-lasso"
@@ -86,11 +99,33 @@
 						:height="selectionBox.maxY - selectionBox.minY + 12"
 						:stroke-width="1.5 / view.zoom" />
 				</svg>
+
+				<div
+					v-for="peer in peers.filter((p) => p.cursor)"
+					:key="peer.id"
+					class="nb-peer"
+					:style="{ transform: `translate(${peer.cursor[0]}px, ${peer.cursor[1]}px) scale(${1 / view.zoom})`, '--nb-peer': peer.color }">
+					<svg class="nb-peer__pointer" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1l11 6-5 1.5L6 14z" /></svg>
+					<span class="nb-peer__name">{{ peer.name }}</span>
+				</div>
 			</div>
 
 			<p v-if="!readOnly && page.elements.length === 0 && page.strokes.length === 0" class="nb-hint">
 				Irgendwo klicken und schreiben, mit dem Stift zeichnen oder Bilder hineinziehen.
 			</p>
+		</div>
+
+		<div
+			v-if="contextMenu"
+			class="nb-context-menu"
+			role="menu"
+			:style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+			@click.stop>
+			<button v-if="!readOnly" type="button" role="menuitem" @click="addTextFromMenu">Text einfügen</button>
+			<button v-if="!readOnly" type="button" role="menuitem" @click="addImageFromMenu">Bild einfügen</button>
+			<button v-if="selectionBox && !contextMenu.elementId && !readOnly" type="button" role="menuitem" @click="moveSelectionFromMenu">Verschieben</button>
+			<button v-if="contextMenu.elementId && !readOnly" type="button" role="menuitem" class="nb-context-menu__danger" @click="deleteElementFromMenu">Löschen</button>
+			<button v-if="selectionBox" type="button" role="menuitem" class="nb-context-menu__danger" @click="deleteSelectionFromMenu">Auswahl löschen</button>
 		</div>
 
 		<input
@@ -103,8 +138,9 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import { api } from '../api.js'
+import { ORIGIN_LOCAL, ORIGIN_REMOTE, ORIGIN_TEXT } from '../collab.js'
 import { strokePath, TOOLS } from '../ink.js'
 import {
 	eraseAt,
@@ -121,8 +157,11 @@ import Toolbar from './Toolbar.vue'
 
 const props = defineProps({
 	pageId: { type: Number, required: true },
-	initialContent: { type: Object, required: true },
+	/** PageSync of the open page; the page shown is always what its document contains */
+	sync: { type: Object, required: true },
+	peers: { type: Array, default: () => [] },
 	readOnly: { type: Boolean, default: false },
+	templates: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['change', 'error'])
@@ -130,9 +169,8 @@ const emit = defineEmits(['change', 'error'])
 const MIN_ZOOM = 0.25
 const MAX_ZOOM = 4
 const GRID = 24
-const HISTORY_LIMIT = 100
 
-const page = ref(JSON.parse(JSON.stringify(props.initialContent)))
+const page = ref(props.sync.read({ elements: [], strokes: [] }))
 const view = reactive({ x: 48, y: 32, zoom: 1 })
 const tool = ref('text')
 const toolSettings = reactive({
@@ -149,17 +187,20 @@ const editorTick = ref(0)
 const currentStroke = ref(null)
 const lassoPoints = ref([])
 const selection = ref({ strokeIds: [], elementIds: [] })
-const undoStack = ref([])
-const redoStack = ref([])
+const canUndo = ref(props.sync.canUndo)
+const canRedo = ref(props.sync.canRedo)
 const viewport = ref(null)
 const fileInput = ref(null)
 const gestureType = ref(null)
+const contextMenu = ref(null)
+const template = ref('grid')
 
 const pointers = new Map()
 let gesture = null
 let penSeen = false
 let spaceDown = false
-let pendingSnapshot = null
+// Text block being typed in; changes by others leave its text alone until it loses focus.
+let typingIn = null
 const pathCache = new WeakMap()
 
 const toolColor = computed(() => toolSettings[tool.value]?.color ?? toolSettings.pen.color)
@@ -167,14 +208,24 @@ const toolSize = computed(() => toolSettings[tool.value]?.size ?? toolSettings.p
 const selectedStrokeIds = computed(() => new Set(selection.value.strokeIds))
 const selectedElementIds = computed(() => new Set(selection.value.elementIds))
 const selectionBox = computed(() => selectionBounds(page.value, selection.value, heights))
-const orderedStrokes = computed(() => [
-	...page.value.strokes.filter((s) => s.tool === 'highlighter'),
-	...page.value.strokes.filter((s) => s.tool !== 'highlighter'),
-])
+const orderedStrokes = computed(() => {
+	const highlighters = []
+	const strokes = []
+	for (const stroke of page.value.strokes) {
+		;(stroke.tool === 'highlighter' ? highlighters : strokes).push(stroke)
+	}
+	return highlighters.concat(strokes)
+})
 const paperStyle = computed(() => ({
 	backgroundSize: `${GRID * view.zoom}px ${GRID * view.zoom}px`,
 	backgroundPosition: `${view.x}px ${view.y}px`,
 }))
+
+watch(() => props.templates, (items) => {
+	if (items.length > 0 && !items.some((item) => item.id === template.value)) {
+		template.value = items[0].id
+	}
+}, { immediate: true })
 
 function pathFor(stroke) {
 	let path = pathCache.get(stroke)
@@ -209,50 +260,40 @@ function setSize(size) {
 	}
 }
 
-// ---------- history ----------
-
-function snapshot() {
-	return JSON.parse(JSON.stringify(page.value))
-}
-
-function beginChange() {
-	pendingSnapshot = snapshot()
-}
+// ---------- changes & history ----------
 
 function endChange(changed = true) {
-	if (changed && pendingSnapshot) {
-		undoStack.value.push(pendingSnapshot)
-		if (undoStack.value.length > HISTORY_LIMIT) {
-			undoStack.value.shift()
-		}
-		redoStack.value = []
-		notifyChange()
+	if (changed) {
+		notifyChange(ORIGIN_LOCAL)
 	}
-	pendingSnapshot = null
 }
 
-function notifyChange() {
+/** Hands a change of the page to the shared document and to whoever saves the page. */
+function notifyChange(origin = ORIGIN_TEXT) {
+	props.sync.commit(page.value, origin)
 	emit('change', page.value)
 }
 
-function undo() {
-	if (undoStack.value.length === 0) {
-		return
+function onDocumentChange(origin) {
+	props.sync.read(page.value, origin === ORIGIN_REMOTE ? typingIn : null)
+	if (origin !== ORIGIN_REMOTE) {
+		emit('change', page.value)
 	}
-	redoStack.value.push(snapshot())
-	page.value = undoStack.value.pop()
+}
+
+function onHistoryChange() {
+	canUndo.value = props.sync.canUndo
+	canRedo.value = props.sync.canRedo
+}
+
+function undo() {
 	clearSelection()
-	notifyChange()
+	props.sync.undo()
 }
 
 function redo() {
-	if (redoStack.value.length === 0) {
-		return
-	}
-	undoStack.value.push(snapshot())
-	page.value = redoStack.value.pop()
 	clearSelection()
-	notifyChange()
+	props.sync.redo()
 }
 
 // ---------- coordinates & view ----------
@@ -323,6 +364,9 @@ function startPinch() {
 }
 
 function onPointerDown(event) {
+	if (event.button === 2) {
+		return
+	}
 	if (event.pointerType === 'pen') {
 		penSeen = true
 	}
@@ -359,7 +403,6 @@ function onPointerDown(event) {
 	const penEraser = event.pointerType === 'pen' && (event.buttons & 32) === 32
 	if (penEraser || tool.value === 'eraser') {
 		event.preventDefault()
-		beginChange()
 		gesture = { type: 'erase', pointerId: event.pointerId, radius: 8 / view.zoom, changed: false }
 		eraseAtPoint(x, y)
 		capture(event)
@@ -380,7 +423,6 @@ function onPointerDown(event) {
 		event.preventDefault()
 		const box = selectionBox.value
 		if (box && x >= box.minX && x <= box.maxX && y >= box.minY && y <= box.maxY) {
-			beginChange()
 			gesture = { type: 'move-selection', pointerId: event.pointerId, last: [x, y], moved: false }
 		} else {
 			clearSelection()
@@ -406,7 +448,6 @@ function startElementGesture(event, element, type) {
 	if (gesture || tool.value !== 'text' || props.readOnly) {
 		return
 	}
-	beginChange()
 	gesture = {
 		type,
 		pointerId: event.pointerId,
@@ -424,6 +465,7 @@ function pressureOf(event) {
 }
 
 function onPointerMove(event) {
+	props.sync.setCursor(toWorld(event.clientX, event.clientY))
 	const pointer = pointers.get(event.pointerId)
 	if (pointer) {
 		pointer.x = event.clientX
@@ -530,7 +572,6 @@ function onPointerUp(event) {
 		break
 	case 'stroke':
 		if (currentStroke.value) {
-			beginChange()
 			page.value.strokes.push(currentStroke.value)
 			currentStroke.value = null
 			endChange(true)
@@ -566,10 +607,74 @@ function clearSelection() {
 	lassoPoints.value = []
 }
 
+function openContextMenu(event) {
+	const element = event.target.closest?.('.nb-element')
+	if (props.readOnly && !selectionBox.value && !element) {
+		return
+	}
+	contextMenu.value = {
+		x: Math.min(event.clientX, window.innerWidth - 180),
+		y: Math.min(event.clientY, window.innerHeight - 120),
+		point: toWorld(event.clientX, event.clientY),
+		elementId: element?.dataset.elementId ?? null,
+	}
+	document.addEventListener('click', closeContextMenu, { once: true })
+	document.addEventListener('keydown', onContextKeydown)
+}
+
+function closeContextMenu() {
+	contextMenu.value = null
+	document.removeEventListener('keydown', onContextKeydown)
+}
+
+function onContextKeydown(event) {
+	if (event.key === 'Escape') {
+		closeContextMenu()
+	}
+}
+
+function addTextFromMenu() {
+	const point = contextMenu.value?.point
+	closeContextMenu()
+	if (!props.readOnly && point) {
+		createTextBlock(point[0], point[1])
+	}
+}
+
+function addImageFromMenu() {
+	closeContextMenu()
+	if (!props.readOnly) {
+		fileInput.value?.click()
+	}
+}
+
+function moveSelectionFromMenu() {
+	closeContextMenu()
+	if (!props.readOnly && selectionBox.value) {
+		tool.value = 'lasso'
+	}
+}
+
+function deleteSelectionFromMenu() {
+	closeContextMenu()
+	if (selectionBox.value) {
+		page.value = removeSelection(page.value, selection.value)
+		clearSelection()
+		endChange(true)
+	}
+}
+
+function deleteElementFromMenu() {
+	const elementId = contextMenu.value?.elementId
+	closeContextMenu()
+	if (!props.readOnly && elementId) {
+		removeElement(elementId)
+	}
+}
+
 // ---------- elements ----------
 
 function createTextBlock(x, y) {
-	beginChange()
 	const element = { id: uid(), type: 'text', x, y: round(y - 12), width: 360, doc: null }
 	page.value.elements.push(element)
 	autofocusId.value = element.id
@@ -583,7 +688,8 @@ function onTextChange(element, doc) {
 	notifyChange()
 }
 
-function onEditorFocus(editor) {
+function onEditorFocus(editor, element) {
+	typingIn = element.id
 	awaitingEditor = false
 	pendingInput.value = ''
 	activeEditor.value = editor
@@ -592,6 +698,8 @@ function onEditorFocus(editor) {
 
 function onEditorBlur(editor) {
 	editor.off('transaction', bumpEditorTick)
+	typingIn = null
+	props.sync.read(page.value)
 	// Keep the toolbar when focus moves into the toolbar itself.
 	setTimeout(() => {
 		if (activeEditor.value === editor && !editor.isFocused) {
@@ -620,7 +728,6 @@ async function insertImage(file, worldPoint) {
 		const width = Math.min(480, size.width)
 		const height = round(size.height * (width / size.width))
 		const [x, y] = worldPoint ?? centerOfView()
-		beginChange()
 		page.value.elements.push({ id: uid(), type: 'image', x: round(x - width / 2), y: round(y - height / 2), width, height, fileId })
 		endChange(true)
 	} catch (error) {
@@ -698,7 +805,6 @@ function onKeyDown(event) {
 		redo()
 	} else if ((event.key === 'Delete' || event.key === 'Backspace') && selectionBox.value) {
 		event.preventDefault()
-		beginChange()
 		page.value = removeSelection(page.value, selection.value)
 		clearSelection()
 		endChange(true)
@@ -726,12 +832,17 @@ function onPaste(event) {
 }
 
 onMounted(() => {
+	props.sync.onChange = onDocumentChange
+	props.sync.onHistory = onHistoryChange
 	window.addEventListener('keydown', onKeyDown)
 	window.addEventListener('keyup', onKeyUp)
 	window.addEventListener('paste', onPaste)
 })
 
 onBeforeUnmount(() => {
+	closeContextMenu()
+	props.sync.onChange = () => {}
+	props.sync.onHistory = () => {}
 	window.removeEventListener('keydown', onKeyDown)
 	window.removeEventListener('keyup', onKeyUp)
 	window.removeEventListener('paste', onPaste)

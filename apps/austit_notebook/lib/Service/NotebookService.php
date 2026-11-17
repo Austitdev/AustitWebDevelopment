@@ -505,7 +505,12 @@ class NotebookService {
 		return Location::LEVEL_OTHER;
 	}
 
-	private function page(string $userId, int $pageId): Location {
+	/**
+	 * A page the user may at least read.
+	 *
+	 * @throws NotFoundException
+	 */
+	public function page(string $userId, int $pageId): Location {
 		$location = $this->resolve($userId, $pageId);
 		if ($location->level !== Location::LEVEL_PAGE) {
 			throw new NotFoundException();

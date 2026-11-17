@@ -20,6 +20,7 @@ node_modules/
 !/apps/admin_audit
 !/apps/austit_notebook
 !/apps/austit_shell
+!/apps/austit_talk
 !/apps/austit_updates
 !/apps/appstore
 !/apps/cloud_federation_api

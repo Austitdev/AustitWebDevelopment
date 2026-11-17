@@ -19,6 +19,17 @@ unbegrenzte Fläche für frei platzierten Text, Bilder und Handschrift.
 Seiten liegen als `.anote`-Dateien (JSON) unter `Notizbücher/<Notizbuch>/<Abschnitt>/` im Speicher
 des Nutzers, eingefügte Bilder im Ordner `.medien` des Abschnitts.
 
+## Zusammenarbeit
+
+Wer dieselbe Seite geöffnet hat, bearbeitet sie gemeinsam: Änderungen werden als Yjs-Updates über
+`POST api/pages/{id}/sync` ausgetauscht (regelmäßige Abfrage, kein zusätzlicher Dienst nötig) und
+in den Browsern zusammengeführt. Der Server speichert die Updates nur (`austit_nb_sync`) und führt
+Buch, wer gerade auf der Seite ist (`austit_nb_presence`). Die `.anote`-Datei bleibt die
+gespeicherte Fassung der Seite.
+
+Position, Größe und Text eines Elements werden getrennt zusammengeführt. Der Text eines Textblocks
+gilt als Ganzes: Tippen zwei Personen gleichzeitig im selben Block, gewinnt die letzte Änderung.
+
 ## Entwicklung
 
 ```sh

@@ -13,6 +13,7 @@ use OCA\AustitNotebook\AppInfo\Application;
 use OCA\AustitNotebook\Service\ConflictException;
 use OCA\AustitNotebook\Service\NotebookException;
 use OCA\AustitNotebook\Service\NotebookService;
+use OCA\AustitNotebook\Service\SyncService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
@@ -31,6 +32,7 @@ class ApiController extends Controller {
 	public function __construct(
 		IRequest $request,
 		private NotebookService $service,
+		private SyncService $sync,
 		private IUserSession $userSession,
 		private LoggerInterface $logger,
 	) {
@@ -40,7 +42,28 @@ class ApiController extends Controller {
 	#[NoAdminRequired]
 	#[FrontpageRoute(verb: 'GET', url: '/api/tree')]
 	public function tree(): JSONResponse {
-		return $this->run(fn () => ['notebooks' => $this->service->getTree($this->userId())]);
+		return $this->run(fn () => [
+			'notebooks' => $this->service->getTree($this->userId()),
+			'templates' => $this->templatesList(),
+		]);
+	}
+
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'GET', url: '/api/templates')]
+	public function templates(): JSONResponse {
+		return new JSONResponse(['templates' => $this->templatesList()]);
+	}
+
+	/**
+	 * @return list<array{id: string, name: string}>
+	 */
+	private function templatesList(): array {
+		return [
+			['id' => 'plain', 'name' => 'Leer'],
+			['id' => 'grid', 'name' => 'Kariert'],
+			['id' => 'lines', 'name' => 'Liniert'],
+			['id' => 'dots', 'name' => 'Punkte'],
+		];
 	}
 
 	#[NoAdminRequired]
@@ -122,6 +145,30 @@ class ApiController extends Controller {
 	#[FrontpageRoute(verb: 'PUT', url: '/api/pages/{id}')]
 	public function savePage(int $id, array $content, string $etag): JSONResponse {
 		return $this->run(fn () => ['etag' => $this->service->writePage($this->userId(), $id, $content, $etag)]);
+	}
+
+	/**
+	 * @param list<mixed>|null $cursor
+	 */
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'POST', url: '/api/pages/{id}/sync')]
+	public function syncPage(
+		int $id,
+		string $session = '',
+		int $epoch = 0,
+		int $since = 0,
+		string $update = '',
+		bool $init = false,
+		?array $cursor = null,
+		bool $leave = false,
+	): JSONResponse {
+		return $this->run(fn () => $this->sync->sync($this->userId(), $id, $session, $epoch, $since, $update, $init, $cursor, $leave));
+	}
+
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'POST', url: '/api/pages/{id}/sync/compact')]
+	public function compactPage(int $id, int $epoch = 0, int $upTo = 0, string $state = ''): JSONResponse {
+		return $this->run(fn () => ['compacted' => $this->sync->compact($this->userId(), $id, $epoch, $upTo, $state)]);
 	}
 
 	#[NoAdminRequired]

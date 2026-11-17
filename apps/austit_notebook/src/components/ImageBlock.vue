@@ -5,6 +5,7 @@
 <template>
 	<div
 		class="nb-element nb-image"
+		:data-element-id="element.id"
 		:class="{ 'nb-element--selected': selected }"
 		:style="{ left: element.x + 'px', top: element.y + 'px', width: element.width + 'px', height: element.height + 'px' }"
 		@pointerdown.stop.prevent="$emit('drag-start', $event)">

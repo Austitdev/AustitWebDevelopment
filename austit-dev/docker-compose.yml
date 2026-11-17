@@ -2,7 +2,6 @@
 # Das Repo muss im WSL-Dateisystem liegen (z.B. ~/PhpstormProjects/untitled in Ubuntu), auf C:\
 # braucht jede Seite wegen des langsamen Windows-Mounts mehrere Sekunden.
 # Start (in WSL):  docker compose -f austit-dev/docker-compose.yml up -d
-# Start:  docker compose -f austit-dev/docker-compose.yml up -d
 # Aufruf: http://localhost:8080  (Login: admin / admin)
 name: austit-cloud-dev
 

@@ -7,22 +7,29 @@
 
 body#body-user,
 body#body-settings {
-	--austit-sidebar-width: 200px;
-	--austit-rail-width: 64px;
+	--austit-sidebar-width: 88px;
+	--austit-rail-width: 60px;
 	--austit-sw: var(--austit-sidebar-width);
 	--austit-radius: 12px;
 	--austit-radius-small: 8px;
+	--austit-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cpath d='M82.17 92.6H45.89L40.16 109H16.83L50.17 19h27.66l33.34 90H87.84ZM51.67 75.91h24.66L64.03 40.1Z' fill='%2357b6ff'/%3E%3C/svg%3E");
 	--austit-accent: #2563eb;
 	--austit-accent-hover: #1d4ed8;
 	--austit-accent-text: #ffffff;
-	--austit-bg: #f5f7fb;
+	--austit-accent-soft: color-mix(in srgb, var(--austit-accent) 12%, transparent);
+	--austit-accent-on-bg: #1d4ed8;
+	--austit-bg: #f3f4f6;
 	--austit-surface: #ffffff;
-	--austit-surface-hover: #eef2f8;
-	--austit-sidebar-bg: #ffffff;
-	--austit-border: #e2e8f0;
-	--austit-text: #0f172a;
-	--austit-text-muted: #5b6678;
-	--header-height: 64px;
+	--austit-surface-hover: #e8eaee;
+	--austit-frame-text: var(--color-background-plain-text, #ffffff);
+	--austit-frame-muted: color-mix(in srgb, var(--austit-frame-text) 72%, transparent);
+	--austit-frame-hover: color-mix(in srgb, var(--austit-frame-text) 10%, transparent);
+	--austit-frame-active: color-mix(in srgb, var(--austit-frame-text) 16%, transparent);
+	--austit-border: #e3e5e8;
+	--austit-text: #1f2328;
+	--austit-text-muted: #5f6672;
+	--austit-shadow: 0 1px 2px rgba(15, 23, 42, .06), 0 4px 12px rgba(15, 23, 42, .06);
+	--header-height: 56px;
 }
 
 /* Dark: explicit choice or system preference with the default theme */
@@ -31,18 +38,12 @@ body#body-settings[data-theme-dark] {
 	--austit-bg: #0b1120;
 	--austit-surface: #111a2b;
 	--austit-surface-hover: #172338;
-	--austit-sidebar-bg: #0d1526;
+	--austit-accent-soft: color-mix(in srgb, var(--austit-accent) 24%, transparent);
+	--austit-accent-on-bg: #8ab4ff;
+	--austit-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 12px rgba(0, 0, 0, .25);
 	--austit-border: #1e2a3f;
 	--austit-text: #e6edf6;
 	--austit-text-muted: #8b98ad;
-	--color-main-background: #0b1120;
-	--color-main-background-rgb: 11, 17, 32;
-	--color-main-background-blur: rgba(13, 21, 38, .9);
-	--color-background-hover: #172338;
-	--color-background-dark: #131d30;
-	--color-background-darker: #1a263b;
-	--color-border: #1e2a3f;
-	--color-border-dark: #2a3953;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,18 +52,12 @@ body#body-settings[data-theme-dark] {
 		--austit-bg: #0b1120;
 		--austit-surface: #111a2b;
 		--austit-surface-hover: #172338;
-		--austit-sidebar-bg: #0d1526;
+		--austit-accent-soft: color-mix(in srgb, var(--austit-accent) 24%, transparent);
+		--austit-accent-on-bg: #8ab4ff;
+		--austit-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 12px rgba(0, 0, 0, .25);
 		--austit-border: #1e2a3f;
 		--austit-text: #e6edf6;
 		--austit-text-muted: #8b98ad;
-		--color-main-background: #0b1120;
-		--color-main-background-rgb: 11, 17, 32;
-		--color-main-background-blur: rgba(13, 21, 38, .9);
-		--color-background-hover: #172338;
-		--color-background-dark: #131d30;
-		--color-background-darker: #1a263b;
-		--color-border: #1e2a3f;
-		--color-border-dark: #2a3953;
 	}
 }
 
@@ -72,21 +67,31 @@ html.austit-shell--collapsed body {
 
 /* ---------- Page frame ---------- */
 
-html.austit-shell body#body-user,
-html.austit-shell body#body-settings {
-	background: var(--austit-bg) !important;
-	background-image: none !important;
-}
-
-html.austit-shell #content {
+html.austit-shell #content,
+html.austit-shell #content-vue {
 	margin: 0;
 	margin-top: var(--header-height);
 	margin-inline-start: var(--austit-sw);
 	width: calc(100% - var(--austit-sw));
 	height: calc(100% - var(--header-height) - env(safe-area-inset-bottom));
+	border-block-start: 1px solid var(--austit-border);
+	border-inline-start: 1px solid var(--austit-border);
 	border-radius: 0;
-	background-color: var(--austit-bg);
+	border-start-start-radius: var(--austit-radius);
+	box-sizing: border-box;
+	background-color: var(--austit-surface);
 	transition: margin .2s ease, width .2s ease;
+}
+
+/* Some apps (e.g. Talk) put their own container inside #content; only the outer one is the frame. */
+html.austit-shell #content #content-vue {
+	position: static;
+	flex: 1 1 auto;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	border: 0;
+	border-radius: 0;
 }
 
 /* ---------- Header ---------- */
@@ -94,24 +99,25 @@ html.austit-shell #content {
 html.austit-shell #header:not(.header-guest) {
 	inset-inline-start: var(--austit-sw);
 	width: calc(100% - var(--austit-sw));
-	padding: 0 24px;
+	padding: 0 16px;
 	align-items: center;
-	background: var(--austit-bg);
-	border-bottom: 1px solid var(--austit-border);
-	/* Header icons sit on the page background, not on the primary color */
-	--color-background-plain: var(--austit-bg);
-	--color-background-plain-text: var(--austit-text);
+	background: transparent;
+	border-bottom: 0;
 	transition: inset-inline-start .2s ease, width .2s ease;
 }
 
+/* Kept as an invisible spacer so the search stays centered between both header sides */
 html.austit-shell #header .header-start {
-	display: none;
+	visibility: hidden;
+	min-width: 0;
+	overflow: hidden;
 }
 
 html.austit-shell #header .header-center {
 	flex: 1 1 auto;
-	justify-content: flex-start;
-	max-width: 560px;
+	justify-content: center;
+	max-width: 640px;
+	margin-inline: auto;
 }
 
 html.austit-shell #header .header-center #unified-search,
@@ -120,15 +126,15 @@ html.austit-shell #header .header-center > * {
 }
 
 html.austit-shell #header .header-center input {
-	height: 40px;
-	border-radius: var(--austit-radius-small);
+	height: 36px;
+	border-radius: 18px;
 	border: 1px solid var(--austit-border);
 	background-color: var(--austit-surface);
 	color: var(--austit-text);
 }
 
 html.austit-shell #header .header-end {
-	flex: 1 0 auto;
+	flex: 0 0 auto;
 	gap: 8px;
 }
 
@@ -146,34 +152,32 @@ html.austit-shell #header .header-end {
 	display: flex;
 	flex-direction: column;
 	width: var(--austit-sw);
-	padding: 16px 12px;
+	padding: 10px 6px;
 	box-sizing: border-box;
-	background: var(--austit-sidebar-bg);
-	border-inline-end: 1px solid var(--austit-border);
-	color: var(--austit-text);
+	background: transparent;
+	color: var(--austit-frame-text);
 	overflow: hidden auto;
 	transition: width .2s ease, transform .2s ease;
 }
 
 .austit-sidebar__brand {
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 10px;
-	padding: 4px 8px 20px;
+	gap: 4px;
+	padding: 0 0 12px;
 	color: inherit !important;
 	text-decoration: none;
 }
 
+/* Logo tile as in the austit word mark; the glyph comes from the theming app when a header logo is set */
 .austit-sidebar__mark {
-	display: grid;
-	place-items: center;
-	flex: 0 0 32px;
-	height: 32px;
-	border-radius: var(--austit-radius-small);
-	background: var(--austit-accent);
-	color: var(--austit-accent-text);
-	font-weight: 700;
-	font-size: 16px;
+	flex: 0 0 36px;
+	width: 36px;
+	box-sizing: border-box;
+	border: 1px solid #2b4a63;
+	border-radius: 10px;
+	background: #12202f var(--image-logoheader, var(--austit-glyph)) center / 24px no-repeat;
 }
 
 .austit-sidebar__brand-text {
@@ -184,12 +188,14 @@ html.austit-shell #header .header-end {
 }
 
 .austit-sidebar__brand-text strong {
-	font-size: 15px;
+	font-size: 11px;
+	font-weight: 600;
 	text-transform: capitalize;
 }
 
 .austit-sidebar__brand-text small {
-	color: var(--austit-text-muted);
+	display: none;
+	color: var(--austit-frame-muted);
 	font-size: 11px;
 }
 
@@ -203,22 +209,34 @@ html.austit-shell #header .header-end {
 }
 
 .austit-sidebar__item {
+	position: relative;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 12px;
-	min-height: 40px;
-	padding: 0 12px;
+	justify-content: center;
+	gap: 4px;
+	min-height: 56px;
+	padding: 6px 2px;
+	box-sizing: border-box;
 	border-radius: var(--austit-radius-small);
-	color: var(--austit-text) !important;
-	font-size: 14px;
+	color: var(--austit-frame-muted) !important;
+	font-size: 11px;
+	line-height: 1.2;
 	text-decoration: none;
 	white-space: nowrap;
-	transition: background-color .15s ease;
+	transition: background-color .15s ease, color .15s ease;
+}
+
+.austit-sidebar__item .austit-icon {
+	flex-basis: 22px;
+	width: 22px;
+	height: 22px;
 }
 
 .austit-sidebar__item:hover,
 .austit-sidebar__item:focus-visible {
-	background: var(--austit-surface-hover);
+	background: var(--austit-frame-hover);
+	color: var(--austit-frame-text) !important;
 }
 
 .austit-sidebar__item:focus-visible,
@@ -230,32 +248,40 @@ html.austit-shell #header .header-end {
 
 .austit-sidebar__item--active,
 .austit-sidebar__item--active:hover {
-	background: var(--austit-accent);
-	color: var(--austit-accent-text) !important;
+	background: var(--austit-frame-active);
+	color: var(--austit-frame-text) !important;
 	font-weight: 600;
 }
 
+.austit-sidebar__item--active::before {
+	content: '';
+	position: absolute;
+	inset-block: 14px;
+	inset-inline-start: 0;
+	width: 3px;
+	border-radius: 3px;
+	background: var(--austit-accent);
+}
+
 .austit-sidebar__label {
-	flex: 1 1 auto;
+	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
 .austit-sidebar__badge {
-	min-width: 20px;
-	padding: 1px 6px;
+	position: absolute;
+	top: 4px;
+	inset-inline-end: 12px;
+	min-width: 16px;
+	padding: 0 4px;
 	border-radius: 10px;
-	background: var(--austit-surface-hover);
-	color: var(--austit-text);
-	font-size: 11px;
+	background: var(--austit-accent);
+	color: var(--austit-accent-text);
+	font-size: 10px;
 	font-weight: 600;
 	text-align: center;
 	box-sizing: border-box;
-}
-
-.austit-sidebar__item--active .austit-sidebar__badge {
-	background: rgba(255, 255, 255, .25);
-	color: inherit;
 }
 
 .austit-sidebar__footer {
@@ -269,27 +295,29 @@ html.austit-shell #header .header-end {
 .austit-sidebar__collapse {
 	display: flex;
 	align-items: center;
-	min-height: 36px;
+	justify-content: center;
+	min-height: 32px;
 	margin: 0;
-	padding: 0 12px;
+	padding: 0;
 	border: 0;
 	border-radius: var(--austit-radius-small);
 	background: transparent;
-	color: var(--austit-text-muted);
+	color: var(--austit-frame-muted);
 	cursor: pointer;
 }
 
 .austit-sidebar__collapse:hover {
-	background: var(--austit-surface-hover);
-	color: var(--austit-text);
+	background: var(--austit-frame-hover);
+	color: var(--austit-frame-text);
 }
 
 .austit-sidebar__legal {
-	padding: 6px 12px 0;
-	color: var(--austit-text-muted) !important;
-	font-size: 11px;
+	padding: 6px 2px 0;
+	color: var(--austit-frame-muted) !important;
+	font-size: 10px;
+	line-height: 1.3;
+	text-align: center;
 	text-decoration: none;
-	white-space: nowrap;
 }
 
 .austit-sidebar__legal:hover,
@@ -311,26 +339,12 @@ html.austit-shell--collapsed .austit-sidebar__brand-text {
 	display: none;
 }
 
-html.austit-shell--collapsed .austit-sidebar__item,
-html.austit-shell--collapsed .austit-sidebar__collapse,
-html.austit-shell--collapsed .austit-sidebar__brand {
-	justify-content: center;
-	padding-inline: 0;
-}
-
 html.austit-shell--collapsed .austit-sidebar__item {
-	position: relative;
+	min-height: 44px;
 }
 
 html.austit-shell--collapsed .austit-sidebar__badge {
-	position: absolute;
-	top: 2px;
 	inset-inline-end: 2px;
-	min-width: 16px;
-	padding: 0 4px;
-	background: var(--austit-accent);
-	color: var(--austit-accent-text);
-	font-size: 10px;
 }
 
 /* ---------- Icons ---------- */
@@ -388,17 +402,23 @@ html.austit-shell--collapsed .austit-sidebar__badge {
 
 /* ---------- Start page (dashboard) ---------- */
 
+/* The start page sits directly on the theming background instead of the content card */
+html.austit-shell #content.app-dashboard {
+	border: 0;
+	background-color: transparent;
+}
+
 html.austit-shell #app-dashboard {
 	width: 100%;
 	padding: 32px 28px;
 	box-sizing: border-box;
-	background: var(--austit-bg) !important;
-	color: var(--austit-text);
+	background: transparent !important;
+	color: var(--austit-frame-text);
 }
 
 html.austit-shell #app-dashboard > h2 {
 	margin: 0 0 20px;
-	color: var(--austit-text);
+	color: var(--austit-frame-text);
 	font-size: 30px;
 	font-weight: 700;
 	text-align: start;
@@ -407,24 +427,61 @@ html.austit-shell #app-dashboard > h2 {
 
 .austit-dashboard__date {
 	margin: 0 0 4px;
-	color: var(--austit-text-muted);
+	color: var(--austit-frame-muted);
 	font-size: 13px;
 }
 
 .austit-dashboard__actions {
 	display: flex;
 	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 28px;
+}
+
+/* Quick actions as tiles: icon chip above the label */
+.austit-dashboard__actions .austit-button {
+	flex-direction: column;
+	justify-content: center;
 	gap: 10px;
-	margin-bottom: 24px;
+	width: 140px;
+	height: 108px;
+	padding: 12px;
+	box-sizing: border-box;
+	border-color: var(--austit-border);
+	border-radius: var(--austit-radius);
+	background: var(--austit-surface);
+	box-shadow: var(--austit-shadow);
+	color: var(--austit-text) !important;
+	font-size: 13px;
+	text-align: center;
+	white-space: normal;
+}
+
+.austit-dashboard__actions .austit-button:hover,
+.austit-dashboard__actions .austit-button:focus-visible {
+	border-color: var(--austit-accent);
+	background: var(--austit-surface);
+}
+
+.austit-dashboard__actions .austit-icon {
+	flex: 0 0 40px;
+	width: 40px;
+	height: 40px;
+	padding: 9px;
+	box-sizing: border-box;
+	border-radius: 10px;
+	background: var(--austit-accent-soft);
+	color: var(--austit-accent-on-bg);
+}
+
+.austit-dashboard__actions .austit-button--primary .austit-icon {
+	background: var(--austit-accent);
+	color: var(--austit-accent-text);
 }
 
 html.austit-shell #app-dashboard .statuses {
 	justify-content: flex-start;
 	margin: 0 0 20px;
-}
-
-html.austit-shell #app-dashboard .statuses li {
-	--color-background-plain-text: var(--austit-text);
 }
 
 html.austit-shell #app-dashboard .panels {
@@ -449,7 +506,7 @@ html.austit-shell #app-dashboard .panel {
 	background: var(--austit-surface);
 	-webkit-backdrop-filter: none;
 	backdrop-filter: none;
-	box-shadow: none;
+	box-shadow: var(--austit-shadow);
 }
 
 html.austit-shell #app-dashboard .panel--header h2 {
@@ -483,6 +540,263 @@ html.austit-shell .files-list__thead th {
 	font-weight: 600;
 }
 
+/* ---------- Talk ---------- */
+
+html.austit-shell #content.app-spreed {
+	--color-primary-element: var(--austit-accent);
+	--color-primary-element-hover: var(--austit-accent-hover);
+	--color-primary-element-text: var(--austit-accent-text);
+	--color-primary-element-light: var(--austit-accent-soft);
+	--color-primary-element-light-hover: var(--austit-accent-soft);
+	--color-primary-element-light-text: var(--austit-accent-on-bg);
+}
+
+html.austit-shell #content.app-spreed .app-content,
+html.austit-shell #content.app-spreed #app-content-vue,
+html.austit-shell #content.app-spreed .main-view,
+html.austit-shell #content.app-spreed .chatView,
+html.austit-shell #content.app-spreed .messages-list-dragover-wrapper,
+html.austit-shell #content.app-spreed .messages-list__scroller {
+	border-radius: 0;
+	background: var(--austit-surface);
+}
+
+/* Conversation list */
+html.austit-shell #content.app-spreed .app-navigation {
+	border-inline-end: 1px solid var(--austit-border);
+	background: var(--austit-bg);
+}
+
+html.austit-shell #content.app-spreed .app-navigation__search {
+	margin: 0;
+	padding: 12px 8px 4px;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+}
+
+html.austit-shell #content.app-spreed .app-navigation__search .input-field__input {
+	height: 36px;
+	border: 1px solid var(--austit-border);
+	border-radius: 18px;
+	background: var(--austit-surface);
+	color: var(--austit-text);
+	box-shadow: none;
+}
+
+html.austit-shell #content.app-spreed .app-navigation__search .input-field__input:focus {
+	border-color: var(--austit-accent);
+}
+
+html.austit-shell #content.app-spreed .left-sidebar-button {
+	border-radius: var(--austit-radius-small);
+	color: var(--austit-text-muted);
+	font-weight: 500;
+}
+
+html.austit-shell #content.app-spreed .left-sidebar-button:hover {
+	background: var(--austit-surface-hover);
+	color: var(--austit-text);
+}
+
+html.austit-shell #content.app-spreed .app-navigation-list .scroller {
+	overflow-x: hidden;
+}
+
+html.austit-shell #content.app-spreed .app-navigation-entry {
+	margin: 0;
+	transform: none;
+}
+
+/* Group headings such as "Favoriten" */
+html.austit-shell #content.app-spreed .app-navigation-entry:has(+ .app-navigation-entry__children),
+html.austit-shell #content.app-spreed .app-navigation-entry:has(+ .app-navigation-entry__children):hover {
+	background: transparent;
+}
+
+html.austit-shell #content.app-spreed .app-navigation-entry:has(+ .app-navigation-entry__children) .app-navigation-entry__name {
+	color: var(--austit-text-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+html.austit-shell #content.app-spreed .conversation .list-item {
+	margin-inline: 8px;
+	padding: 6px 8px;
+	border-radius: var(--austit-radius-small);
+	transition: background-color .15s ease;
+}
+
+html.austit-shell #content.app-spreed .conversation .list-item:hover {
+	background: var(--austit-surface-hover);
+}
+
+html.austit-shell #content.app-spreed .conversation--active .list-item,
+html.austit-shell #content.app-spreed .conversation--active .list-item:hover {
+	background: var(--austit-accent-soft);
+}
+
+html.austit-shell #content.app-spreed .conversation--active .list-item {
+	box-shadow: inset 3px 0 0 var(--austit-accent);
+}
+
+html.austit-shell #content.app-spreed .conversation .list-item-content__name {
+	color: var(--austit-text);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+html.austit-shell #content.app-spreed .conversation .list-item-content__subname,
+html.austit-shell #content.app-spreed .conversation .list-item-content__details {
+	color: var(--austit-text-muted);
+	font-size: 13px;
+}
+
+/* Conversation header */
+html.austit-shell #content.app-spreed .top-bar {
+	min-height: 56px;
+	padding: 8px 16px;
+	border-bottom: 1px solid var(--austit-border);
+	background: var(--austit-surface);
+}
+
+html.austit-shell #content.app-spreed .conversation-header {
+	min-height: 0;
+	padding-inline: 12px;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+html.austit-shell #content.app-spreed .conversation-header .title {
+	color: var(--austit-text);
+	font-size: 16px;
+	font-weight: 600;
+}
+
+html.austit-shell #content.app-spreed .top-bar .button-vue {
+	border-radius: var(--austit-radius-small);
+}
+
+html.austit-shell #content.app-spreed .top-bar__classified {
+	border-radius: 999px;
+}
+
+/* Messages */
+html.austit-shell #content.app-spreed .messages-date__text {
+	padding: 2px 10px;
+	border: 1px solid var(--austit-border);
+	border-radius: 999px;
+	background: var(--austit-surface);
+	color: var(--austit-text-muted);
+	font-size: 12px;
+}
+
+html.austit-shell #content.app-spreed .messages__author {
+	color: var(--austit-text-muted);
+}
+
+html.austit-shell #content.app-spreed .message--sided .message-body {
+	padding: 8px 12px;
+	border: 0;
+	border-radius: var(--austit-radius);
+	border-end-start-radius: 4px;
+	background: var(--austit-surface-hover);
+	color: var(--austit-text);
+	box-shadow: none;
+	transform: none;
+	--message-body-hover: var(--austit-surface-hover);
+}
+
+html.austit-shell #content.app-spreed .message--sided .message-main__text,
+html.austit-shell #content.app-spreed .message--sided .rich-text--wrapper {
+	color: var(--austit-text);
+}
+
+html.austit-shell #content.app-spreed .message--sided .message-main__info {
+	color: var(--austit-text-muted);
+}
+
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-body {
+	border-radius: var(--austit-radius);
+	border-end-end-radius: 4px;
+	background: var(--austit-accent);
+	--message-body-hover: var(--austit-accent-hover);
+}
+
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-main__text,
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-main__text *:not(a),
+html.austit-shell #content.app-spreed .message--sided.outgoing .rich-text--wrapper {
+	color: var(--austit-accent-text);
+}
+
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-body a {
+	color: var(--austit-accent-text);
+	text-decoration: underline;
+}
+
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-main__info,
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-status {
+	color: color-mix(in srgb, var(--austit-accent-text) 75%, transparent);
+}
+
+/* Message composer */
+html.austit-shell #content.app-spreed .new-message-form {
+	padding: 12px 16px 16px;
+	border-top: 1px solid var(--austit-border);
+	background: var(--austit-surface);
+}
+
+html.austit-shell #content.app-spreed .new-message-form__input {
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+html.austit-shell #content.app-spreed .rich-contenteditable__input {
+	border: 1px solid var(--austit-border);
+	border-radius: var(--austit-radius);
+	background: var(--austit-bg);
+	color: var(--austit-text);
+	box-shadow: none;
+	caret-color: var(--austit-accent);
+}
+
+html.austit-shell #content.app-spreed .rich-contenteditable__input:focus,
+html.austit-shell #content.app-spreed .rich-contenteditable__input:focus-within {
+	border-color: var(--austit-accent);
+	box-shadow: 0 0 0 3px var(--austit-accent-soft);
+}
+
+html.austit-shell #content.app-spreed .new-message-form .button-vue--tertiary {
+	color: var(--austit-text-muted);
+}
+
+html.austit-shell #content.app-spreed .new-message-form .button-vue--tertiary:hover {
+	background: var(--austit-surface-hover);
+	color: var(--austit-text);
+}
+
+/* Right sidebar */
+html.austit-shell #content.app-spreed .app-sidebar {
+	border-inline-start: 1px solid var(--austit-border);
+	background: var(--austit-bg);
+}
+
+html.austit-shell #content.app-spreed .app-sidebar-header,
+html.austit-shell #content.app-spreed .app-sidebar-tabs {
+	background: transparent;
+}
+
+html.austit-shell #content.app-spreed .app-sidebar .input-field__input {
+	border: 1px solid var(--austit-border);
+	border-radius: 18px;
+	background: var(--austit-surface);
+	color: var(--austit-text);
+}
+
 /* ---------- Narrow screens ---------- */
 
 @media (max-width: 1024px) {
@@ -493,14 +807,13 @@ html.austit-shell .files-list__thead th {
 
 	.austit-sidebar__label,
 	.austit-sidebar__brand-text,
+	.austit-sidebar__legal,
 	.austit-sidebar__collapse {
 		display: none !important;
 	}
 
-	.austit-sidebar__item,
-	.austit-sidebar__brand {
-		justify-content: center;
-		padding-inline: 0;
+	.austit-sidebar__item {
+		min-height: 44px;
 	}
 }
 
@@ -514,6 +827,10 @@ html.austit-shell .files-list__thead th {
 		padding: 0 12px;
 	}
 
+	html.austit-shell #header .header-start {
+		display: none;
+	}
+
 	#austit-menu-toggle {
 		display: inline-flex;
 		align-items: center;
@@ -525,12 +842,13 @@ html.austit-shell .files-list__thead th {
 		border: 0;
 		border-radius: var(--austit-radius-small);
 		background: transparent;
-		color: var(--austit-text);
+		color: var(--austit-frame-text);
 	}
 
 	#austit-sidebar {
 		width: 240px;
 		transform: translateX(-100%);
+		background: var(--color-background-plain, #0f1724);
 		box-shadow: 0 16px 48px rgba(0, 0, 0, .35);
 	}
 
@@ -544,14 +862,18 @@ html.austit-shell .files-list__thead th {
 
 	/* The off-canvas menu always shows labels */
 	html.austit-shell--open .austit-sidebar__label,
-	html.austit-shell--open .austit-sidebar__brand-text {
+	html.austit-shell--open .austit-sidebar__brand-text,
+	html.austit-shell--open .austit-sidebar__legal {
 		display: initial !important;
 	}
 
 	html.austit-shell--open .austit-sidebar__item,
 	html.austit-shell--open .austit-sidebar__brand {
+		flex-direction: row;
 		justify-content: flex-start;
+		gap: 12px;
 		padding-inline: 12px;
+		font-size: 14px;
 	}
 
 	html.austit-shell--open .austit-shell__backdrop {
@@ -577,6 +899,7 @@ html.austit-shell .files-list__thead th {
 @media (prefers-reduced-motion: reduce) {
 	#austit-sidebar,
 	html.austit-shell #content,
+	html.austit-shell #content-vue,
 	html.austit-shell #header:not(.header-guest) {
 		transition: none;
 	}

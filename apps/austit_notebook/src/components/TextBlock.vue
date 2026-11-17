@@ -6,6 +6,7 @@
 	<div
 		ref="root"
 		class="nb-element nb-text"
+		:data-element-id="element.id"
 		:class="{ 'nb-element--focused': focused, 'nb-element--selected': selected }"
 		:style="{ left: element.x + 'px', top: element.y + 'px', width: element.width + 'px' }">
 		<div v-if="editable" class="nb-handle" title="Verschieben" @pointerdown.stop.prevent="$emit('drag-start', $event)" />

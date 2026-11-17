@@ -26,7 +26,7 @@
 					:aria-label="navVisible ? 'Navigation ausblenden' : 'Navigation einblenden'"
 					:aria-expanded="navVisible"
 					@click="navVisible = !navVisible">
-					☰
+					<NbIcon name="panel" />
 				</button>
 				<template v-if="pageId && loadedPage">
 					<input
@@ -38,6 +38,17 @@
 						@blur="saveTitle"
 						@keydown.enter.prevent="$event.target.blur()">
 					<span class="nb-date">{{ createdLabel }}</span>
+					<span v-if="peers.length > 0" class="nb-peers" :aria-label="'Ebenfalls auf dieser Seite: ' + peers.map((p) => p.name).join(', ')">
+						<span
+							v-for="peer in peers.slice(0, 5)"
+							:key="peer.id"
+							class="nb-peers__avatar"
+							:style="{ background: peer.color }"
+							:title="peer.name">
+							{{ peer.name.trim().charAt(0).toUpperCase() }}
+						</span>
+						<span v-if="peers.length > 5" class="nb-peers__more">+{{ peers.length - 5 }}</span>
+					</span>
 					<span v-if="!loadedPage.canWrite" class="nb-pill">Nur lesen</span>
 					<button v-if="loadedPage.canDistribute" type="button" class="nb-button" @click="distributeDialog = { section: 'Hausaufgaben', custom: '' }">
 						Seite verteilen
@@ -56,11 +67,13 @@
 			</div>
 
 			<PageCanvas
-				v-if="pageId && loadedPage"
+				v-if="pageId && loadedPage && pageSync"
 				:key="pageId + ':' + pageVersion"
 				:page-id="pageId"
-				:initial-content="loadedPage.content"
+				:sync="pageSync"
+				:peers="peers"
 				:read-only="!loadedPage.canWrite"
+				:templates="templates"
 				@change="onPageChange"
 				@error="(text) => showMessage(text)" />
 
@@ -129,10 +142,12 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { api, ApiError } from './api.js'
+import { PageSync, peerColor } from './collab.js'
 import MemberPicker from './components/MemberPicker.vue'
 import ModalDialog from './components/ModalDialog.vue'
+import NbIcon from './components/NbIcon.vue'
 import NotebookNav from './components/NotebookNav.vue'
 import PageCanvas from './components/PageCanvas.vue'
 import { flattenSections, normalizePage } from './model.js'
@@ -142,10 +157,13 @@ const SAVE_DELAY = 800
 const STUDENT_SECTIONS = ['Handouts', 'Klassennotizen', 'Hausaufgaben', 'Tests']
 
 const notebooks = ref([])
+const templates = ref([])
 const notebookId = ref(null)
 const sectionId = ref(null)
 const pageId = ref(null)
 const loadedPage = ref(null)
+const pageSync = shallowRef(null)
+const peers = ref([])
 const pageVersion = ref(0)
 const titleDraft = ref('')
 const loading = ref(true)
@@ -197,7 +215,9 @@ function recalled() {
 }
 
 async function loadTree() {
-	notebooks.value = (await api.tree()).notebooks
+	const data = await api.tree()
+	notebooks.value = data.notebooks
+	templates.value = data.templates ?? []
 }
 
 async function select({ notebookId: nId = null, sectionId: sId = null, pageId: pId = null }) {
@@ -218,21 +238,63 @@ async function select({ notebookId: nId = null, sectionId: sId = null, pageId: p
 	}
 }
 
+function closeSync() {
+	pageSync.value?.stop()
+	pageSync.value = null
+	peers.value = []
+}
+
 async function openPage(id) {
 	pageId.value = id
 	loadedPage.value = null
 	saveState.value = 'idle'
+	closeSync()
 	if (id === null) {
 		return
 	}
 	try {
 		const data = await api.getPage(id)
+		const content = normalizePage(data.content)
+		const sync = new PageSync({ pageId: id, content, canWrite: data.canWrite, api })
+		sync.onPeers = (list) => {
+			peers.value = list.map((peer) => ({ ...peer, color: peerColor(peer.id) }))
+		}
+		sync.onReset = () => {
+			showMessage('Die Seite wurde an anderer Stelle ersetzt und neu geladen.', 'info')
+			openPage(id)
+		}
+		if (pageId.value !== id || pageSync.value !== null) {
+			// Another page was opened while this one was joining.
+			sync.stop()
+			return
+		}
 		etag = data.etag
-		loadedPage.value = { ...data, content: normalizePage(data.content) }
+		pageSync.value = sync
+		loadedPage.value = { ...data, content }
 		titleDraft.value = data.name
 		pageVersion.value++
+		await sync.start()
+		if (pageId.value !== id) {
+			sync.stop()
+		}
 	} catch (error) {
 		showMessage(error.message)
+	}
+}
+
+/**
+ * Saves the page file. While the page is edited together everyone holds the same merged content,
+ * so a file that was saved by someone else in the meantime is not a conflict.
+ */
+async function putPage(id, content) {
+	try {
+		return await api.savePage(id, content, etag)
+	} catch (error) {
+		if (!(error instanceof ApiError) || error.status !== 409 || !pageSync.value?.epoch) {
+			throw error
+		}
+		etag = (await api.getPage(id)).etag
+		return api.savePage(id, content, etag)
 	}
 }
 
@@ -257,7 +319,7 @@ async function save() {
 	const id = pageId.value
 	const content = JSON.parse(JSON.stringify(latestContent))
 	saveState.value = 'saving'
-	saving = api.savePage(id, content, etag)
+	saving = putPage(id, content)
 		.then((result) => {
 			etag = result.etag
 			if (saveState.value === 'saving') {
@@ -458,6 +520,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+	closeSync()
 	window.removeEventListener('beforeunload', onBeforeUnload)
 })
 </script>

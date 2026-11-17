@@ -41,6 +41,7 @@ async function request(method, path, body) {
 
 export const api = {
 	tree: () => request('GET', '/tree'),
+	templates: () => request('GET', '/templates'),
 	createNotebook: (name) => request('POST', '/notebooks', { name }),
 	createClassNotebook: (name, members) => request('POST', '/class-notebooks', { name, members }),
 	getMembers: (notebookId) => request('GET', `/class-notebooks/${notebookId}/members`),
@@ -53,6 +54,8 @@ export const api = {
 	remove: (id) => request('DELETE', `/nodes/${id}`),
 	getPage: (id) => request('GET', `/pages/${id}`),
 	savePage: (id, content, etag) => request('PUT', `/pages/${id}`, { content, etag }),
+	syncPage: (id, body) => request('POST', `/pages/${id}/sync`, body),
+	compactPage: (id, body) => request('POST', `/pages/${id}/sync/compact`, body),
 	uploadImage(pageId, file) {
 		const form = new FormData()
 		form.append('image', file)
