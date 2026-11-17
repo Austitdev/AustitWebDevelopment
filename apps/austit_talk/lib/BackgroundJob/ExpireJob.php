@@ -28,6 +28,7 @@ class ExpireJob extends TimedJob {
 
 	#[\Override]
 	protected function run(mixed $argument): void {
+		$this->secretService->registerPendingRoomShares();
 		$this->secretService->protectPending();
 		$this->secretService->deleteExpired($this->time->getTime());
 	}

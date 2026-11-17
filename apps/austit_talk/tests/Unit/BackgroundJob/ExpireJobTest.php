@@ -21,6 +21,7 @@ class ExpireJobTest extends TestCase {
 		$time->method('getTime')->willReturn(1700000000);
 
 		$service = $this->createMock(SecretService::class);
+		$service->expects($this->once())->method('registerPendingRoomShares');
 		$service->expects($this->once())->method('protectPending');
 		$service->expects($this->once())
 			->method('deleteExpired')

@@ -11,6 +11,7 @@ namespace OCA\AustitTalk\Db;
 
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use OCP\Share\IShare;
 
 /**
  * Which conversations are secret and which files are protected in them.
@@ -175,6 +176,27 @@ class SecretStore {
 			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId, IQueryBuilder::PARAM_INT)))
 			->executeStatement();
 		unset($this->fileIds[$fileId], $this->files[$fileId]);
+	}
+
+	/**
+	 * Files that are shared into the conversation, no matter when they were shared. Folders are
+	 * left out: the conversation folder Talk shares with its participants is no protected file.
+	 *
+	 * @return list<array{fileId: int, owner: string}>
+	 */
+	public function getRoomShareFiles(string $token): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('file_source', 'uid_owner')
+			->from('share')
+			->innerJoin('share', 'filecache', 'fc', $qb->expr()->eq('fc.fileid', 'file_source'))
+			->where($qb->expr()->eq('share_type', $qb->createNamedParameter(IShare::TYPE_ROOM, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('share_with', $qb->createNamedParameter($token)))
+			->andWhere($qb->expr()->neq('fc.mimetype', $qb->createNamedParameter('httpd/unix-directory')));
+		$files = [];
+		foreach ($qb->executeQuery()->fetchAllAssociative() as $row) {
+			$files[(int)$row['file_source']] = ['fileId' => (int)$row['file_source'], 'owner' => (string)$row['uid_owner']];
+		}
+		return array_values($files);
 	}
 
 	/**

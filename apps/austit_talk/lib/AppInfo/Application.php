@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\AustitTalk\AppInfo;
 
 use OCA\AustitTalk\Listener\ConversationFolderListener;
+use OCA\AustitTalk\Listener\LoadTalkStyleListener;
 use OCA\AustitTalk\Listener\FileSystemListener;
 use OCA\AustitTalk\Listener\RoomListener;
 use OCA\AustitTalk\Listener\ShareListener;
@@ -21,6 +22,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\Files\Events\BeforeFileSystemSetupEvent;
 use OCP\Files\Events\Node\NodeCreatedEvent;
 use OCP\Files\Events\Node\NodeRenamedEvent;
@@ -37,6 +39,7 @@ class Application extends App implements IBootstrap {
 	#[\Override]
 	public function register(IRegistrationContext $context): void {
 		$context->registerEventListener(BeforeFileSystemSetupEvent::class, FileSystemListener::class);
+		$context->registerEventListener(BeforeTemplateRenderedEvent::class, LoadTalkStyleListener::class);
 		$context->registerEventListener(BeforeShareCreatedEvent::class, ShareListener::class);
 		$context->registerEventListener(ShareCreatedEvent::class, ShareListener::class);
 		$context->registerEventListener(MoveToTrashEvent::class, TrashListener::class);

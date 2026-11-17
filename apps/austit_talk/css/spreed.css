@@ -1,0 +1,91 @@
+/**
+ * SPDX-FileCopyrightText: 2026 austit.de
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* austit design for the Talk interface. The tokens come from the austit shell,
+   which loads on every page of the logged-in workspace, the fallbacks keep the
+   design intact where the shell is absent. */
+
+/* Conversation list */
+
+#content .app-navigation {
+	border-right: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
+	background: var(--austit-surface, var(--color-main-background, #fff));
+}
+
+#content .app-navigation .app-navigation-entry {
+	border-radius: var(--austit-radius-small, 8px);
+	transition: background-color .15s ease;
+}
+
+#content .app-navigation .app-navigation-entry:hover {
+	background: var(--austit-surface-hover, var(--color-background-hover, #e8eaee));
+}
+
+#content .app-navigation .app-navigation-entry.active {
+	background: var(--austit-accent-soft, color-mix(in srgb, var(--color-primary) 12%, transparent));
+}
+
+#content .conversations-search input,
+#content .conversations-search .input-field__input {
+	border-radius: var(--austit-radius-small, 8px);
+	border-color: var(--austit-border, var(--color-border, #e3e5e8));
+}
+
+#content .conversations-search:focus-within {
+	border-color: var(--austit-accent, var(--color-primary, #2563eb));
+	box-shadow: 0 0 0 3px var(--austit-accent-soft, color-mix(in srgb, var(--color-primary) 12%, transparent));
+}
+
+/* Chat area */
+
+#content .chatView,
+#content .messages-list-dragover-wrapper {
+	background: var(--austit-bg, var(--color-background-dark, #f3f4f6));
+}
+
+#content .top-bar {
+	border-bottom: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
+	background: var(--austit-surface, var(--color-main-background, #fff));
+}
+
+#content .conversation-header .title {
+	letter-spacing: -.01em;
+}
+
+#content .messages__content,
+#content .message-body__scroll .message__main {
+	border-radius: var(--austit-radius, 12px);
+}
+
+#content .messages__content {
+	background: var(--austit-surface, var(--color-main-background, #fff));
+	border: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
+	box-shadow: var(--austit-shadow, none);
+}
+
+#content .messages__content .messages__author {
+	color: var(--austit-text-muted, var(--color-text-maxcontrast, #5f6672));
+}
+
+/* New message form */
+
+#content .new-message-form {
+	border-radius: var(--austit-radius, 12px);
+	border: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
+	background: var(--austit-surface, var(--color-main-background, #fff));
+	box-shadow: var(--austit-shadow, none);
+}
+
+#content .new-message-form__input:focus-within,
+#content .new-message-form .input-field:focus-within {
+	border-color: var(--austit-accent, var(--color-primary, #2563eb));
+	box-shadow: 0 0 0 3px var(--austit-accent-soft, color-mix(in srgb, var(--color-primary) 12%, transparent));
+}
+
+#content .new-message-form button.primary,
+#content .top-bar button.primary {
+	background-color: var(--austit-accent, var(--color-primary, #2563eb));
+	border-radius: var(--austit-radius-small, 8px);
+}

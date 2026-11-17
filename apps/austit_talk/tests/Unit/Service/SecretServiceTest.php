@@ -265,4 +265,44 @@ class SecretServiceTest extends TestCase {
 		$deleted = $this->service->deleteExpired(1000);
 		$this->assertSame(1, $deleted);
 	}
+
+	public function testRegisterRoomSharesRegistersSharedFiles(): void {
+		$this->store->method('getLease')->with(self::TOKEN)->willReturn(300);
+		$this->store->method('getRoomShareFiles')->with(self::TOKEN)->willReturn([
+			['fileId' => 301, 'owner' => 'alice'],
+			['fileId' => 302, 'owner' => 'bob'],
+		]);
+		$this->store->method('getFile')->willReturnCallback(fn (int $fileId): ?array => $fileId === 301
+			? ['fileId' => 301, 'token' => self::TOKEN, 'owner' => 'alice', 'key' => 'k', 'expiresAt' => self::NOW + 300, 'encrypted' => false]
+			: null);
+		$this->cipher->method('newKey')->willReturn('wrapped_key');
+		$this->store->expects($this->once())
+			->method('addFile')
+			->with(302, self::TOKEN, 'bob', 'wrapped_key', self::NOW + 300);
+
+		$this->assertSame(1, $this->service->registerRoomShares(self::TOKEN));
+	}
+
+	public function testRegisterRoomSharesSkipsNormalRoom(): void {
+		$this->store->method('getLease')->with(self::TOKEN)->willReturn(null);
+		$this->store->expects($this->never())->method('getRoomShareFiles');
+
+		$this->assertSame(0, $this->service->registerRoomShares(self::TOKEN));
+	}
+
+	public function testRegisterPendingRoomSharesCoversEveryRoom(): void {
+		$this->store->method('getRoomTokens')->willReturn([self::TOKEN, 'other_room']);
+		$this->store->method('getLease')->willReturnMap([
+			[self::TOKEN, 300],
+			['other_room', null],
+		]);
+		$this->store->method('getRoomShareFiles')->with(self::TOKEN)->willReturn([
+			['fileId' => 401, 'owner' => 'alice'],
+		]);
+		$this->store->method('getFile')->willReturn(null);
+		$this->cipher->method('newKey')->willReturn('wrapped_key');
+		$this->store->expects($this->once())->method('addFile')->with(401, self::TOKEN, 'alice', 'wrapped_key', self::NOW + 300);
+
+		$this->assertSame(1, $this->service->registerPendingRoomShares());
+	}
 }

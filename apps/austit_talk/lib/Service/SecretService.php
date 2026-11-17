@@ -52,6 +52,7 @@ class SecretService {
 
 		if ($lease > 0) {
 			$this->store->setRoom($token, $lease, $userId);
+			$this->registerRoomShares($token);
 			$this->talkRooms->setMessageExpiration($token, $lease);
 		} else {
 			$this->store->removeRoom($token);
@@ -78,11 +79,49 @@ class SecretService {
 			}
 		} elseif ($lease !== $expiration) {
 			$this->store->setRoom($token, $expiration, $userId);
+			$this->registerRoomShares($token);
 		}
 	}
 
 	public function isSecretFile(int $fileId): bool {
 		return $this->store->getFile($fileId) !== null;
+	}
+
+	/**
+	 * Registers every file that is shared into the conversation, files that were shared before
+	 * the conversation became secret included. Files that are already protected are left alone.
+	 *
+	 * @return int number of files newly registered
+	 */
+	public function registerRoomShares(string $token): int {
+		$lease = $this->store->getLease($token);
+		if ($lease === null || $lease <= 0) {
+			return 0;
+		}
+
+		$registered = 0;
+		foreach ($this->store->getRoomShareFiles($token) as $file) {
+			if ($this->isSecretFile($file['fileId'])) {
+				continue;
+			}
+			$this->store->addFile($file['fileId'], $token, $file['owner'], $this->cipher->newKey(), $this->time->getTime() + $lease);
+			$registered++;
+		}
+		return $registered;
+	}
+
+	/**
+	 * Registers the files of every secret conversation, so files whose share event was missed
+	 * stop being visible outside of their chat.
+	 *
+	 * @return int number of files newly registered
+	 */
+	public function registerPendingRoomShares(): int {
+		$registered = 0;
+		foreach ($this->store->getRoomTokens() as $token) {
+			$registered += $this->registerRoomShares($token);
+		}
+		return $registered;
 	}
 
 	/**
