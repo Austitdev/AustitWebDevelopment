@@ -1,4 +1,7 @@
 # Lokale Entwicklungsumgebung fuer die austit Cloud.
+# Das Repo muss im WSL-Dateisystem liegen (z.B. ~/PhpstormProjects/untitled in Ubuntu), auf C:\
+# braucht jede Seite wegen des langsamen Windows-Mounts mehrere Sekunden.
+# Start (in WSL):  docker compose -f austit-dev/docker-compose.yml up -d
 # Start:  docker compose -f austit-dev/docker-compose.yml up -d
 # Aufruf: http://localhost:8080  (Login: admin / admin)
 name: austit-cloud-dev
@@ -14,6 +17,8 @@ services:
         condition: service_started
     ports:
       - "127.0.0.1:8080:80"
+      # Windows loest localhost zuerst als ::1 auf, ohne diese Bindung wartet jede neue Verbindung ca. 200 ms.
+      - "[::1]:8080:80"
     volumes: &app-volumes
       - ..:/var/www/html
       - ./dev.config.php:/var/www/html/config/dev.config.php:ro
@@ -48,6 +53,7 @@ services:
         --o:user_interface.brandProductURL=https://austit.de
     ports:
       - "127.0.0.1:9980:9980"
+      - "[::1]:9980:9980"
 
   db:
     image: postgres:16-alpine

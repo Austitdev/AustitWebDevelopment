@@ -12,6 +12,8 @@ occ() {
 
 chown www-data:www-data data custom_apps
 chmod -R a+rwX data
+# occ und Cron laufen als Besitzer von config.php; www-data darf auch die Dateien von Apache aendern.
+chown www-data:www-data config/config.php 2>/dev/null || true
 chmod a+rw config/config.php 2>/dev/null || true
 
 if ! grep -q "'installed' => true" config/config.php 2>/dev/null; then
