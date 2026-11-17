@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.name "austit-ci"
           git config user.email "ci@austit.de"
-          git add '*.openapi*.json' openapi.json apps/*/openapi.json core/openapi*.json
+          git add openapi.json core/openapi.json core/openapi-full.json apps/*/openapi.json || true
           git diff --cached --quiet && echo "Nothing to commit" && exit 0
           git commit -m "chore(openapi): Spezifikationen der austit-Apps generieren"
           git push
