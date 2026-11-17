@@ -40,7 +40,7 @@ jobs:
 
       - name: Coding standard
         run: |
-          composer run cs:check -- \
+          lib/composer/bin/php-cs-fixer fix --dry-run --diff --config .php-cs-fixer.dist.php \
             apps/austit_talk \
             apps/austit_notebook \
             apps/austit_shell \
