@@ -15,6 +15,7 @@ use OCA\AustitUpdates\Service\UpdateAnalyzer;
 use OCA\AustitUpdates\Service\UpstreamException;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\ServerVersion;
@@ -23,6 +24,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Admin-only endpoints of the manual update check. Nothing is installed here.
  */
+#[OpenAPI(scope: OpenAPI::SCOPE_ADMINISTRATION)]
 class UpdateController extends Controller {
 	public function __construct(
 		IRequest $request,
