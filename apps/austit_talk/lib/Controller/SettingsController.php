@@ -36,6 +36,7 @@ class SettingsController extends OCSController {
 	 * Returns the Talk settings this app exposes
 	 *
 	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>
+	 * 200: The Talk settings this app exposes
 	 */
 	#[NoAdminRequired]
 	public function index(): DataResponse {
@@ -49,6 +50,7 @@ class SettingsController extends OCSController {
 	 * @param ?string $key name of the setting
 	 * @param mixed $value new value of the setting, JSON is accepted as well
 	 * @return DataResponse<Http::STATUS_OK, array<string, mixed>, array{}>
+	 * 200: The Talk settings this app exposes
 	 */
 	#[NoAdminRequired]
 	public function update(?string $key = null, mixed $value = null): DataResponse {

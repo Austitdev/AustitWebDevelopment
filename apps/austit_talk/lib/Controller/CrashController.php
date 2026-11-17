@@ -46,6 +46,7 @@ class CrashController extends OCSController {
 	 *
 	 * @param ?string $stacktrace stack trace of the crash
 	 * @return DataResponse<Http::STATUS_OK, array{stored: bool}, array{}>
+	 * 200: The crash report was stored
 	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 30, period: 3600)]

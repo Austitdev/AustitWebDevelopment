@@ -39,6 +39,7 @@ class RoomController extends OCSController {
 	 *
 	 * @param string $token token of the conversation
 	 * @return DataResponse<Http::STATUS_OK, array{token: string, secret: bool, lease: int, isModerator: bool}, array{}>
+	 * 200: The secret state of the conversation
 	 */
 	#[NoAdminRequired]
 	public function getRoom(string $token): DataResponse {
@@ -69,6 +70,7 @@ class RoomController extends OCSController {
 	 * @param string $token token of the conversation
 	 * @param ?string $lease seconds the messages and shared files of the conversation stay, 0 lifts the protection
 	 * @return DataResponse<Http::STATUS_OK, array{token: string, secret: bool, lease: int, isModerator: bool}, array{}>
+	 * 200: The secret state of the conversation
 	 */
 	#[NoAdminRequired]
 	public function setRoom(string $token, ?string $lease = null): DataResponse {
