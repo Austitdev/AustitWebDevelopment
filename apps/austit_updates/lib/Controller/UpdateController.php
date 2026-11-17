@@ -62,6 +62,7 @@ class UpdateController extends Controller {
 	 * @param string $version version of the release to analyze
 	 * @return JSONResponse<Http::STATUS_OK, array<string, mixed>, array{}>|JSONResponse<Http::STATUS_BAD_REQUEST, array{message: string}, array{}>|JSONResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 * 200: The comparison of the release with the installed version
+	 * 400: The version is invalid
 	 */
 	public function analyze(string $version): JSONResponse {
 		try {
