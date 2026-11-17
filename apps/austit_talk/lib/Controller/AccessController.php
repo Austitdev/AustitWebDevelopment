@@ -31,6 +31,11 @@ class AccessController extends OCSController {
 		parent::__construct($appName, $request);
 	}
 
+	/**
+	 * Tells the requesting user which Talk administration rights they have
+	 *
+	 * @return DataResponse<array{userId: string, isAdmin: bool, canUseSettings: bool, canManageAccess: bool}>
+	 */
 	#[NoAdminRequired]
 	public function me(): DataResponse {
 		$user = $this->userSession->getUser();
@@ -52,6 +57,12 @@ class AccessController extends OCSController {
 		]);
 	}
 
+	/**
+	 * Lists the Talk administrators and whether they may use the Talk administration
+	 *
+	 * @param string $search only users whose id or display name contain this are listed
+	 * @return DataResponse<list<array{id: string, displayName: string, allowed: bool}>>
+	 */
 	public function users(string $search = ''): DataResponse {
 		$this->requireAllowed();
 
@@ -76,17 +87,21 @@ class AccessController extends OCSController {
 		return new DataResponse($result);
 	}
 
-	public function setUser(): DataResponse {
+	/**
+	 * Grants or revokes access to the Talk administration for an administrator
+	 *
+	 * @param ?string $userId id of the administrator whose access is changed
+	 * @param ?string $allowed whether the administrator may use the Talk administration
+	 * @return DataResponse<array{userId: string, allowed: bool}>
+	 */
+	public function setUser(?string $userId = null, ?string $allowed = null): DataResponse {
 		$this->requireAllowed();
-
-		$userId = $this->request->getParam('userId');
-		$allowedRaw = $this->request->getParam('allowed');
 
 		if (!is_string($userId) || $userId === '') {
 			throw new OCSException('Missing userId', 400);
 		}
 
-		$allowed = filter_var($allowedRaw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+		$allowed = filter_var($allowed, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 		if ($allowed === null) {
 			throw new OCSException('Invalid allowed value', 400);
 		}

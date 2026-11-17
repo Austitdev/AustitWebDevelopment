@@ -31,22 +31,32 @@ class SettingsController extends OCSController {
 		parent::__construct($appName, $request);
 	}
 
+	/**
+	 * Returns the Talk settings this app exposes
+	 *
+	 * @return DataResponse<array<string, mixed>>
+	 */
 	#[NoAdminRequired]
 	public function index(): DataResponse {
 		$this->requireAllowed();
 		return new DataResponse($this->settingsService->getSettings());
 	}
 
+	/**
+	 * Changes one of the Talk settings this app exposes
+	 *
+	 * @param ?string $key name of the setting
+	 * @param mixed $value new value of the setting, JSON is accepted as well
+	 * @return DataResponse<array<string, mixed>>
+	 */
 	#[NoAdminRequired]
-	public function update(): DataResponse {
+	public function update(?string $key = null, mixed $value = null): DataResponse {
 		$this->requireAllowed();
 
-		$key = $this->request->getParam('key');
 		if (!is_string($key) || $key === '') {
 			throw new OCSException('Missing key', 400);
 		}
 
-		$value = $this->request->getParam('value');
 		if (is_string($value)) {
 			$decoded = json_decode($value, true);
 			if (json_last_error() === JSON_ERROR_NONE) {

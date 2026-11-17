@@ -52,25 +52,19 @@ class SettingsControllerTest extends TestCase {
 
 	public function testUpdateDecodesJsonAndIsAudited(): void {
 		$this->access->method('canUseSettings')->willReturn(true);
-		$this->request->method('getParam')->willReturnMap([
-			['key', null, 'allowed_groups'],
-			['value', null, '["teachers"]'],
-		]);
 		$this->settings->expects($this->once())->method('update')
 			->with('allowed_groups', ['teachers'])
 			->willReturn(['allowed_groups' => ['teachers']]);
 		$this->audit->expects($this->once())->method('log')
 			->with($this->anything(), ['key' => 'allowed_groups', 'user' => 'alice', 'value' => '["teachers"]']);
 
-		$this->assertSame(['allowed_groups' => ['teachers']], $this->controller->update()->getData());
+		$this->assertSame(['allowed_groups' => ['teachers']], $this->controller->update('allowed_groups', '["teachers"]')->getData());
 	}
 
 	public function testUpdateNeedsAKey(): void {
 		$this->access->method('canUseSettings')->willReturn(true);
-		$this->request->method('getParam')->willReturn(null);
-
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
-		$this->controller->update();
+		$this->controller->update(null);
 	}
 }

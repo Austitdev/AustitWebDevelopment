@@ -40,15 +40,20 @@ class CrashController extends OCSController {
 		parent::__construct($appName, $request);
 	}
 
+	/**
+	 * Stores a crash report of the austit Talk Android app
+	 *
+	 * @param ?string $stacktrace stack trace of the crash
+	 * @return DataResponse<array{stored: bool}>
+	 */
 	#[NoAdminRequired]
 	#[UserRateLimit(limit: 30, period: 3600)]
-	public function report(): DataResponse {
+	public function report(?string $stacktrace = null): DataResponse {
 		$user = $this->userSession->getUser();
 		if ($user === null) {
 			throw new OCSException('Not logged in', 401);
 		}
 
-		$stacktrace = $this->request->getParam('stacktrace');
 		if (!is_string($stacktrace) || $stacktrace === '') {
 			throw new OCSException('Missing stacktrace', 400);
 		}

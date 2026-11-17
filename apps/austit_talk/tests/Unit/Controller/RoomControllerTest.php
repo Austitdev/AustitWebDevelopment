@@ -64,23 +64,21 @@ class RoomControllerTest extends TestCase {
 	}
 
 	public function testSetRoomRejectsNonModerator(): void {
-		$this->request->method('getParam')->with('lease', self::DEFAULT_LEASE)->willReturn(300);
 		$this->service->method('setRoomLease')
 			->willThrowException(new NotPermittedException());
 
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(403);
 
-		$this->controller->setRoom(self::TOKEN);
+		$this->controller->setRoom(self::TOKEN, '300');
 	}
 
 	public function testSetRoomSucceedsForModerator(): void {
-		$this->request->method('getParam')->with('lease', self::DEFAULT_LEASE)->willReturn(600);
 		$this->service->expects($this->once())
 			->method('setRoomLease')
 			->with(self::TOKEN, 600, 'alice');
 
-		$response = $this->controller->setRoom(self::TOKEN);
+		$response = $this->controller->setRoom(self::TOKEN, '600');
 		$data = $response->getData();
 
 		$this->assertSame(self::TOKEN, $data['token']);
@@ -89,10 +87,6 @@ class RoomControllerTest extends TestCase {
 	}
 
 	public function testSetRoomUsesOneHourByDefault(): void {
-		$this->request->expects($this->once())
-			->method('getParam')
-			->with('lease', self::DEFAULT_LEASE)
-			->willReturn(self::DEFAULT_LEASE);
 		$this->service->expects($this->once())
 			->method('setRoomLease')
 			->with(self::TOKEN, self::DEFAULT_LEASE, 'alice');

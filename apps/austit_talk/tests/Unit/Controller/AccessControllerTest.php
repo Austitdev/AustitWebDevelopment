@@ -47,10 +47,6 @@ class AccessControllerTest extends TestCase {
 		return $user;
 	}
 
-	private function params(array $params): void {
-		$this->request->method('getParam')->willReturnCallback(fn (string $key): mixed => $params[$key] ?? null);
-	}
-
 	public function testMeReportsAccess(): void {
 		$this->access->method('isAdmin')->willReturn(true);
 		$this->access->method('canUseSettings')->with('alice')->willReturn(false);
@@ -88,12 +84,11 @@ class AccessControllerTest extends TestCase {
 		$this->access->method('isAdmin')->willReturn(true);
 		$this->access->method('getAllowedUsers')->willReturn(['alice']);
 		$this->userManager->method('get')->with('Bob')->willReturn($this->user('bob'));
-		$this->params(['userId' => 'Bob', 'allowed' => 'true']);
-
+		
 		$this->access->expects($this->once())->method('setAllowedUsers')->with(['alice', 'bob']);
 		$this->audit->expects($this->once())->method('log');
 
-		$this->assertSame(['userId' => 'bob', 'allowed' => true], $this->controller->setUser()->getData());
+		$this->assertSame(['userId' => 'bob', 'allowed' => true], $this->controller->setUser('Bob', 'true')->getData());
 	}
 
 	public function testLastAllowedUserCannotBeRemoved(): void {
@@ -101,32 +96,37 @@ class AccessControllerTest extends TestCase {
 		$this->access->method('isAdmin')->willReturn(true);
 		$this->access->method('getAllowedUsers')->willReturn(['alice']);
 		$this->userManager->method('get')->willReturn($this->user('alice'));
-		$this->params(['userId' => 'alice', 'allowed' => 'false']);
-
+		
 		$this->access->expects($this->never())->method('setAllowedUsers');
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
-		$this->controller->setUser();
+		$this->controller->setUser('alice', 'false');
 	}
 
 	public function testNonAdminCannotBeGranted(): void {
 		$this->access->method('canUseSettings')->willReturn(true);
 		$this->access->method('isAdmin')->with('bob')->willReturn(false);
 		$this->userManager->method('get')->willReturn($this->user('bob'));
-		$this->params(['userId' => 'bob', 'allowed' => '1']);
-
+		
 		$this->access->expects($this->never())->method('setAllowedUsers');
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
-		$this->controller->setUser();
+		$this->controller->setUser('bob', '1');
 	}
 
 	public function testInvalidAllowedValueIsRefused(): void {
 		$this->access->method('canUseSettings')->willReturn(true);
-		$this->params(['userId' => 'bob', 'allowed' => 'maybe']);
+		
+		$this->expectException(OCSException::class);
+		$this->expectExceptionCode(400);
+		$this->controller->setUser('bob', 'maybe');
+	}
+
+	public function testMissingUserIdIsRefused(): void {
+		$this->access->method('canUseSettings')->willReturn(true);
 
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
-		$this->controller->setUser();
+		$this->controller->setUser(null, 'true');
 	}
 }

@@ -33,6 +33,12 @@ class RoomController extends OCSController {
 		parent::__construct($appName, $request);
 	}
 
+	/**
+	 * Tells whether a conversation is a secret conversation and whether the user moderates it
+	 *
+	 * @param string $token token of the conversation
+	 * @return DataResponse<array{token: string, secret: bool, lease: int, isModerator: bool}>
+	 */
 	#[NoAdminRequired]
 	public function getRoom(string $token): DataResponse {
 		$user = $this->userSession->getUser();
@@ -56,14 +62,21 @@ class RoomController extends OCSController {
 		]);
 	}
 
+	/**
+	 * Turns a conversation into a secret conversation or ends the protection
+	 *
+	 * @param string $token token of the conversation
+	 * @param ?string $lease seconds the messages and shared files of the conversation stay, 0 lifts the protection
+	 * @return DataResponse<array{token: string, secret: bool, lease: int, isModerator: bool}>
+	 */
 	#[NoAdminRequired]
-	public function setRoom(string $token): DataResponse {
+	public function setRoom(string $token, ?string $lease = null): DataResponse {
 		$user = $this->userSession->getUser();
 		if ($user === null) {
 			throw new OCSException('Not logged in', 401);
 		}
 
-		$leaseRaw = $this->request->getParam('lease', self::DEFAULT_LEASE);
+		$leaseRaw = $lease ?? (string)self::DEFAULT_LEASE;
 		if (!is_numeric($leaseRaw)) {
 			throw new OCSException('Invalid lease', 400);
 		}

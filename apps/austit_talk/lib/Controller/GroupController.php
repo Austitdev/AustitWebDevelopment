@@ -29,6 +29,11 @@ class GroupController extends OCSController {
 		parent::__construct($appName, $request);
 	}
 
+	/**
+	 * Lists the groups for the Talk administration settings
+	 *
+	 * @return DataResponse<list<array{id: string, name: string}>>
+	 */
 	#[NoAdminRequired]
 	public function index(): DataResponse {
 		$user = $this->userSession->getUser();
