@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OCA\AustitTalk\AppInfo;
 
 use OCA\AustitTalk\Listener\ConversationFolderListener;
-use OCA\AustitTalk\Listener\LoadTalkStyleListener;
 use OCA\AustitTalk\Listener\FileSystemListener;
+use OCA\AustitTalk\Listener\LoadTalkStyleListener;
 use OCA\AustitTalk\Listener\RoomListener;
 use OCA\AustitTalk\Listener\ShareListener;
 use OCA\AustitTalk\Listener\TrashListener;

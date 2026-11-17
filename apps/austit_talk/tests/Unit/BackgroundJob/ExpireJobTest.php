@@ -12,7 +12,6 @@ namespace OCA\AustitTalk\Tests\Unit\BackgroundJob;
 use OCA\AustitTalk\BackgroundJob\ExpireJob;
 use OCA\AustitTalk\Service\SecretService;
 use OCP\AppFramework\Utility\ITimeFactory;
-use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 class ExpireJobTest extends TestCase {
