@@ -23,12 +23,14 @@ use OCP\Util;
  */
 class LoadTalkStyleListener implements IEventListener {
 	public function handle(Event $event): void {
-		if (!$event instanceof BeforeTemplateRenderedEvent
-			|| !$event->isLoggedIn()
-			|| $event->getResponse()->getApp() !== 'spreed') {
-			return;
+		if ($this->shouldLoad($event)) {
+			Util::addStyle(Application::APP_ID, 'spreed');
 		}
+	}
 
-		Util::addStyle(Application::APP_ID, 'spreed');
+	public function shouldLoad(Event $event): bool {
+		return $event instanceof BeforeTemplateRenderedEvent
+			&& $event->isLoggedIn()
+			&& $event->getResponse()->getApp() === 'spreed';
 	}
 }

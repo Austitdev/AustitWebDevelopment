@@ -16,19 +16,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 class LoadTalkStyleListenerTest extends TestCase {
-	private const STYLE = 'austit_talk/css/spreed.css';
-
 	private LoadTalkStyleListener $listener;
 
 	protected function setUp(): void {
 		parent::setUp();
-		\OC_Util::$styles = [];
 		$this->listener = new LoadTalkStyleListener();
-	}
-
-	protected function tearDown(): void {
-		\OC_Util::$styles = [];
-		parent::tearDown();
 	}
 
 	private function response(string $app): TemplateResponse&MockObject {
@@ -37,27 +29,23 @@ class LoadTalkStyleListenerTest extends TestCase {
 		return $response;
 	}
 
-	private function assertStyleLoaded(bool $loaded): void {
-		$paths = \OC_Util::$styles;
-		if ($loaded) {
-			$this->assertContains(self::STYLE, $paths);
-		} else {
-			$this->assertNotContains(self::STYLE, $paths);
-		}
-	}
-
 	public function testLoadsStyleOnTalkPage(): void {
-		$this->listener->handle(new BeforeTemplateRenderedEvent(true, $this->response('spreed')));
-		$this->assertStyleLoaded(true);
+		$event = new BeforeTemplateRenderedEvent(true, $this->response('spreed'));
+		$this->assertTrue($this->listener->shouldLoad($event));
 	}
 
 	public function testIgnoresOtherApps(): void {
-		$this->listener->handle(new BeforeTemplateRenderedEvent(true, $this->response('files')));
-		$this->assertStyleLoaded(false);
+		$event = new BeforeTemplateRenderedEvent(true, $this->response('files'));
+		$this->assertFalse($this->listener->shouldLoad($event));
 	}
 
 	public function testIgnoresGuestRequests(): void {
-		$this->listener->handle(new BeforeTemplateRenderedEvent(false, $this->response('spreed')));
-		$this->assertStyleLoaded(false);
+		$event = new BeforeTemplateRenderedEvent(false, $this->response('spreed'));
+		$this->assertFalse($this->listener->shouldLoad($event));
+	}
+
+	public function testIgnoresOtherEvents(): void {
+		$event = $this->createMock(\OCP\EventDispatcher\Event::class);
+		$this->assertFalse($this->listener->shouldLoad($event));
 	}
 }
