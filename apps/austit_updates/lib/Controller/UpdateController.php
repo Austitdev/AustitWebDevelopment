@@ -41,7 +41,7 @@ class UpdateController extends Controller {
 	 *
 	 * @param bool $includePrereleases include prereleases in the list
 	 * @return JSONResponse<Http::STATUS_OK, array{installedVersion: string, releases: list<mixed>}, array{}>|JSONResponse<Http::STATUS_BAD_GATEWAY, array{message: string}, array{}>
-	 * 200: The releases that are newer than the installed version
+	 *                                                                                                                                                                                200: The releases that are newer than the installed version
 	 */
 	public function releases(bool $includePrereleases = false): JSONResponse {
 		$installed = $this->serverVersion->getVersionString();
@@ -61,8 +61,8 @@ class UpdateController extends Controller {
 	 *
 	 * @param string $version version of the release to analyze
 	 * @return JSONResponse<Http::STATUS_OK, array<string, mixed>, array{}>|JSONResponse<Http::STATUS_BAD_REQUEST, array{message: string}, array{}>|JSONResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
-	 * 200: The comparison of the release with the installed version
-	 * 400: The version is invalid
+	 *                                                                                                                                                                                                                                200: The comparison of the release with the installed version
+	 *                                                                                                                                                                                                                                400: The version is invalid
 	 */
 	public function analyze(string $version): JSONResponse {
 		try {

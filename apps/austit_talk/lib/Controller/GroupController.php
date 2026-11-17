@@ -34,7 +34,7 @@ class GroupController extends OCSController {
 	 * Lists the groups for the Talk administration settings
 	 *
 	 * @return DataResponse<Http::STATUS_OK, list<array{id: string, name: string}>, array{}>
-	 * 200: The groups for the Talk administration settings
+	 *                                                                                       200: The groups for the Talk administration settings
 	 */
 	#[NoAdminRequired]
 	public function index(): DataResponse {

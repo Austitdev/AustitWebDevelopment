@@ -36,7 +36,7 @@ class AccessController extends OCSController {
 	 * Tells the requesting user which Talk administration rights they have
 	 *
 	 * @return DataResponse<Http::STATUS_OK, array{userId: string, isAdmin: bool, canUseSettings: bool, canManageAccess: bool}, array{}>
-	 * 200: The Talk administration access of the current user
+	 *                                                                                                                                   200: The Talk administration access of the current user
 	 */
 	#[NoAdminRequired]
 	public function me(): DataResponse {
@@ -64,7 +64,7 @@ class AccessController extends OCSController {
 	 *
 	 * @param string $search only users whose id or display name contain this are listed
 	 * @return DataResponse<Http::STATUS_OK, list<array{id: string, displayName: string, allowed: bool}>, array{}>
-	 * 200: The administrators and whether they may use the Talk administration
+	 *                                                                                                             200: The administrators and whether they may use the Talk administration
 	 */
 	public function users(string $search = ''): DataResponse {
 		$this->requireAllowed();
@@ -96,7 +96,7 @@ class AccessController extends OCSController {
 	 * @param ?string $userId id of the administrator whose access is changed
 	 * @param ?string $allowed whether the administrator may use the Talk administration
 	 * @return DataResponse<Http::STATUS_OK, array{userId: string, allowed: bool}, array{}>
-	 * 200: The updated access of the administrator
+	 *                                                                                      200: The updated access of the administrator
 	 */
 	public function setUser(?string $userId = null, ?string $allowed = null): DataResponse {
 		$this->requireAllowed();

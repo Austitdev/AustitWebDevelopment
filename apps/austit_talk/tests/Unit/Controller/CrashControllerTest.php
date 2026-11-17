@@ -45,13 +45,11 @@ class CrashControllerTest extends TestCase {
 		$this->userSession->method('getUser')->willReturn($user);
 	}
 
-	private function params(array $params): void {
-		$this->request->method('getParam')->willReturnCallback(fn (string $key): mixed => $params[$key] ?? null);
-	}
-
 	public function testStoresReportInNewFolder(): void {
 		$this->loggedIn();
-		$this->params(['stacktrace' => 'java.lang.NullPointerException', 'device' => str_repeat('d', 300), 'thread' => ['no scalar']]);
+		$this->request->method('getParam')->willReturnCallback(
+			static fn (string $key): mixed => ['device' => str_repeat('d', 300), 'thread' => ['no scalar']][$key] ?? null
+		);
 		$this->appData->method('getFolder')->willThrowException(new NotFoundException());
 		$this->appData->expects($this->once())->method('newFolder')->with('crashes')->willReturn($this->folder);
 		$this->folder->method('getDirectoryListing')->willReturn([]);
@@ -65,12 +63,11 @@ class CrashControllerTest extends TestCase {
 					&& $report['thread'] === '';
 			}));
 
-		$this->assertSame(['stored' => true], $this->controller->report()->getData());
+		$this->assertSame(['stored' => true], $this->controller->report('java.lang.NullPointerException')->getData());
 	}
 
 	public function testKeepsOnlyTheNewestReports(): void {
 		$this->loggedIn();
-		$this->params(['stacktrace' => 'trace']);
 		$this->appData->method('getFolder')->willReturn($this->folder);
 
 		$files = [];
@@ -82,16 +79,14 @@ class CrashControllerTest extends TestCase {
 		}
 		$this->folder->method('getDirectoryListing')->willReturn($files);
 
-		$this->controller->report();
+		$this->controller->report('trace');
 	}
 
 	public function testNeedsAStacktrace(): void {
 		$this->loggedIn();
-		$this->params([]);
-
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
-		$this->controller->report();
+		$this->controller->report(null);
 	}
 
 	public function testNeedsALogin(): void {

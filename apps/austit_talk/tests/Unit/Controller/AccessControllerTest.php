@@ -84,7 +84,7 @@ class AccessControllerTest extends TestCase {
 		$this->access->method('isAdmin')->willReturn(true);
 		$this->access->method('getAllowedUsers')->willReturn(['alice']);
 		$this->userManager->method('get')->with('Bob')->willReturn($this->user('bob'));
-		
+
 		$this->access->expects($this->once())->method('setAllowedUsers')->with(['alice', 'bob']);
 		$this->audit->expects($this->once())->method('log');
 
@@ -96,7 +96,7 @@ class AccessControllerTest extends TestCase {
 		$this->access->method('isAdmin')->willReturn(true);
 		$this->access->method('getAllowedUsers')->willReturn(['alice']);
 		$this->userManager->method('get')->willReturn($this->user('alice'));
-		
+
 		$this->access->expects($this->never())->method('setAllowedUsers');
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
@@ -107,7 +107,7 @@ class AccessControllerTest extends TestCase {
 		$this->access->method('canUseSettings')->willReturn(true);
 		$this->access->method('isAdmin')->with('bob')->willReturn(false);
 		$this->userManager->method('get')->willReturn($this->user('bob'));
-		
+
 		$this->access->expects($this->never())->method('setAllowedUsers');
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
@@ -116,7 +116,7 @@ class AccessControllerTest extends TestCase {
 
 	public function testInvalidAllowedValueIsRefused(): void {
 		$this->access->method('canUseSettings')->willReturn(true);
-		
+
 		$this->expectException(OCSException::class);
 		$this->expectExceptionCode(400);
 		$this->controller->setUser('bob', 'maybe');
