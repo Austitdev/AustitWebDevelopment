@@ -3,72 +3,71 @@
  - SPDX-FileCopyrightText: 2026 austit.de
  - SPDX-License-Identifier: AGPL-3.0-or-later
 
- Designvorschau der Talk-Oberflaeche im dunklen Austit-Design.
- Die Icons folgen dem Umriss-Stil der austit Shell. Hell oder dunkel stellt
- jede Person selbst in den Einstellungen ein, deshalb zeigt diese Datei nur
- das dunkle Design. Eigenstaendige Datei ohne Abhaengigkeiten, wird nicht vom
- Server ausgeliefert.
+ Designvorschau der Talk-Weboberflaeche im Stil der austit Talk App:
+ dunkles Messenger-Design mit Glas-Effekt und App-Akzent (#0080ff),
+ Umriss-Icons im Stil der austit Shell, Ladescreen-Karte oben und
+ responsives Zusammenschieben. Eigenstaendige Datei ohne Abhaengigkeiten,
+ wird nicht vom Server ausgeliefert.
 -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Talk · austit</title>
+<title>Talk · austit – Designvorschau</title>
 <style>
 	:root {
-		--rail-bg: #1a1d21;
-		--list-bg: #202429;
-		--chat-bg: #17191c;
-		--panel-bg: #1a1d21;
+		--rail: #1a1d21;
+		--liste: #202429;
+		--chat: #17191c;
+		--panel: #1a1d21;
 		--hover: #26292f;
-		--eingang: #23272d;
 		--akzent: #0080ff;
 		--akzent-soft: rgba(0, 128, 255, .14);
 		--text: #edeff2;
 		--muted: #8d939c;
-		--linie: rgba(255, 255, 255, .07);
-		--glas: rgba(20, 23, 27, .72);
 	}
 	* { box-sizing: border-box; }
 	html, body { height: 100%; }
-	* { scrollbar-width: thin; scrollbar-color: #3a3f46 transparent; }
-	*::-webkit-scrollbar { width: 8px; height: 8px; }
-	*::-webkit-scrollbar-thumb { border-radius: 8px; background: #3a3f46; border: 2px solid transparent; background-clip: content-box; }
-	*::-webkit-scrollbar-thumb:hover { background: #4a5059; background-clip: content-box; }
-	*::-webkit-scrollbar-track { background: transparent; }
-	html { height: 100%; }
 	body {
 		margin: 0;
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: var(--chat-bg);
+		background: var(--chat);
 		color: var(--text);
 		font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
 		font-size: 14.5px;
 		overflow: hidden;
 		-webkit-font-smoothing: antialiased;
 	}
-	svg { display: block; }
-	.rumpf { display: flex; flex: 1 1 auto; min-height: 0; }
-	.vorschau-kopf { flex: none; }
+	svg { display: block; flex: none; }
+	*::-webkit-scrollbar { width: 8px; height: 8px; }
+	*::-webkit-scrollbar-thumb { border-radius: 8px; background: #3a3f46; border: 2px solid transparent; background-clip: content-box; }
 
-	/* ---------- Vorschau-Kopf mit Ladescreen ---------- */
-	.vorschau-kopf {
-		max-width: 1120px;
-		margin: 0 auto;
-		padding: 18px 16px 0;
+	/* ================================================================
+	   Kopf der Vorschau mit Ladescreen-Karte
+	   ================================================================ */
+	.kopf {
+		flex: none;
 		display: flex;
-		flex-wrap: wrap;
 		align-items: center;
-		gap: 16px;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 12px;
+		max-width: 1160px;
+		width: 100%;
+		margin: 0 auto;
+		padding: 14px 18px 10px;
 	}
-	.vorschau-kopf h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; flex: 1; }
-	.vorschau-kopf small { color: #757b84; font-size: 12px; }
+	.kopf h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+	.kopf h1 small { display: block; margin-top: 3px; color: #757b84; font-size: 12px; font-weight: 400; }
 	.ladekarte {
-		display: flex; flex-direction: column; align-items: center; justify-content: center;
+		flex: none;
+		display: flex;
+		align-items: center;
 		gap: 14px;
-		height: 132px;
+		height: 84px;
+		padding: 0 22px;
 		border: 1px solid rgba(255, 255, 255, .1);
 		border-radius: 16px;
 		background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
@@ -77,53 +76,64 @@
 		box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
 	}
 	.ladewingel {
-		width: 42px; height: 42px;
-		border: 3px solid rgba(0, 128, 255, .16);
-		border-top-color: #0080ff;
+		width: 30px; height: 30px;
+		border: 3px solid rgba(0, 128, 255, .18);
+		border-top-color: var(--akzent);
 		border-radius: 50%;
 		animation: drehen 1s linear infinite;
 	}
-	.ladetext { color: #aeb3ba; font-size: 14px; }
-	.marke-lade { color: #62778c; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+	.ladeworte { display: grid; gap: 3px; }
+	.ladeworte b { font-size: 13px; font-weight: 500; color: #c3c8ce; }
+	.ladeworte small { color: #62778c; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
 	@keyframes drehen { to { transform: rotate(360deg); } }
 	@media (prefers-reduced-motion: reduce) { .ladewingel { animation-duration: 2.4s; } }
 
-	/* ---------- Vorschau responsiv (wie die Weboberflaeche) ---------- */
-	@media (max-width: 1100px) { .details { display: none !important; } }
-	@media (max-width: 820px) {
-		.nav-talk { display: none !important; }
-		.msg { max-width: 82%; }
+	/* ================================================================
+	   Anwendung
+	   ================================================================ */
+	.app {
+		flex: 1 1 auto;
+		min-height: 0;
+		display: flex;
+		max-width: 1160px;
+		width: 100%;
+		margin: 0 auto;
+		padding: 0 18px 16px;
+		gap: 0;
 	}
-	@media (max-width: 560px) {
-		.schiene { flex-basis: 64px; }
-		.schiene .navpunkt span:not(.punkt-pille) { display: none; }
-		.msg { max-width: 92%; } .msg.aus { max-width: 92%; }
-		.kopfleiste .status { display: none; }
+	.app-innen {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		border: 1px solid #23262b;
+		border-radius: 18px;
+		overflow: hidden;
 	}
 
 	/* ---------- Schiene ---------- */
 	.schiene {
-		flex: 0 0 84px;
+		flex: none;
+		width: 84px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		padding: 14px 6px 12px;
 		gap: 6px;
-		background: var(--rail-bg);
+		background: var(--rail);
 		border-inline-end: 1px solid #23262b;
 	}
-	.kachelmarke {
+	.marke-kachel {
 		width: 38px; height: 38px;
 		display: grid; place-items: center;
 		border: 1px solid #2b4a63;
 		border-radius: 11px;
 		background: #12202f;
-		margin-bottom: 16px;
+		margin-bottom: 14px;
 	}
 	.navpunkt {
 		position: relative;
 		width: 100%;
-		min-height: 54px;
+		min-height: 52px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -142,14 +152,14 @@
 	.navpunkt.aktiv::before {
 		content: '';
 		position: absolute;
-		inset-block: 13px;
+		inset-block: 12px;
 		inset-inline-start: 0;
 		width: 3px;
 		border-radius: 3px;
 		background: var(--akzent);
 	}
-	.punkt-pille {
-		position: absolute; top: 3px; inset-inline-end: 9px;
+	.navpunkt .badge {
+		position: absolute; top: 2px; inset-inline-end: 8px;
 		min-width: 15px; padding: 0 4px;
 		border-radius: 8px;
 		background: var(--akzent); color: #fff;
@@ -158,14 +168,15 @@
 
 	/* ---------- Gespraechsliste ---------- */
 	.nav-talk {
-		flex: 0 0 292px;
+		flex: none;
+		width: 288px;
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
-		background: var(--list-bg);
+		background: var(--liste);
 	}
-	.nav-kopf { padding: 16px 14px 4px; display: flex; align-items: center; gap: 10px; }
-	.nav-kopf h1 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.01em; flex: 1; }
+	.nav-kopf { display: flex; align-items: center; gap: 10px; padding: 16px 14px 4px; }
+	.nav-kopf h2 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.01em; flex: 1; }
 	.rund-knopf {
 		width: 34px; height: 34px;
 		display: grid; place-items: center;
@@ -173,23 +184,11 @@
 		background: var(--akzent-soft);
 		color: #8fc3f2;
 		cursor: pointer;
-		transition: background-color .15s ease;
 	}
 	.rund-knopf:hover { background: rgba(0, 128, 255, .24); }
 	.rund-knopf svg { width: 18px; height: 18px; }
-	.suche { margin: 10px 14px 4px; }
-	.suchfeld {
-		display: flex; align-items: center; gap: 9px;
-		height: 37px; padding: 0 15px;
-		border-radius: 10px;
-		border: 1px solid rgba(255, 255, 255, .05);
-		background: rgba(255, 255, 255, .045);
-		color: var(--muted);
-		font-size: 13.5px;
-		transition: border-color .15s ease, background-color .15s ease;
-	}
-	.suchfeld svg { width: 16px; height: 16px; flex: none; }
-	.suchfeld:focus-within { border-color: rgba(0, 128, 255, .55); background: rgba(255, 255, 255, .07);
+	.suche { margin: 10px 14px 4px; padding: 9px 14px; display: flex; align-items: center; gap: 9px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .05); background: rgba(255, 255, 255, .045); color: var(--muted); font-size: 13.5px; }
+	.suche svg { width: 15px; height: 15px; }
 	.liste { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px 14px; }
 	.eintrag {
 		position: relative;
@@ -200,9 +199,8 @@
 		padding: 8px 10px;
 		border-radius: 12px;
 		cursor: pointer;
-		transition: background-color .14s ease;
+		transition: background-color .15s ease;
 	}
-	.eintrag { transition: background-color .15s ease; }
 	.eintrag:hover { background: var(--hover); }
 	.eintrag.aktiv { background: var(--akzent-soft); }
 	.eintrag.aktiv::before {
@@ -214,17 +212,11 @@
 		border-radius: 3px;
 		background: var(--akzent);
 	}
-	.eintrag .zeile1 { display: flex; align-items: baseline; gap: 6px; }
+	.eintrag .zeile1 { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
 	.eintrag .name { flex: 1; font-size: 14.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.eintrag .zeit { color: #757b84; font-size: 11.5px; flex: none; }
+	.eintrag .zeit { color: #757b84; font-size: 11.5px; }
 	.eintrag .vorschau { grid-column: 2; color: #82888f; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.eintrag .vorschau b { color: #aeb4bc; font-weight: 500; }
-	.eintrag.aktiv .vorschau { color: #97a0aa; }
-	.eintrag.ungelesen .vorschau b { color: var(--text); }
-	.schloss { flex: none; width: 13px; height: 13px; color: #6f93b8; }
-	.verborgen { display: none; }
 	.avatar {
-		--ring: #202429;
 		grid-row: span 2;
 		position: relative;
 		width: 42px; height: 42px;
@@ -242,9 +234,10 @@
 		width: 11px; height: 11px;
 		border-radius: 50%;
 		background: #2ecc71;
-		border: 2.5px solid var(--ring);
+		border: 2.5px solid var(--liste);
 		box-shadow: 0 0 0 1px rgba(46, 204, 113, .25);
 	}
+	.schloss-klein { width: 13px; height: 13px; color: #6f93b8; }
 
 	/* ---------- Chat ---------- */
 	.chat {
@@ -255,12 +248,12 @@
 		background:
 			radial-gradient(520px 380px at 82% -6%, rgba(0, 128, 255, .12), transparent 64%),
 			radial-gradient(640px 460px at 8% 108%, rgba(22, 160, 133, .09), transparent 66%),
-			radial-gradient(380px 300px at 30% 55%, rgba(60, 90, 160, .07), transparent 70%),
-			var(--chat-bg);
+			var(--chat);
 	}
 	.kopfleiste {
 		position: relative;
 		z-index: 2;
+		flex: none;
 		min-height: 62px;
 		display: flex;
 		align-items: center;
@@ -271,21 +264,23 @@
 		-webkit-backdrop-filter: blur(18px) saturate(1.25);
 		backdrop-filter: blur(18px) saturate(1.25);
 	}
-	.kopfleiste .titel { display: flex; align-items: center; gap: 13px; }
-	.kopfleiste .titel .avatar { --ring: #17191c; width: 38px; height: 38px; font-size: 14px; grid-row: auto; }
-	.kopfleiste .name-row { display: flex; align-items: center; gap: 8px; }
+	.kopfleiste .titel { display: flex; align-items: center; gap: 13px; min-width: 0; }
+	.kopfleiste .avatar { width: 38px; height: 38px; font-size: 14px; }
+	.kopfleiste .name-reihe { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 	.kopfleiste strong { font-size: 15.5px; letter-spacing: -.01em; }
 	.kopfleiste .status { color: var(--muted); font-size: 12px; margin-top: 1px; }
-	.schloss-badge {
+	.klassifiziert {
 		display: inline-flex; align-items: center; gap: 6px;
 		padding: 4px 11px;
 		border-radius: 999px;
 		border: 1px solid rgba(111, 147, 184, .35);
+		background: rgba(0, 128, 255, .1);
 		color: #8fb4d9;
 		font-size: 12px; font-weight: 500;
 	}
-	.schloss-badge svg { width: 13px; height: 13px; }
-	.kopf-aktionsknopf {
+	.klassifiziert svg { width: 13px; height: 13px; }
+	.kopf-space { flex: 1; }
+	.kopf-knopf {
 		width: 36px; height: 36px;
 		display: grid; place-items: center;
 		border: 0; border-radius: 10px;
@@ -294,10 +289,18 @@
 		cursor: pointer;
 		transition: background-color .15s ease, color .15s ease;
 	}
-	.kopf-aktionsknopf:hover { background: var(--hover); color: var(--text); }
-	.kopf-aktionsknopf svg { width: 19px; height: 19px; }
+	.kopf-knopf:hover { background: var(--hover); color: var(--text); }
+	.kopf-knopf svg { width: 19px; height: 19px; }
 
-	.verlauf { flex: 1; min-height: 0; overflow: auto; padding: 16px 26px 8px; display: flex; flex-direction: column; gap: 3px; scroll-behavior: smooth; }
+	.verlauf {
+		flex: 1;
+		min-height: 0;
+		overflow: auto;
+		padding: 16px 26px 8px;
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
 	.tagespille { align-self: center; margin: 8px 0 14px; }
 	.tagespille span {
 		display: inline-block;
@@ -309,26 +312,7 @@
 		backdrop-filter: blur(12px);
 		color: #848a92;
 		font-size: 11.5px;
-		letter-spacing: .01em;
 	}
-	.systemzeile {
-		align-self: center;
-		margin: 10px 0;
-		color: #757b84;
-		font-size: 12px;
-	}
-	.systemzeile::before, .systemzeile::after { content: "—"; margin: 0 8px; color: #3c4048; }
-	.ungelesen-trenner {
-		align-self: center;
-		display: flex; align-items: center; gap: 10px;
-		margin: 14px 0;
-		color: var(--akzent);
-		font-size: 11.5px; font-weight: 600; letter-spacing: .02em;
-		width: 100%;
-	}
-	.ungelesen-trenner::before { content: ''; flex: 1; height: 1px; background: var(--akzent); }
-	.ungelesen-trenner::after { content: ''; flex: 1; height: 1px; background: var(--akzent); }
-
 	.msg { display: flex; flex-direction: column; align-items: flex-start; max-width: 68%; margin: 1px 0; }
 	.msg.aus { align-items: flex-end; margin-inline-start: auto; }
 	.msg .autor { margin: 8px 6px 2px; color: var(--muted); font-size: 12px; }
@@ -344,16 +328,14 @@
 		line-height: 1.45;
 		color: #eef1f4;
 		box-shadow: 0 4px 14px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .08);
-		transition: background-color .16s ease, border-color .16s ease;
+		transition: border-color .16s ease;
 	}
 	.msg:hover .bubble { border-color: rgba(255, 255, 255, .14); }
 	.bubble::after {
 		content: '';
 		position: absolute;
-		inset-inline: 26px;
-		top: 0;
+		left: 26px; right: 26px; top: 0;
 		height: 1px;
-		border-radius: 1px;
 		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent);
 	}
 	.msg.aus .bubble {
@@ -361,98 +343,49 @@
 		background: linear-gradient(165deg, rgba(0, 128, 255, .6), rgba(0, 110, 225, .46));
 		color: #fff;
 	}
+	.zeitstempel { margin: 3px 6px 6px; color: #71767e; font-size: 10.5px; }
+	.msg.aus .zeitstempel { color: #78a9d2; }
 	.reaktion {
 		align-self: flex-start;
+		z-index: 1;
 		display: inline-flex; align-items: center; gap: 5px;
-		margin: -9px 10px 0;
 		height: 22px; padding: 0 9px;
+		margin: -10px 10px 0;
 		border-radius: 999px;
 		border: 1px solid rgba(255, 255, 255, .1);
-		background: rgba(24, 27, 32, .72);
-		-webkit-backdrop-filter: blur(12px);
-		backdrop-filter: blur(12px);
+		background: rgba(24, 27, 32, .85);
 		font-size: 11.5px;
-		box-shadow: 0 1px 2px rgba(0,0,0,.25), inset 0 1px 0 rgba(255, 255, 255, .06);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
 	}
-	.msg.aus .reaktion { align-self: flex-end; }
-	.reaktion.fein { opacity: .9; }
-	.zeit-innerhalb { margin: 3px 13px 0; color: #6f94b8; font-size: 10px; align-self: flex-end; }
-	.msg .zeitstempel { margin: 3px 6px 6px; color: #71767e; font-size: 10.5px; }
-	.msg.aus .zeitstempel { color: #78a9d2; }
 
-	.bildmeldung {
-		width: 268px;
-		padding: 4px;
-		border-radius: 15px;
-		border: 1px solid rgba(255, 255, 255, .12);
-		background: linear-gradient(160deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .04));
-		-webkit-backdrop-filter: blur(15px) saturate(1.25);
-		backdrop-filter: blur(15px) saturate(1.25);
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .07);
-	}
-	.msg.aus .bildmeldung {
-		border-color: rgba(255, 255, 255, .18);
-		background: linear-gradient(165deg, rgba(0, 128, 255, .62), rgba(0, 118, 232, .48));
-	}
-	.bildrahm {
-		height: 150px;
-		border-radius: 9px;
-		background:
-			radial-gradient(120px 80px at 30% 30%, rgba(255,255,255,.25), transparent 60%),
-			linear-gradient(150deg, #1c5d8f 0%, #123a56 55%, #0f2b3f 100%);
-		display: grid; place-items: center;
-	}
+	.bildmeldung { width: 268px; padding: 4px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, .12); background: linear-gradient(160deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .045)); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); box-shadow: 0 4px 14px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .08); }
+	.msg.aus .bildmeldung { border-color: rgba(140, 195, 255, .22); background: linear-gradient(165deg, rgba(0, 128, 255, .6), rgba(0, 110, 225, .46)); }
+	.bildrahm { height: 150px; border-radius: 11px; background: radial-gradient(120px 80px at 30% 30%, rgba(255, 255, 255, .25), transparent 60%), linear-gradient(150deg, #1c5d8f 0%, #123a56 55%, #0f2b3f 100%); display: grid; place-items: center; }
 	.bildrahm svg { width: 34px; height: 34px; color: rgba(255, 255, 255, .55); }
-	.bildfuss {
-		display: flex; align-items: center; justify-content: space-between; gap: 10px;
-		padding: 8px 10px 4px;
-	}
-	.bildfuss .text { font-size: 13px; }
-	.msg.aus .bildfuss .text { color: #fff; }
+	.bildfuss { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px 4px; }
+	.bildfuss .text { font-size: 13px; color: #eef1f4; }
 	.bildfuss svg { width: 14px; height: 14px; color: #9fc0dc; }
-	.msg.aus .bildfuss svg { color: rgba(255,255,255,.85); }
 
 	.dateikarte { display: flex; align-items: center; gap: 11px; padding: 9px 13px; width: 262px; }
-	.dateisymbol {
-		width: 40px; height: 40px; flex: none;
-		display: grid; place-items: center;
-		border-radius: 10px;
-		background: rgba(0, 0, 0, .22);
-	}
-	.dateisymbol svg { width: 20px; height: 20px; color: #cfd6de; }
+	.dateisymbol { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 10px; background: rgba(0, 0, 0, .22); }
 	.msg.aus .dateisymbol { background: rgba(0, 0, 0, .18); }
-	.dateikarte .detail strong { display: block; font-size: 13.5px; font-weight: 600; }
-	.dateikarte .detail small { color: rgba(237, 239, 242, .62); font-size: 11.5px; }
+	.dateisymbol svg { width: 20px; height: 20px; color: #cfd6de; }
+	.dateikarte strong { display: block; font-size: 13.5px; font-weight: 600; }
+	.dateikarte small { color: rgba(237, 239, 242, .62); font-size: 11.5px; }
 
-	.sprachnachricht { display: flex; align-items: center; gap: 11px; min-width: 236px; }
-	.sprachnachricht { min-width: 252px; }
-	.sprachnachricht svg.play { width: 30px; height: 30px; color: #dee5ec; }
+	.sprachnachricht { display: flex; align-items: center; gap: 11px; min-width: 252px; }
+	.sprachnachricht .play { width: 30px; height: 30px; color: #dee5ec; }
 	.welle { flex: 1; display: flex; align-items: center; gap: 2.5px; height: 26px; }
 	.welle i { flex: 1; border-radius: 2px; background: rgba(255, 255, 255, .35); }
 	.msg.aus .welle i { background: rgba(255, 255, 255, .5); }
-	.sprachnachricht .dauer { font-variant-numeric: tabular-nums; color: rgba(237, 239, 242, .62); font-size: 11.5px; }
+	.dauer { font-variant-numeric: tabular-nums; color: rgba(237, 239, 242, .62); font-size: 11.5px; }
 
-	/* Schreibt-Indikator */
-	.schreibt {
-		display: inline-flex; align-items: center; gap: 8px;
-		align-self: flex-start;
-		margin: 8px 0 2px;
-		padding: 9px 14px;
-		border-radius: 18px 18px 18px 6px;
-		border: 1px solid rgba(255, 255, 255, .09);
-		background: linear-gradient(160deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .04));
-		-webkit-backdrop-filter: blur(15px);
-		backdrop-filter: blur(15px);
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .07);
-		color: var(--muted); font-size: 12px;
-	}
-	.schreibt .punkte { display: inline-flex; gap: 3.5px; }
-	.schreibt .punkte i { width: 5.5px; height: 5.5px; border-radius: 50%; background: #9aa1aa; }
-	.schreibt .punkte i:nth-child(2) { opacity: .75; }
-	.schreibt .punkte i:nth-child(3) { opacity: .5; }
+	.ungelesen-trenner { align-self: center; display: flex; align-items: center; gap: 10px; margin: 14px 0; width: 100%; color: var(--akzent); font-size: 11.5px; font-weight: 600; }
+	.ungelesen-trenner::before, .ungelesen-trenner::after { content: ''; flex: 1; height: 1px; background: var(--akzent); }
+	.systemzeile { align-self: center; margin: 10px 0; color: #757b84; font-size: 12px; }
 
-	/* Ablauf-Hinweis */
 	.ablauf {
+		flex: none;
 		align-self: center;
 		display: inline-flex; align-items: center; gap: 7px;
 		margin: 4px 0 8px;
@@ -466,15 +399,7 @@
 	.ablauf svg { width: 13px; height: 13px; color: #6fa4d8; }
 
 	/* Composer */
-	.komponist { padding: 8px 16px 14px; }
-	.antwort-vorlage {
-		display: none;
-		align-items: center; gap: 10px;
-		margin: 0 0 8px; padding: 8px 13px;
-		border-inline-start: 3px solid var(--akzent);
-		border-radius: 8px;
-		background: var(--eingang);
-	}
+	.komponist { flex: none; padding: 8px 16px 14px; }
 	.komponistzeile {
 		display: flex; align-items: center; gap: 6px;
 		padding: 5px 7px;
@@ -512,20 +437,16 @@
 
 	/* ---------- Rechte Spalte ---------- */
 	.details {
-		flex: 0 0 292px;
+		flex: none;
+		width: 292px;
 		border-inline-start: 1px solid #23262b;
-		background: var(--panel-bg);
+		background: var(--panel);
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
 	}
-	.details__kopf {
-		display: flex; align-items: center; gap: 13px;
-		padding: 18px 18px 14px;
-		border-bottom: 1px solid rgba(255, 255, 255, .06);
-		background: rgba(255, 255, 255, .02);
-	}
-	.details__kopf .avatar { --ring: #1a1d21; width: 46px; height: 46px; font-size: 16px; grid-row: auto; }
+	.details__kopf { display: flex; align-items: center; gap: 13px; padding: 18px 18px 14px; }
+	.details__kopf .avatar { width: 46px; height: 46px; font-size: 16px; }
 	.details__kopf strong { display: block; font-size: 15.5px; letter-spacing: -.01em; }
 	.details__kopf small { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; margin-top: 2px; }
 	.details__kopf small svg { width: 12.5px; height: 12.5px; color: #6f93b8; }
@@ -536,18 +457,10 @@
 		border: 1px solid rgba(255, 255, 255, .07);
 		background: rgba(255, 255, 255, .04);
 	}
-	.tab {
-		flex: 1; padding: 7px 0;
-		text-align: center;
-		border-radius: 10px;
-		color: var(--muted);
-		font-size: 12.5px; font-weight: 500;
-		cursor: pointer;
-		transition: background-color .16s ease, color .16s ease;
-	}
+	.tab { flex: 1; padding: 7px 0; text-align: center; border-radius: 10px; color: var(--muted); font-size: 12.5px; font-weight: 500; cursor: pointer; transition: background-color .16s ease, color .16s ease; }
 	.tab:hover { color: var(--text); }
 	.tab.aktiv { background: var(--akzent-soft); color: #9ac8f5; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05); }
-	.details__inhalt { flex: 1; overflow: auto; padding: 4px 14px 18px; }
+	.details__inhalt { flex: 1; min-height: 0; overflow: auto; padding: 4px 14px 18px; }
 	.medien-raster { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
 	.medien-raster div {
 		aspect-ratio: 1;
@@ -560,233 +473,237 @@
 	}
 	.medien-raster div:nth-child(3n) { background: radial-gradient(90px 60px at 60% 35%, rgba(255, 255, 255, .13), transparent 60%), linear-gradient(155deg, #1d4f4a, #133a37); }
 	.medien-raster div:nth-child(3n+2) { background: radial-gradient(90px 60px at 40% 40%, rgba(255, 255, 255, .12), transparent 60%), linear-gradient(155deg, #22334d, #16263a); }
-	.abschnitts-kopf {
-		margin: 18px 2px 9px;
-		color: #757b84;
-		font-size: 11.5px; font-weight: 600;
-		letter-spacing: .06em; text-transform: uppercase;
-	}
+	.abschnitts-kopf { margin: 18px 2px 9px; color: #757b84; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 	.datei-zeile { display: flex; align-items: center; gap: 11px; padding: 8px 6px; border-radius: 9px; font-size: 13px; }
 	.datei-zeile:hover { background: var(--hover); }
 	.datei-zeile .dateisymbol { width: 34px; height: 34px; background: #23272d; }
 	.datei-zeile .dateisymbol svg { color: #9aa2ac; }
 	.datei-zeile strong { display: block; font-size: 13px; font-weight: 500; }
 	.datei-zeile small { color: var(--muted); font-size: 11.5px; }
-	.hinweiskarte {
-		margin-top: 16px;
-		padding: 12px 14px;
-		border-radius: 11px;
-		border: 1px solid rgba(111, 147, 184, .28);
-		background: rgba(0, 64, 128, .1);
-		font-size: 12.5px;
-		line-height: 1.55;
-		color: #a4bcd4;
-	}
+	.hinweiskarte { margin-top: 16px; padding: 12px 14px; border-radius: 11px; border: 1px solid rgba(111, 147, 184, .28); background: rgba(0, 64, 128, .1); font-size: 12.5px; line-height: 1.55; color: #a4bcd4; }
 	.hinweiskarte strong { color: var(--text); font-weight: 600; }
 	.hinweiskarte svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 5px; color: #6fa4d8; }
+
+	/* ================================================================
+	   Responsiv
+	   ================================================================ */
+	@media (max-width: 1100px) { .details { display: none; } }
+	@media (max-width: 820px) { .nav-talk { display: none; } .msg { max-width: 82%; } .msg.aus { max-width: 82%; } }
+	@media (max-width: 560px) {
+		.kopf { padding: 12px 12px 8px; }
+		.app { padding: 0 10px 10px; }
+		.schiene { width: 62px; }
+		.schiene .navpunkt .label { display: none; }
+		.msg { max-width: 92%; } .msg.aus { max-width: 92%; }
+		.kopfleiste .status { display: none; }
+		.verlauf { padding: 12px 12px 6px; }
+	}
 </style>
 </head>
 <body>
 
-<div class="vorschau-kopf">
-	<h1>Talk Web · Vorschau im Design der App <small>(responsive · Ladescreen links)</small></h1>
-	<div class="ladekarte" style="width:200px" role="status">
+<header class="kopf">
+	<h1>Talk Web · Vorschau im Design der App
+		<small>Eigenständige Datei · responsiv: Fenster verkleinern · Ladescreen rechts</small>
+	</h1>
+	<div class="ladekarte" role="status">
 		<div class="ladewingel"></div>
-		<div class="ladetext">austit Talk wird geladen …</div>
-		<div class="marke-lade">austit talk</div>
+		<div class="ladeworte">
+			<b>austit Talk wird geladen …</b>
+			<small>austit talk</small>
+		</div>
 	</div>
-</div>
+</header>
 
-<div class="rumpf">
-	<!-- Schiene: alle Apps der austit Cloud -->
-	<nav class="schiene">
-		<div class="kachelmarke">
-			<svg viewBox="0 0 128 128" width="24" height="24" aria-hidden="true"><path d="M82.17 92.6H45.89L40.16 109H16.83L50.17 19h27.66l33.34 90H87.84ZM51.67 75.91h24.66L64.03 40.1Z" fill="#57b6ff"/></svg>
-		</div>
-		<div class="navpunkt" title="Start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Start</span></div>
-		<div class="navpunkt aktiv" title="Talk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg><span>Talk</span><span class="punkt-pille">3</span></div>
-		<div class="navpunkt" title="Dateien"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Dateien</span></div>
-		<div class="navpunkt" title="Kalender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>Kalender</span></div>
-		<div class="navpunkt" title="Notizbücher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg><span>Notizbücher</span></div>
-		<div class="navpunkt" title="Fotos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg><span>Fotos</span></div>
-		<div class="navpunkt" title="Einstellungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Einstellungen</span></div>
-	</nav>
+<div class="app">
+	<div class="app-innen">
 
-	<!-- Gespraechsliste -->
-	<aside class="nav-talk">
-		<div class="nav-kopf">
-			<h1>Talk</h1>
-			<button class="rund-knopf" title="Neue Unterhaltung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
-		</div>
-		<div class="suche">
-			<label class="suchfeld">
+		<nav class="schiene">
+			<div class="marke-kachel">
+				<svg viewBox="0 0 128 128" width="24" height="24" aria-hidden="true"><path d="M82.17 92.6H45.89L40.16 109H16.83L50.17 19h27.66l33.34 90H87.84ZM51.67 75.91h24.66L64.03 40.1Z" fill="#57b6ff"/></svg>
+			</div>
+			<div class="navpunkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="label">Start</span></div>
+			<div class="navpunkt aktiv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg><span class="label">Talk</span><span class="badge">3</span></div>
+			<div class="navpunkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="label">Dateien</span></div>
+			<div class="navpunkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span class="label">Kalender</span></div>
+			<div class="navpunkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg><span class="label">Notizbücher</span></div>
+			<div class="navpunkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg><span class="label">Fotos</span></div>
+			<div class="navpunkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="label">Einstellungen</span></div>
+		</nav>
+
+		<aside class="nav-talk">
+			<div class="nav-kopf">
+				<h2>Talk</h2>
+				<button class="rund-knopf" title="Neue Unterhaltung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+			</div>
+			<div class="suche">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 				Unterhaltungen, Nachrichten …
-			</label>
-		</div>
-		<div class="liste">
-			<div class="eintrag aktiv">
-				<div class="avatar blau">2<span class="anwesend"></span></div>
-				<div class="zeile1"><span class="name">2. Klasse Informatik</span><svg class="schloss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span class="zeit">08:41</span></div>
-				<span class="vorschau verborgen"></span>
 			</div>
-			<div class="eintrag">
-				<div class="avatar tuerkis">P</div>
-				<div class="zeile1"><span class="name">Projekt Webseite</span><svg class="schloss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span class="zeit">Gestern</span></div>
-				<span class="vorschau verborgen"></span>
+			<div class="liste">
+				<div class="eintrag aktiv">
+					<div class="avatar blau">2<span class="anwesend"></span></div>
+					<div class="zeile1">
+						<span class="name">2. Klasse Informatik</span>
+						<svg class="schloss-klein" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+						<span class="zeit">08:41</span>
+					</div>
+					<span class="vorschau"></span>
+				</div>
+				<div class="eintrag">
+					<div class="avatar tuerkis">P</div>
+					<div class="zeile1">
+						<span class="name">Projekt Webseite</span>
+						<svg class="schloss-klein" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+						<span class="zeit">Gestern</span>
+					</div>
+					<span class="vorschau"></span>
+				</div>
+				<div class="eintrag">
+					<div class="avatar blau">K<span class="anwesend"></span></div>
+					<div class="zeile1"><span class="name">Katao</span><span class="zeit">08:13</span></div>
+					<span class="vorschau">Ja hammer mich. Melde mich später!</span>
+				</div>
+				<div class="eintrag">
+					<div class="avatar violett">L</div>
+					<div class="zeile1"><span class="name">Laura M.</span><span class="zeit">Di</span></div>
+					<span class="vorschau">Danke, bis morgen 🙂</span>
+				</div>
+				<div class="eintrag">
+					<div class="avatar">J</div>
+					<div class="zeile1"><span class="name">Jonas K.</span><span class="zeit">Di</span></div>
+					<span class="vorschau">OK passt</span>
+				</div>
 			</div>
-			<div class="eintrag ungelesen">
-				<div class="avatar blau">K<span class="anwesend"></span></div>
-				<div class="zeile1"><span class="name">Katao</span><span class="zeit">08:13</span></div>
-				<span class="vorschau"><b>Ja hammer mich. Melde mich später!</b></span>
-			</div>
-			<div class="eintrag">
-				<div class="avatar violett">L</div>
-				<div class="zeile1"><span class="name">Laura M.</span><span class="zeit">Di</span></div>
-				<span class="vorschau">Danke, bis morgen 🙂</span>
-			</div>
-			<div class="eintrag">
-				<div class="avatar">J</div>
-				<div class="zeile1"><span class="name">Jonas K.</span><span class="zeit">Di</span></div>
-				<span class="vorschau">OK passt</span>
-			</div>
-			<div class="eintrag">
-				<div class="avatar tuerkis">F</div>
-				<div class="zeile1"><span class="name">Fachschaft</span><span class="zeit">Mo</span></div>
-				<span class="vorschau">Frau Weber: Steht alles im Notizbuch</span>
-			</div>
-		</div>
-	</aside>
+		</aside>
 
-	<!-- Chat -->
-	<main class="chat">
-		<header class="kopfleiste">
-			<div class="titel">
+		<main class="chat">
+			<header class="kopfleiste">
+				<div class="titel">
+					<div class="avatar blau">2</div>
+					<div>
+						<div class="name-reihe">
+							<strong>2. Klasse Informatik</strong>
+							<span class="klassifiziert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Geheime Unterhaltung</span>
+						</div>
+						<div class="status">6 Teilnehmer · Ortszeit: 08:41 · Nachrichten laufen nach 1 Stunde ab</div>
+					</div>
+				</div>
+				<span class="kopf-space"></span>
+				<button class="kopf-knopf" title="Anrufen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.37 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.33 1.84.57 2.8.7a2 2 0 0 1 1.7 2z"/></svg></button>
+				<button class="kopf-knopf" title="Videoanruf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg></button>
+				<button class="kopf-knopf" title="Suchen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+				<button class="kopf-knopf" title="Mehr"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>
+			</header>
+
+			<div class="verlauf">
+				<div class="tagespille"><span>Gestern</span></div>
+				<div class="msg">
+					<span class="autor">Herr Baur · 17:02</span>
+					<div class="bubble">Ich habe den Zeitplan für nächste Woche hochgeladen. Schaut bitte mal drüber, bevor wir Freitag besprechen.</div>
+				</div>
+				<div class="msg aus">
+					<div class="bubble">Mach ich 👍</div>
+					<span class="zeitstempel">17:04</span>
+				</div>
+				<div class="tagespille"><span>Heute</span></div>
+				<div class="msg">
+					<span class="autor">Franzi · 08:12</span>
+					<div class="bubble">Hey, hat jemand die Bilder von der Expo? Ich finds nirgends 🙈</div>
+					<span class="reaktion">😄 3</span>
+				</div>
+				<div class="msg aus">
+					<div class="bildmeldung">
+						<div class="bildrahm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div>
+						<div class="bildfuss">
+							<span class="text">Expo-Tag_Stand.jpg</span>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+						</div>
+					</div>
+					<span class="zeitstempel">08:14 · nur im Chat sichtbar, läuft um 09:14 ab</span>
+				</div>
+				<div class="msg aus">
+					<div class="dateikarte">
+						<div class="dateisymbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div>
+						<div><strong>Agenda-Wochenplan.pdf</strong><small>245 kB · läuft um 09:14 ab</small></div>
+					</div>
+					<span class="zeitstempel">08:15</span>
+				</div>
+				<div class="msg">
+					<span class="autor">Jonas · 08:22</span>
+					<div class="bubble">Super, danke! Kann ich das auch bei mir in den Dateien finden?</div>
+				</div>
+				<div class="msg aus">
+					<div class="bubble">Nein — in einer geheimen Unterhaltung bleibt alles nur hier im Chat.</div>
+					<span class="zeitstempel">08:26</span>
+				</div>
+				<div class="ungelesen-trenner">2 neue Nachrichten</div>
+				<div class="msg">
+					<span class="autor">Katao · 08:31</span>
+					<div class="sprachnachricht bubble">
+						<svg class="play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+						<span class="welle"><i style="height:7px"></i><i style="height:12px"></i><i style="height:5px"></i><i style="height:16px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:6px"></i><i style="height:14px"></i><i style="height:8px"></i><i style="height:11px"></i><i style="height:5px"></i><i style="height:15px"></i><i style="height:9px"></i><i style="height:6px"></i><i style="height:12px"></i><i style="height:7px"></i></span>
+						<span class="dauer">0:34</span>
+					</div>
+					<span class="zeitstempel">08:31</span>
+				</div>
+				<div class="msg">
+					<span class="autor">Franzi · 08:38</span>
+					<div class="bubble">Perfekt, dann plan ich das fürs Plakat ein 🎉</div>
+				</div>
+			</div>
+
+			<div class="ablauf">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+				Nachrichten und Dateien dieser Unterhaltung werden nach 1 Stunde gelöscht
+			</div>
+
+			<div class="komponist">
+				<div class="komponistzeile">
+					<button class="werkzeug" title="Emojis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5s1.2 1.8 3.5 1.8 3.5-1.8 3.5-1.8"/><circle cx="9" cy="9.5" r=".4" fill="currentColor"/><circle cx="15" cy="9.5" r=".4" fill="currentColor"/></svg></button>
+					<button class="werkzeug" title="Datei anhängen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.4 11.3-8.5 8.5a5.5 5.5 0 0 1-7.8-7.8l8.5-8.5a3.7 3.7 0 0 1 5.2 5.2l-8.5 8.5a1.8 1.8 0 0 1-2.6-2.6l7.8-7.7"/></svg></button>
+					<span class="textzeile">Nachricht schreiben …</span>
+					<button class="werkzeug" title="Sprachnachricht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+					<button class="senden" title="Senden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+				</div>
+			</div>
+		</main>
+
+		<aside class="details">
+			<div class="details__kopf">
 				<div class="avatar blau">2</div>
 				<div>
-					<div class="name-row">
-						<strong>2. Klasse Informatik</strong>
-						<span class="schloss-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Geheime Unterhaltung</span>
-					</div>
-					<div class="status">6 Teilnehmer · Ortszeit: 08:41 · Nachrichten laufen nach 1 Stunde ab</div>
+					<strong>2. Klasse Informatik</strong>
+					<small><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Geheim · läuft um 09:41 ab</small>
 				</div>
 			</div>
-			<span style="flex:1"></span>
-			<button class="kopf-aktionsknopf" title="Anrufen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.37 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.33 1.84.57 2.8.7a2 2 0 0 1 1.7 2z"/></svg></button>
-			<button class="kopf-aktionsknopf" title="Videoanruf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg></button>
-			<button class="kopf-aktionsknopf" title="In Unterhaltung suchen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
-			<button class="kopf-aktionsknopf" title="Mehr"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>
-		</header>
-
-		<div class="verlauf">
-			<div class="tagespille"><span>Gestern</span></div>
-			<div class="msg">
-				<span class="autor">Herr Baur · 17:02</span>
-				<div class="bubble">Ich habe den Zeitplan für nächste Woche hochgeladen. Schaut bitte mal drüber, bevor wir Freitag besprechen.</div>
+			<div class="tabs">
+				<div class="tab aktiv">Medien</div>
+				<div class="tab">Dateien</div>
+				<div class="tab">Sprachnachr.</div>
 			</div>
-			<div class="msg aus">
-				<div class="bubble">Mach ich 👍</div>
-				<span class="zeitstempel">17:04</span>
-			</div>
-			<div style="height:6px"></div>
-			<div class="tagespille"><span>Heute</span></div>
-			<div class="msg">
-				<span class="autor">Franzi · 08:12</span>
-				<div class="bubble">Hey, hat jemand die Bilder von der Expo? Ich finds nirgends 🙈</div>
-				<span class="reaktion fein">😄 3</span>
-			</div>
-			<div class="msg aus">
-				<div class="bildmeldung">
-					<div class="bildrahm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div>
-					<div class="bildfuss">
-						<span class="text">Expo-Tag_Stand.jpg</span>
-						<span style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg></span>
-					</div>
+			<div class="details__inhalt">
+				<div class="medien-raster">
+					<div><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div><div><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div><div><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div>
+					<div><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div><div><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div><div><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div>
 				</div>
-				<span class="zeitstempel">08:14 · nur im Chat sichtbar, läuft um 09:14 ab</span>
-			</div>
-			<div class="msg aus">
-				<div class="dateikarte">
+				<div class="abschnitts-kopf">Zuletzt geteilt</div>
+				<div class="datei-zeile">
 					<div class="dateisymbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div>
-					<div class="detail"><strong>Agenda-Wochenplan.pdf</strong><small>245 kB · läuft um 09:14 ab</small></div>
+					<div><strong>Agenda-Wochenplan.pdf</strong><small>245 kB · vor 26 Min.</small></div>
 				</div>
-				<span class="zeitstempel">08:15</span>
-			</div>
-			<div class="msg">
-				<span class="autor">Jonas · 08:22</span>
-				<div class="bubble">Super, danke! Kann ich das auch bei mir in den Dateien finden?</div>
-			</div>
-			<div class="msg aus">
-				<div class="bubble">Nein — in einer geheimen Unterhaltung bleibt alles nur hier im Chat.</div>
-				<span class="zeitstempel">08:26 ✓✓</span>
-			</div>
-			<div class="msg">
-				<span class="autor">Katao · 08:31</span>
-				<div class="sprachnachricht bubble">
-					<svg class="play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
-					<span class="welle"><i style="height:7px"></i><i style="height:12px"></i><i style="height:5px"></i><i style="height:16px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:6px"></i><i style="height:14px"></i><i style="height:8px"></i><i style="height:11px"></i><i style="height:5px"></i><i style="height:15px"></i><i style="height:9px"></i><i style="height:6px"></i><i style="height:12px"></i><i style="height:7px"></i><i style="height:10px"></i></span>
-					<span class="dauer">0:34</span>
+				<div class="datei-zeile">
+					<div class="dateisymbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div>
+					<div><strong>Expo-Tag_Stand.jpg</strong><small>1,8 MB · vor 27 Min.</small></div>
 				</div>
-				<span class="zeitstempel">08:31</span>
+				<div class="hinweiskarte">
+					<strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Geschützte Unterhaltung</strong><br>
+					Alles hier ist verschlüsselt, bleibt nur im Chat und wird nach Ablauf automatisch gelöscht.
+				</div>
 			</div>
-			<div class="ungelesen-trenner">2 neue Nachrichten</div>
-			<div class="msg">
-				<span class="autor">Franzi · 08:38</span>
-				<div class="bubble">Perfekt, dann plan ich das fürs Plakat ein 🎉</div>
-			</div>
-			<div class="schreibt"><span class="punkte"><i></i><i></i><i></i></span> Jonas schreibt …</div>
-		</div>
+		</aside>
 
-		<div class="ablauf">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-			Nachrichten und Dateien dieser Unterhaltung werden nach 1 Stunde gelöscht
-		</div>
-
-		<div class="komponist">
-			<div class="komponistzeile">
-				<button class="werkzeug" title="Emojis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5s1.2 1.8 3.5 1.8 3.5-1.8 3.5-1.8"/><circle cx="9" cy="9.5" r=".4" fill="currentColor"/><circle cx="15" cy="9.5" r=".4" fill="currentColor"/></svg></button>
-				<button class="werkzeug" title="Datei anhängen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.4 11.3-8.5 8.5a5.5 5.5 0 0 1-7.8-7.8l8.5-8.5a3.7 3.7 0 0 1 5.2 5.2l-8.5 8.5a1.8 1.8 0 0 1-2.6-2.6l7.8-7.7"/></svg></button>
-				<span class="textzeile">Nachricht schreiben …</span>
-				<button class="werkzeug" title="Sprachnachricht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
-				<button class="senden" title="Senden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
-			</div>
-		</div>
-	</main>
-
-	<!-- Rechte Spalte -->
-	<aside class="details">
-		<div class="details__kopf">
-			<div class="avatar blau">2</div>
-			<div>
-				<strong>2. Klasse Informatik</strong>
-				<small><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Geheim · läuft um 09:41 ab</small>
-			</div>
-		</div>
-		<div class="tabs">
-			<div class="tab aktiv">Medien</div>
-			<div class="tab">Dateien</div>
-			<div class="tab">Sprachnachr.</div>
-		</div>
-		<div class="details__inhalt">
-			<div class="medien-raster">
-				<div>▶</div><div>▶</div><div>▶</div>
-				<div>▶</div><div>▶</div><div>▶</div>
-			</div>
-			<div class="abschnitts-kopf">Zuletzt geteilt</div>
-			<div class="datei-zeile">
-				<div class="dateisymbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div>
-				<div><strong>Agenda-Wochenplan.pdf</strong><small>245 kB · vor 26 Min.</small></div>
-			</div>
-			<div class="datei-zeile">
-				<div class="dateisymbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div>
-				<div><strong>Expo-Tag_Stand.jpg</strong><small>1,8 MB · vor 27 Min.</small></div>
-			</div>
-			<div class="hinweiskarte">
-				<strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Geschützte Unterhaltung</strong><br>
-				Alles hier ist verschlüsselt, bleibt nur im Chat und wird nach Ablauf automatisch gelöscht.
-			</div>
-		</div>
-	</aside>
+	</div>
 </div>
 
 </body>
