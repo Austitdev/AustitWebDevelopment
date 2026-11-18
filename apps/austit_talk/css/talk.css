@@ -93,7 +93,11 @@ body[data-theme-dark-highcontrast] #austit-talk {
 	--at-app-soft: rgba(87, 182, 255, .18);
 }
 
-@supports not ((backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px))) or (prefers-reduced-transparency: reduce) and (prefers-reduced-transparency: reduce)) {
+@supports not ((backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px))) {
+	#austit-talk { --at-glas: var(--at-surface); --at-glas-weich: var(--at-hover); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
 	#austit-talk { --at-glas: var(--at-surface); --at-glas-weich: var(--at-hover); }
 }
 
@@ -134,41 +138,50 @@ body[data-theme-dark-highcontrast] #austit-talk {
 body[data-theme-dark] #austit-talk .at-search:focus-within,
 body[data-theme-dark] #austit-talk .at-field input:focus { border-color: rgba(87, 182, 255, .55); }
 
-/* Ladescreen im App-Design: Spinner und austit-Schriftzug */
+/* Ladescreen im App-Design: Glas-Kachel mit Logo und Wortmarke */
 #austit-talk .at-loading {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	gap: 16px;
 	min-height: 60%;
-	font-size: 15px;
-	letter-spacing: .01em;
+	padding: 60px 0;
+	color: var(--at-muted);
+	font-size: 14px;
+	letter-spacing: .02em;
 }
 
 #austit-talk .at-loading::before {
 	content: '';
-	width: 42px;
-	height: 42px;
-	margin-bottom: 18px;
-	border: 3px solid var(--at-soft);
-	border-top-color: var(--at-app-accent);
-	border-radius: 50%;
-	animation: at-drehen 1s linear infinite;
+	width: 86px;
+	height: 86px;
+	border-radius: 26px;
+	border: 1px solid var(--at-kante-weich);
+	background:
+		url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cpath d='M82.17 92.6H45.89L40.16 109H16.83L50.17 19h27.66l33.34 90H87.84ZM51.67 75.91h24.66L64.03 40.1Z' fill='%230080ff'/%3E%3C/svg%3E") center/44px 44px no-repeat,
+		linear-gradient(160deg, var(--at-glas-weich), transparent);
+	-webkit-backdrop-filter: blur(18px) saturate(1.3);
+	backdrop-filter: blur(18px) saturate(1.3);
+	animation: at-atmen 2.6s ease-in-out infinite;
 }
 
 #austit-talk .at-loading::after {
-	content: 'austit Talk';
-	margin-top: 10px;
+	content: 'austit talk';
+	margin-top: 4px;
 	color: var(--at-muted);
-	font-size: 12px;
-	letter-spacing: .12em;
+	font-size: 10.5px;
+	letter-spacing: .26em;
 	text-transform: uppercase;
 }
 
-@keyframes at-drehen { to { transform: rotate(360deg); } }
+@keyframes at-atmen {
+	0%, 100% { box-shadow: 0 12px 36px var(--at-shadow), 0 0 26px var(--at-app-soft), inset 0 1px 0 var(--at-kante-weich); }
+	50% { box-shadow: 0 12px 36px var(--at-shadow), 0 0 54px var(--at-app-soft), inset 0 1px 0 var(--at-kante-weich); }
+}
 
-/* Bewegungsreduzierung: Spinner langsam statt Schleife */
+/* Bewegungsreduzierung: Kachel ohne Puls */
 @media (prefers-reduced-motion: reduce) {
-	#austit-talk .at-loading::before { animation-duration: 2.4s; }
+	#austit-talk .at-loading::before { animation: none; }
 }
