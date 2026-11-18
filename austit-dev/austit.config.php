@@ -15,6 +15,11 @@ $CONFIG = [
 	'updatechecker' => false,
 	// Der Web-Updater wuerde die austit-Anpassungen mit dem Original ueberschreiben.
 	'upgrade.disable-web' => true,
+	// Kein Nextcloud App Store: der Apps-Katalog bleibt leer, der Link wird
+	// ausgeblendet und die Update-Benachrichtigung fragt keine App-Versionen ab.
+	// Apps (auch Mail, Calendar, Social Login, TOTP) werden ausschliesslich
+	// ueber den eigenen austit_store aus den Austit-Repositories verwaltet.
+	'appstoreenabled' => false,
 	// Apps, die weder im App Store noch bei "occ upgrade" aktualisiert werden.
 	// Talk (spreed) bleibt fest, weil das Backend durch eine eigene Implementierung ersetzt wird.
 	'app_update_blocklist' => [
