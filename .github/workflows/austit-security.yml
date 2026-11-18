@@ -9,15 +9,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'composer.lock'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'apps/**/composer.lock'
-      - 'apps/**/package.json'
-      - 'apps/**/package-lock.json'
-      - 'apps/**/gradle.lockfile'
-      - 'apps/**/pom.xml'
 
 permissions:
   contents: read
