@@ -3,89 +3,273 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-/* austit design for the Talk interface. The tokens come from the austit shell,
-   which loads on every page of the logged-in workspace, the fallbacks keep the
-   design intact where the shell is absent. */
+/* Design der austit Talk App im Web: Glas-Muster mit dem App-Akzent (#0080FF).
+   Die Wirkung zieht sich durch die gesamte Talk-Oberflaeche: Gespraechsliste,
+   Chat, Composer und rechte Seitenleiste. Farben folgen dem Theme des Nutzers,
+   das Muster bleibt in hell und dunkel identisch. Responsiv bis auf schmale
+   Bildschirme; ohne Unterstuetzung von backdrop-filter greifen deckende
+   Ersatzflaechen. Wird nur auf Seiten von Talk geladen. */
 
-/* Conversation list */
-
-#content .app-navigation {
-	border-right: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
-	background: var(--austit-surface, var(--color-main-background, #fff));
+html.austit-shell #content.app-spreed {
+	--at-accent: #0080ff;
+	--at-accent-hover: #0a8fff;
+	--at-accent-soft: rgba(0, 128, 255, .14);
+	--at-tint: color-mix(in srgb, var(--austit-text, #1f2328) 8%, transparent);
+	--at-tint-soft: color-mix(in srgb, var(--austit-text, #1f2328) 4%, transparent);
+	--at-soft: color-mix(in srgb, var(--austit-text, #1f2328) 6%, transparent);
+	--at-kante: color-mix(in srgb, var(--austit-text, #1f2328) 9%, transparent);
+	--at-kante-hell: color-mix(in srgb, var(--austit-text, #1f2328) 14%, transparent);
+	--at-flaeche: color-mix(in srgb, var(--austit-surface, #fff) 72%, transparent);
 }
 
-#content .app-navigation .app-navigation-entry {
-	border-radius: var(--austit-radius-small, 8px);
+/* Ohne backdrop-filter: deckende Ersatzflaechen statt Glas */
+@supports not ((backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px))) {
+	html.austit-shell #content.app-spreed {
+		--at-flaeche: var(--austit-surface, #fff);
+	}
+}
+
+/* ---------- Gespraechsliste ---------- */
+
+html.austit-shell #content.app-spreed .app-navigation {
+	background: var(--at-flaeche);
+	-webkit-backdrop-filter: blur(18px) saturate(1.2);
+	backdrop-filter: blur(18px) saturate(1.2);
+	border-inline-end: 1px solid var(--at-kante);
+}
+
+html.austit-shell #content.app-spreed .app-navigation__search .input-field__input {
+	border: 1px solid var(--at-kante);
+	background: var(--at-soft);
+	box-shadow: none;
+}
+
+html.austit-shell #content.app-spreed .app-navigation__search .input-field__input:focus,
+html.austit-shell #content.app-spreed .app-navigation__search .input-field__input:focus-within {
+	border-color: rgba(0, 128, 255, .55);
+	box-shadow: 0 0 0 3px var(--at-accent-soft);
+}
+
+html.austit-shell #content.app-spreed .conversation .list-item {
+	border-radius: 12px;
 	transition: background-color .15s ease;
 }
 
-#content .app-navigation .app-navigation-entry:hover {
-	background: var(--austit-surface-hover, var(--color-background-hover, #e8eaee));
+html.austit-shell #content.app-spreed .conversation .list-item:hover {
+	background: var(--at-soft);
 }
 
-#content .app-navigation .app-navigation-entry.active {
-	background: var(--austit-accent-soft, color-mix(in srgb, var(--color-primary) 12%, transparent));
+html.austit-shell #content.app-spreed .conversation--active .list-item,
+html.austit-shell #content.app-spreed .conversation--active .list-item:hover {
+	background: var(--at-accent-soft);
+	box-shadow: inset 3px 0 0 var(--at-accent);
 }
 
-#content .conversations-search input,
-#content .conversations-search .input-field__input {
-	border-radius: var(--austit-radius-small, 8px);
-	border-color: var(--austit-border, var(--color-border, #e3e5e8));
+html.austit-shell #content.app-spreed .left-sidebar-button {
+	color: color-mix(in srgb, var(--austit-text, #1f2328) 60%, transparent);
 }
 
-#content .conversations-search:focus-within {
-	border-color: var(--austit-accent, var(--color-primary, #2563eb));
-	box-shadow: 0 0 0 3px var(--austit-accent-soft, color-mix(in srgb, var(--color-primary) 12%, transparent));
+/* ---------- Chat-Flaeche ---------- */
+
+html.austit-shell #content.app-spreed .messages-list__scroller,
+html.austit-shell #content.app-spreed .messages-list-dragover-wrapper {
+	background:
+		radial-gradient(560px 400px at 85% 0%, rgba(0, 128, 255, .09), transparent 65%),
+		radial-gradient(680px 480px at 5% 100%, rgba(22, 160, 133, .07), transparent 65%),
+		var(--austit-bg, var(--color-background-dark, #f3f4f6)) !important;
+	scrollbar-width: thin;
 }
 
-/* Chat area */
-
-#content .chatView,
-#content .messages-list-dragover-wrapper {
-	background: var(--austit-bg, var(--color-background-dark, #f3f4f6));
+html.austit-shell #content.app-spreed .top-bar {
+	background: color-mix(in srgb, var(--austit-surface, #fff) 55%, transparent);
+	-webkit-backdrop-filter: blur(18px) saturate(1.25);
+	backdrop-filter: blur(18px) saturate(1.25);
+	border-bottom: 1px solid var(--at-kante);
 }
 
-#content .top-bar {
-	border-bottom: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
-	background: var(--austit-surface, var(--color-main-background, #fff));
+html.austit-shell #content.app-spreed .top-bar .button-vue,
+html.austit-shell #content.app-spreed .top-bar button {
+	border-radius: 10px;
 }
 
-#content .conversation-header .title {
-	letter-spacing: -.01em;
+html.austit-shell #content.app-spreed .top-bar__classified {
+	background: var(--at-accent-soft);
+	color: color-mix(in srgb, var(--at-accent) 60%, var(--austit-text, #1f2328));
+	border-radius: 999px;
+	border: 1px solid color-mix(in srgb, var(--at-accent) 35%, transparent);
 }
 
-#content .messages__content,
-#content .message-body__scroll .message__main {
-	border-radius: var(--austit-radius, 12px);
+/* ---------- Nachrichten als Glasblasen ---------- */
+
+html.austit-shell #content.app-spreed .message--sided .message-body,
+html.austit-shell #content.app-spreed .message-body {
+	border: 1px solid var(--at-kante);
+	border-radius: 18px;
+	background: linear-gradient(160deg, var(--at-tint), var(--at-tint-soft));
+	-webkit-backdrop-filter: blur(18px) saturate(1.3);
+	backdrop-filter: blur(18px) saturate(1.3);
+	box-shadow: 0 4px 14px rgba(15, 23, 42, .14), inset 0 1px 0 var(--at-kante-hell);
+	--message-body-hover: var(--at-tint);
+	transition: border-color .16s ease;
 }
 
-#content .messages__content {
-	background: var(--austit-surface, var(--color-main-background, #fff));
-	border: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
-	box-shadow: var(--austit-shadow, none);
+html.austit-shell #content.app-spreed .message:hover .message-body {
+	border-color: var(--at-kante-hell);
 }
 
-#content .messages__content .messages__author {
-	color: var(--austit-text-muted, var(--color-text-maxcontrast, #5f6672));
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-body {
+	border-color: rgba(140, 195, 255, .35);
+	border-radius: 18px;
+	background: linear-gradient(165deg, rgba(0, 128, 255, .85), rgba(0, 110, 225, .75));
+	-webkit-backdrop-filter: blur(18px) saturate(1.3);
+	backdrop-filter: blur(18px) saturate(1.3);
+	--message-body-hover: var(--at-accent-hover);
 }
 
-/* New message form */
-
-#content .new-message-form {
-	border-radius: var(--austit-radius, 12px);
-	border: 1px solid var(--austit-border, var(--color-border, #e3e5e8));
-	background: var(--austit-surface, var(--color-main-background, #fff));
-	box-shadow: var(--austit-shadow, none);
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-main__text,
+html.austit-shell #content.app-spreed .message--sided.outgoing .rich-text--wrapper,
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-main__info,
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-status {
+	color: #fff;
 }
 
-#content .new-message-form__input:focus-within,
-#content .new-message-form .input-field:focus-within {
-	border-color: var(--austit-accent, var(--color-primary, #2563eb));
-	box-shadow: 0 0 0 3px var(--austit-accent-soft, color-mix(in srgb, var(--color-primary) 12%, transparent));
+html.austit-shell #content.app-spreed .message--sided.outgoing .message-body a {
+	color: #fff;
+	text-decoration: underline;
 }
 
-#content .new-message-form button.primary,
-#content .top-bar button.primary {
-	background-color: var(--austit-accent, var(--color-primary, #2563eb));
-	border-radius: var(--austit-radius-small, 8px);
+html.austit-shell #content.app-spreed .messages-date__text {
+	border: 1px solid var(--at-kante);
+	background: var(--at-flaeche);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+}
+
+html.austit-shell #content.app-spreed .message-body .file-preview,
+html.austit-shell #content.app-spreed .message-part__body,
+html.austit-shell #content.app-spreed .default-message__file-preview {
+	border: 1px solid var(--at-kante);
+	border-radius: 14px;
+	background: var(--at-tint-soft);
+	-webkit-backdrop-filter: blur(15px) saturate(1.25);
+	backdrop-filter: blur(15px) saturate(1.25);
+	overflow: hidden;
+}
+
+/* Ungelesen-Markierung in App-Farbe */
+html.austit-shell #content.app-spreed .chat-button-unread-marker,
+html.austit-shell #content.app-spreed .message-unread-marker {
+	background: var(--at-accent);
+}
+
+/* ---------- Composer ---------- */
+
+html.austit-shell #content.app-spreed .new-message-form {
+	border-top: 1px solid var(--at-kante);
+	background: color-mix(in srgb, var(--austit-surface, #fff) 75%, transparent);
+	-webkit-backdrop-filter: blur(20px) saturate(1.3);
+	backdrop-filter: blur(20px) saturate(1.3);
+}
+
+html.austit-shell #content.app-spreed .rich-contenteditable__input {
+	border: 1px solid var(--at-kante);
+	border-radius: 20px;
+	background: var(--at-tint-soft);
+	box-shadow: none;
+	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
+}
+
+html.austit-shell #content.app-spreed .rich-contenteditable__input:focus,
+html.austit-shell #content.app-spreed .rich-contenteditable__input:focus-within {
+	border-color: rgba(0, 128, 255, .55);
+	box-shadow: 0 0 0 3px var(--at-accent-soft);
+}
+
+html.austit-shell #content.app-spreed .new-message-form .button-vue--primary,
+html.austit-shell #content.app-spreed .new-message-form button.primary {
+	background: linear-gradient(165deg, #0a8fff, #0069d9);
+	border: 0;
+	border-radius: 13px;
+	box-shadow: 0 3px 10px rgba(0, 128, 255, .35), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+html.austit-shell #content.app-spreed .new-message-form .button-vue--tertiary:hover {
+	background: var(--at-soft);
+}
+
+/* ---------- Rechte Seitenleiste ---------- */
+
+html.austit-shell #content.app-spreed .app-sidebar {
+	background: var(--at-flaeche);
+	-webkit-backdrop-filter: blur(18px) saturate(1.2);
+	backdrop-filter: blur(18px) saturate(1.2);
+	border-inline-start: 1px solid var(--at-kante);
+}
+
+html.austit-shell #content.app-spreed .app-sidebar-tabs {
+	background: var(--at-soft);
+	border-radius: 13px;
+	border: 1px solid var(--at-kante);
+}
+
+html.austit-shell #content.app-spreed .app-sidebar .input-field__input {
+	border: 1px solid var(--at-kante);
+	background: var(--at-soft);
+}
+
+/* ---------- Responsiv ---------- */
+
+/* Tablet: engere Abstaende, breitere Blasen */
+@media (max-width: 1024px) {
+	html.austit-shell #content.app-spreed .message-body,
+	html.austit-shell #content.app-spreed .message--sided .message-body {
+		max-width: 82%;
+	}
+
+	html.austit-shell #content.app-spreed .top-bar,
+	html.austit-shell #content.app-spreed .new-message-form {
+		padding-inline: 12px;
+	}
+}
+
+/* Schmale Bildschirme: Blasen fast über die volle Breite, Pille kompakt */
+@media (max-width: 640px) {
+	html.austit-shell #content.app-spreed .message-body,
+	html.austit-shell #content.app-spreed .message--sided .message-body {
+		max-width: 92%;
+		border-radius: 14px;
+	}
+
+	html.austit-shell #content.app-spreed .rich-contenteditable__input {
+		border-radius: 16px;
+	}
+
+	html.austit-shell #content.app-spreed .messages-date__text {
+		font-size: 11px;
+		padding: 2px 10px;
+	}
+
+	html.austit-shell #content.app-spreed .top-bar__classified {
+		display: none;
+	}
+}
+
+/* Reduzierte Transparenz: statt Glas deckende Flaechen */
+@media (prefers-reduced-transparency: reduce) {
+	html.austit-shell #content.app-spreed .app-navigation,
+	html.austit-shell #content.app-spreed .app-sidebar,
+	html.austit-shell #content.app-spreed .top-bar,
+	html.austit-shell #content.app-spreed .new-message-form,
+	html.austit-shell #content.app-spreed .message-body,
+	html.austit-shell #content.app-spreed .message--sided .message-body,
+	html.austit-shell #content.app-spreed .messages-date__text {
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+		background: var(--austit-surface, #fff);
+	}
+
+	html.austit-shell #content.app-spreed .message--sided.outgoing .message-body {
+		background: var(--at-accent);
+	}
 }

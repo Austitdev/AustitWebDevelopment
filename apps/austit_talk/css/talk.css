@@ -74,3 +74,101 @@ body[data-theme-dark-highcontrast] #austit-talk {
 }
 @keyframes at-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { #austit-talk { scroll-behavior: auto; }.at-hero { animation: none; }.at-stat,.at-panel,.at-toggle i,.at-switch i { transition: none; } }
+
+/* ---------- App-Design: Glas-Muster und Ladescreen ---------- */
+/* Zieht das Muster der austit Talk App ueber die Verwaltung ohne sie
+   1:1 zu kopieren: Glasflaechen, App-Akzent, Ladescreen mit Spinner. */
+
+#austit-talk {
+	--at-app-accent: #0080ff;
+	--at-app-soft: rgba(0, 128, 255, .14);
+	--at-glas: color-mix(in srgb, var(--at-surface) 72%, transparent);
+	--at-glas-weich: color-mix(in srgb, var(--at-text) 5%, transparent);
+	--at-kante-weich: color-mix(in srgb, var(--at-text) 9%, transparent);
+}
+
+body[data-theme-dark] #austit-talk,
+body[data-theme-dark-highcontrast] #austit-talk {
+	--at-app-accent: #57b6ff;
+	--at-app-soft: rgba(87, 182, 255, .18);
+}
+
+@supports not ((backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px))) or (prefers-reduced-transparency: reduce) and (prefers-reduced-transparency: reduce)) {
+	#austit-talk { --at-glas: var(--at-surface); --at-glas-weich: var(--at-hover); }
+}
+
+/* Panels und Karten als Glas */
+#austit-talk .at-stat,
+#austit-talk .at-panel,
+#austit-talk .at-error,
+#austit-talk .at-notice {
+	background: var(--at-glas);
+	-webkit-backdrop-filter: blur(18px) saturate(1.25);
+	backdrop-filter: blur(18px) saturate(1.25);
+}
+
+#austit-talk .at-stat,
+#austit-talk .at-panel {
+	border-color: var(--at-kante-weich);
+	border-radius: 18px;
+	box-shadow: 0 4px 14px rgba(15, 23, 42, .1), inset 0 1px 0 var(--at-kante-weich);
+}
+
+/* Suchzeile und Eingabefelder als Glas */
+#austit-talk .at-search {
+	background: var(--at-glas-weich);
+	border-radius: 10px;
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+}
+
+/* Schalter und Avatare im App-Akzent */
+#austit-talk .at-toggle input:checked + i,
+#austit-talk .at-switch input:checked + i,
+#austit-talk .at-avatar { background: var(--at-app-accent); }
+#austit-talk .at-search:focus-within,
+#austit-talk .at-field input:focus {
+	border-color: rgba(0, 128, 255, .55);
+	box-shadow: 0 0 0 3px var(--at-app-soft);
+}
+body[data-theme-dark] #austit-talk .at-search:focus-within,
+body[data-theme-dark] #austit-talk .at-field input:focus { border-color: rgba(87, 182, 255, .55); }
+
+/* Ladescreen im App-Design: Spinner und austit-Schriftzug */
+#austit-talk .at-loading {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 60%;
+	font-size: 15px;
+	letter-spacing: .01em;
+}
+
+#austit-talk .at-loading::before {
+	content: '';
+	width: 42px;
+	height: 42px;
+	margin-bottom: 18px;
+	border: 3px solid var(--at-soft);
+	border-top-color: var(--at-app-accent);
+	border-radius: 50%;
+	animation: at-drehen 1s linear infinite;
+}
+
+#austit-talk .at-loading::after {
+	content: 'austit Talk';
+	margin-top: 10px;
+	color: var(--at-muted);
+	font-size: 12px;
+	letter-spacing: .12em;
+	text-transform: uppercase;
+}
+
+@keyframes at-drehen { to { transform: rotate(360deg); } }
+
+/* Bewegungsreduzierung: Spinner langsam statt Schleife */
+@media (prefers-reduced-motion: reduce) {
+	#austit-talk .at-loading::before { animation-duration: 2.4s; }
+}
