@@ -99,6 +99,21 @@ html.austit-shell #content.app-spreed .top-bar__classified {
 	border: 1px solid color-mix(in srgb, var(--at-accent) 35%, transparent);
 }
 
+/* ---------- Systemnachrichten: luftiger Abstand ---------- */
+
+html.austit-shell #content.app-spreed .wrapper--system {
+	padding-block: 10px;
+}
+
+html.austit-shell #content.app-spreed .wrapper--system .messages-group__system .message {
+	margin-block: 3px;
+}
+
+html.austit-shell #content.app-spreed .wrapper + .wrapper--system,
+html.austit-shell #content.app-spreed .wrapper--system + .wrapper {
+	margin-top: 8px;
+}
+
 /* ---------- Nachrichten als Glasblasen ---------- */
 
 html.austit-shell #content.app-spreed .message--sided .message-body,
