@@ -188,7 +188,11 @@
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
-		background: var(--chat-bg);
+		background:
+			radial-gradient(520px 380px at 82% -6%, rgba(0, 128, 255, .12), transparent 64%),
+			radial-gradient(640px 460px at 8% 108%, rgba(22, 160, 133, .09), transparent 66%),
+			radial-gradient(380px 300px at 30% 55%, rgba(60, 90, 160, .07), transparent 70%),
+			var(--chat-bg);
 	}
 	.kopfleiste {
 		min-height: 62px;
@@ -258,19 +262,34 @@
 	.msg .autor { margin: 8px 6px 2px; color: var(--muted); font-size: 12px; }
 	.bubble {
 		position: relative;
-		padding: 8px 13px 7px;
-		border-radius: 14px;
-		border-end-start-radius: 5px;
-		background: var(--eingang);
+		padding: 8px 14px 7px;
+		border-radius: 16px;
+		border-end-start-radius: 6px;
+		border: 1px solid rgba(255, 255, 255, .09);
+		background: linear-gradient(160deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .04));
+		-webkit-backdrop-filter: blur(15px) saturate(1.25);
+		backdrop-filter: blur(15px) saturate(1.25);
 		font-size: 14.5px;
 		line-height: 1.45;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .18);
+		color: #eef1f4;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .07);
+	}
+	.bubble::after {
+		content: '';
+		position: absolute;
+		inset-inline: 22px;
+		top: 0;
+		height: 1px;
+		border-radius: 1px;
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .22), transparent);
 	}
 	.msg.aus .bubble {
-		border-radius: 14px;
-		border-end-start-radius: 14px;
-		border-end-end-radius: 5px;
-		background: var(--akzent);
+		border-radius: 16px;
+		border-end-start-radius: 16px;
+		border-end-end-radius: 6px;
+		border-color: rgba(255, 255, 255, .18);
+		background: linear-gradient(165deg, rgba(0, 128, 255, .62), rgba(0, 118, 232, .48));
+		color: #fff;
 	}
 	.reaktion {
 		align-self: flex-start;
@@ -278,25 +297,33 @@
 		margin: -9px 10px 0;
 		height: 22px; padding: 0 9px;
 		border-radius: 999px;
-		background: #262a30;
-		border: 1px solid var(--linie);
+		border: 1px solid rgba(255, 255, 255, .1);
+		background: rgba(24, 27, 32, .72);
+		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
 		font-size: 11.5px;
-		box-shadow: 0 1px 2px rgba(0,0,0,.2);
+		box-shadow: 0 1px 2px rgba(0,0,0,.25), inset 0 1px 0 rgba(255, 255, 255, .06);
 	}
 	.msg.aus .reaktion { align-self: flex-end; }
 	.reaktion.fein { opacity: .9; }
 	.zeit-innerhalb { margin: 3px 13px 0; color: #6f94b8; font-size: 10px; align-self: flex-end; }
-	.msg .zeitstempel { margin: 3px 6px 6px; color: #6d727a; font-size: 10.5px; }
+	.msg .zeitstempel { margin: 3px 6px 6px; color: #71767e; font-size: 10.5px; }
 	.msg.aus .zeitstempel { color: #78a9d2; }
 
 	.bildmeldung {
 		width: 268px;
 		padding: 4px;
-		border-radius: 12px;
-		background: var(--eingang);
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .18);
+		border-radius: 13px;
+		border: 1px solid rgba(255, 255, 255, .12);
+		background: linear-gradient(160deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .04));
+		-webkit-backdrop-filter: blur(15px) saturate(1.25);
+		backdrop-filter: blur(15px) saturate(1.25);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .07);
 	}
-	.msg.aus .bildmeldung { background: var(--akzent); padding: 4px; }
+	.msg.aus .bildmeldung {
+		border-color: rgba(255, 255, 255, .18);
+		background: linear-gradient(165deg, rgba(0, 128, 255, .62), rgba(0, 118, 232, .48));
+	}
 	.bildrahm {
 		height: 150px;
 		border-radius: 9px;
@@ -328,7 +355,8 @@
 	.dateikarte .detail small { color: rgba(237, 239, 242, .62); font-size: 11.5px; }
 
 	.sprachnachricht { display: flex; align-items: center; gap: 11px; min-width: 236px; }
-	.sprachnachricht svg.play { width: 30px; height: 30px; color: #cfd6de; }
+	.sprachnachricht { min-width: 252px; }
+	.sprachnachricht svg.play { width: 30px; height: 30px; color: #dee5ec; }
 	.welle { flex: 1; display: flex; align-items: center; gap: 2.5px; height: 26px; }
 	.welle i { flex: 1; border-radius: 2px; background: rgba(255, 255, 255, .35); }
 	.msg.aus .welle i { background: rgba(255, 255, 255, .5); }
@@ -340,9 +368,12 @@
 		align-self: flex-start;
 		margin: 8px 0 2px;
 		padding: 9px 14px;
-		border-radius: 14px 14px 14px 5px;
-		background: var(--eingang);
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .18);
+		border-radius: 16px 16px 16px 6px;
+		border: 1px solid rgba(255, 255, 255, .09);
+		background: linear-gradient(160deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .04));
+		-webkit-backdrop-filter: blur(15px);
+		backdrop-filter: blur(15px);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .07);
 		color: var(--muted); font-size: 12px;
 	}
 	.schreibt .punkte { display: inline-flex; gap: 3.5px; }
@@ -377,10 +408,12 @@
 	.komponistzeile {
 		display: flex; align-items: center; gap: 6px;
 		padding: 5px 7px;
-		border-radius: 13px;
-		border: 1px solid var(--linie);
-		background: #1e2126;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+		border-radius: 15px;
+		border: 1px solid rgba(255, 255, 255, .1);
+		background: rgba(27, 30, 35, .78);
+		-webkit-backdrop-filter: blur(16px) saturate(1.2);
+		backdrop-filter: blur(16px) saturate(1.2);
+		box-shadow: 0 2px 10px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .05);
 	}
 	.werkzeug {
 		width: 36px; height: 36px; flex: none;
