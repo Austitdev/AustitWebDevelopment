@@ -9,46 +9,46 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - '.github/workflows/austit-security.yml'
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: austit-security-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  abhaengigkeiten:
-    name: Abhaengigkeiten (PHP, JavaScript, Java/Kotlin)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: OSV-Scanner ueber alle Lockdateien
-        uses: google/osv-scanner-action@6bc832ee85d316ab9aeccf71929026841bd0e1ee # v2.7.1
-        with:
-          scan-args: |-
-            --recursive
-            --skip-git-ignore
-            ./
-
   bsi:
-    name: BSI-Hinweise (CERT-Bund)
+    name: BSI-Sicherheitsluecken-bericht (CERT-Bund)
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Feeds abrufen und auf relevante Hinweise filtern
+      - name: Meldungen abrufen, filtern und als PDF ausgeben
         run: |
           set -euo pipefail
+          if ! find /usr/share/fonts ~/.fonts -name 'DejaVuSans.ttf' -print -quit 2>/dev/null | grep -q .; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
+          fi
+          pip install --quiet fpdf2
           python3 - <<'PYEOF'
           import email.utils
           import html
           import re
           import urllib.request
+
+          from fpdf import FPDF
+
+          import glob
+          import os
+
+          def schrift(name):
+              for wurzel in ('/usr/share/fonts', '~/.fonts'):
+                  funde = glob.glob(os.path.expanduser(wurzel) + '/**/' + name, recursive=True)
+                  if funde:
+                      return funde[0]
+              raise SystemExit('Schrift nicht gefunden: ' + name)
 
           FEED = 'https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_CSW.xml'
           ALTER_TAGE = 14
@@ -59,15 +59,29 @@ jobs:
           ]
 
           def tilde(text):
-              return html.unescape(re.sub('<[^<]+?>', '', text))
+              return html.unescape(re.sub('<[^<]+?>', '', text)).strip()
+
+          def kurz(link):
+              ohne = re.sub(r'^https?://(www\.)?', '', link).rstrip('/')
+              letzte = ohne.split('/')[-1]
+              stamm = ohne.split('/')[0]
+              return ('%s · %s' % (stamm, letzte)) if letzte else ohne
+
+          def brechen(text):
+              stuecke = []
+              for wort in text.split():
+                  while len(wort) > 48:
+                      stuecke.append(wort[:48])
+                      wort = wort[48:]
+                  stuecke.append(wort)
+              return ' '.join(stuecke)
 
           anfrage = urllib.request.Request(FEED, headers={'User-Agent': 'austit-security-workflow'})
           roh = urllib.request.urlopen(anfrage, timeout=60).read().decode('utf-8', 'ignore')
           eintraege = re.findall(r'<item>(.*?)</item>', roh, re.S)
 
-          frist = email.utils.parsedate_to_datetime(
-              email.utils.formatdate()
-          ).timestamp() - ALTER_TAGE * 86400
+          jetzt = email.utils.parsedate_to_datetime(email.utils.formatdate()).timestamp()
+          frist = jetzt - ALTER_TAGE * 86400
 
           treffer = []
           for eintrag in eintraege:
@@ -80,27 +94,71 @@ jobs:
               zeit = email.utils.parsedate_to_datetime(datum.group(1)).timestamp()
               if zeit < frist:
                   continue
-              text = ' '.join(filter(None, [titel.group(1), beschreibung.group(1) if beschreibung else ''])).lower()
-              if any(wort in text for wort in SCHLUESSELWOERTER):
+              haufen = ' '.join(filter(None, [
+                  tilde(titel.group(1)),
+                  tilde(beschreibung.group(1)) if beschreibung else '',
+              ])).lower()
+              if any(wort in haufen for wort in SCHLUESSELWOERTER):
                   treffer.append({
                       'titel': tilde(titel.group(1)),
                       'datum': datum.group(1),
                       'link': tilde(link.group(1)) if link else FEED,
-                      'beschreibung': tilde(beschreibung.group(1))[:500] if beschreibung else '',
+                      'beschreibung': tilde(beschreibung.group(1)) if beschreibung else '',
                   })
 
-          bericht = ['## BSI-Hinweise der letzten %d Tage mit Bezug zum Stack\n' % ALTER_TAGE]
+          zeilen = ['## BSI-Hinweise der letzten %d Tage mit Bezug zum austit-Stack\n' % ALTER_TAGE]
           if treffer:
               for t in treffer:
-                  bericht.append('- [%s](%s) — %s\n' % (t['titel'], t['link'], t['datum']))
+                  zeilen.append('- [%s](%s) — %s\n' % (t['titel'], t['link'], t['datum']))
           else:
-              bericht.append('Keine relevanten Hinweise im Feedszeitraum.\n')
+              zeilen.append('Keine relevanten Hinweise im Zeitraum.\n')
           with open('/tmp/bsi-bericht.md', 'w', encoding='utf-8') as f:
-              f.write('\n'.join(bericht))
+              f.write('\n'.join(zeilen))
+
+          pdf = FPDF(format='A4')
+          pdf.set_auto_page_break(auto=True, margin=20)
+          pdf.add_font('dejavu', '', schrift('DejaVuSans.ttf'))
+          pdf.add_font('dejavu', 'B', schrift('DejaVuSans-Bold.ttf'))
+          pdf.add_page()
+          pdf.set_font('dejavu', 'B', 20)
+          pdf.cell(0, 10, 'austit Cloud — BSI-Sicherheitsbericht', new_x='LMARGIN', new_y='NEXT')
+          pdf.set_font('dejavu', '', 11)
+          pdf.cell(0, 8, 'CERT-Bund-Sicherheitswarnungen mit Bezug zum eigenen Stack', new_x='LMARGIN', new_y='NEXT')
+          pdf.cell(0, 8, 'Zeitraum: letzte %d Tage — Quelle: www.bsi.bund.de' % ALTER_TAGE, new_x='LMARGIN', new_y='NEXT')
+          pdf.ln(6)
+          if treffer:
+              pdf.set_font('dejavu', 'B', 13)
+              pdf.cell(0, 8, '%d relevante Meldungen' % len(treffer), new_x='LMARGIN', new_y='NEXT')
+              pdf.ln(2)
+              for t in treffer:
+                  pdf.set_x(pdf.l_margin)
+                  pdf.set_font('dejavu', 'B', 11)
+                  pdf.multi_cell(0, 6, brechen(t['titel']), new_x='LMARGIN', new_y='NEXT')
+                  pdf.set_x(pdf.l_margin)
+                  pdf.set_font('dejavu', '', 9)
+                  pdf.multi_cell(0, 5, t['datum'], new_x='LMARGIN', new_y='NEXT')
+                  pdf.set_x(pdf.l_margin)
+                  pdf.multi_cell(0, 5, brechen(kurz(t['link'])), new_x='LMARGIN', new_y='NEXT')
+                  if t['beschreibung']:
+                      pdf.set_x(pdf.l_margin)
+                      pdf.multi_cell(0, 5, brechen(t['beschreibung']), new_x='LMARGIN', new_y='NEXT')
+                  pdf.ln(4)
+          else:
+              pdf.set_font('dejavu', '', 12)
+              pdf.cell(0, 8, 'Keine relevanten Meldungen im Zeitraum.', new_x='LMARGIN', new_y='NEXT')
+          pdf.output('/tmp/bsi-sicherheitsbericht.pdf')
+
           with open('/tmp/bsi-treffer', 'w') as f:
               f.write(str(len(treffer)))
-          print('\n'.join(bericht))
+          print('\n'.join(zeilen))
           PYEOF
+
+      - name: PDF als Artefakt bereitstellen
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bsi-sicherheitsbericht
+          path: /tmp/bsi-sicherheitsbericht.pdf
+          retention-days: 30
 
       - name: Treffer in Sammel-Issue festhalten
         env:
@@ -108,15 +166,16 @@ jobs:
         run: |
           set -euo pipefail
           anzahl="$(cat /tmp/bsi-treffer)"
-          echo "Relevante Hinweise: ${anzahl}"
+          echo "Relevante Meldungen: ${anzahl}"
           if [ "${anzahl}" = "0" ]; then
             echo "Keine relevanten Treffer, kein Issue noetig."
             exit 0
           fi
-          titel="[Sicherheit] Relevante BSI-Hinweise"
-          nummer="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label sicherheit --json number --jq '.[0].number || ""')"
-          if [ -n "${nummer}" ]; then
+          nummer="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label sicherheit --json number --jq '.[0].number' 2>/dev/null || true)"
+          if [ -n "${nummer}" ] && [ "${nummer}" != "null" ]; then
             gh issue comment "${nummer}" --repo "$GITHUB_REPOSITORY" --body-file /tmp/bsi-bericht.md
           else
-            gh issue create --repo "$GITHUB_REPOSITORY" --label sicherheit --title "${titel}" --body-file /tmp/bsi-bericht.md
+            gh issue create --repo "$GITHUB_REPOSITORY" --label sicherheit \
+              --title "[Sicherheit] Relevante BSI-Hinweise" \
+              --body-file /tmp/bsi-bericht.md
           fi
