@@ -48,10 +48,12 @@ jobs:
               'php', 'java', 'kotlin', 'nextcloud', 'apache', 'nginx',
               'mariadb', 'mysql', 'postgres', 'redis', 'android', 'docker',
               'gradle', 'maven', 'node.js', 'npm',
+              'libresign', 'phpseclib', 'jsign', 'openssl',
           ]
           NVD_SUCHBEGRIFFE = [
               'php', 'kotlin', 'nextcloud', 'apache http', 'nginx',
               'mariadb', 'redis', 'android',
+              'libresign', 'phpseclib', 'jsign', 'openssl',
           ]
           KOPF = {'User-Agent': 'austit-security-workflow'}
 
@@ -134,18 +136,47 @@ jobs:
               print('BSI-Feed fehlgeschlagen: %s' % fehler)
 
           # --- NVD: neue CVEs zu Suchbegriffen des Stacks ---
+          # Ohne API-Schluessel erlaubt die NVD hoechstens 5 Anfragen pro 30 Sekunden.
+          # Der Fenster-Puffer haelt den Lauf exakt innerhalb dieses Limits und
+          # nutzt die maximale Seitengroesse (200), um mit wenigen Anfragen
+          # auszukommen. Bei 403/429 wartet der Lauf eine Fensterperiode und
+          # versucht es genau einmal erneut statt weiterzulaufen.
+          NVD_MAX_PRO_FENSTER = 5
+          NVD_FENSTER = 30.0
+          nvd_anfragen = []
+
+          def nvd_luft():
+              while len(nvd_anfragen) >= NVD_MAX_PRO_FENSTER and time.time() - nvd_anfragen[0] < NVD_FENSTER:
+                  time.sleep(NVD_FENSTER - (time.time() - nvd_anfragen[0]) + 1.0)
+              nvd_anfragen.append(time.time())
+              while len(nvd_anfragen) > NVD_MAX_PRO_FENSTER:
+                  nvd_anfragen.pop(0)
+
           seit = frist.strftime('%Y-%m-%dT%H:%M:%S.000')
           bis = jetzt_utc.strftime('%Y-%m-%dT%H:%M:%S.000')
           for begriff in NVD_SUCHBEGRIFFE:
               url = ('https://services.nvd.nist.gov/rest/json/cves/2.0'
-                     '?keywordSearch=%s&pubStartDate=%s&pubEndDate=%s&resultsPerPage=50'
+                     '?keywordSearch=%s&pubStartDate=%s&pubEndDate=%s&resultsPerPage=200'
                      % (urllib.parse.quote(begriff), seit, bis))
-              try:
-                  antwort = json.loads(urllib.request.urlopen(
-                      urllib.request.Request(url, headers=KOPF), timeout=120).read())
-              except Exception as fehler:
-                  print('NVD (%s) fehlgeschlagen: %s' % (begriff, fehler))
-                  time.sleep(7)
+              antwort = None
+              for versuch in (1, 2):
+                  nvd_luft()
+                  try:
+                      antwort = json.loads(urllib.request.urlopen(
+                          urllib.request.Request(url, headers=KOPF), timeout=120).read())
+                      break
+                  except urllib.error.HTTPError as fehler:
+                      if fehler.code in (403, 429) and versuch == 1:
+                          print('NVD (%s) gedrosselt, warte eine Fensterperiode …' % begriff)
+                          time.sleep(NVD_FENSTER + 2.0)
+                          continue
+                      antwort = None
+                      break
+                  except Exception as fehler:
+                      print('NVD (%s) fehlgeschlagen: %s' % (begriff, fehler))
+                      antwort = None
+                      break
+              if antwort is None:
                   continue
               for eintrag in antwort.get('vulnerabilities', []):
                   cve = eintrag.get('cve', {})
