@@ -19,6 +19,7 @@ use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IConfig;
@@ -48,7 +49,15 @@ final class PageController extends Controller {
 	#[FrontpageRoute(verb: 'GET', url: '/settings/apps', root: '')]
 	#[FrontpageRoute(verb: 'GET', url: '/settings/apps/{category}', defaults: ['category' => ''], root: '')]
 	#[FrontpageRoute(verb: 'GET', url: '/settings/apps/{category}/{id}', defaults: ['category' => '', 'id' => ''], root: '')]
-	public function viewApps(): TemplateResponse {
+	public function viewApps(): TemplateResponse|RedirectResponse {
+		// austit: die Apps-Verwaltung der austit Cloud fuehrt in den eigenen
+		// austit_store (GitHub-Repositories der Austit-Apps), nicht in den
+		// Nextcloud App Store. Ohne installierten austit_store bleibt die
+		// Standard-Seite erreichbar.
+		if ($this->appManager->isEnabledForAnyone('austit_store')) {
+			return new RedirectResponse($this->urlGenerator->linkToRoute('austit_store.page.index'));
+		}
+
 		$this->initialState->provideInitialState('appstoreEnabled', $this->config->getSystemValueBool('appstoreenabled', true));
 		$this->initialState->provideInitialState('appstoreBundles', $this->getBundles());
 		$this->initialState->provideInitialState('appstoreDeveloperDocs', $this->urlGenerator->linkToDocs('developer-manual'));

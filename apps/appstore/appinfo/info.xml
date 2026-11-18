@@ -23,7 +23,7 @@
 	<navigations>
 		<!-- No app menu entry: the menu already has a "More apps" tile linking here -->
 		<navigation role="admin">
-			<name>Apps</name>
+			<name>Austit Store</name>
 			<route>appstore.page.viewApps</route>
 			<icon>app-dark.svg</icon>
 			<order>5</order>
