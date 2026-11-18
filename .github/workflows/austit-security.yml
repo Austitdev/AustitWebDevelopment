@@ -171,6 +171,7 @@ jobs:
             echo "Keine relevanten Treffer, kein Issue noetig."
             exit 0
           fi
+          gh label create sicherheit --repo "$GITHUB_REPOSITORY" --color 0b65da --description "BSI-Sicherheitsberichte" 2>/dev/null || true
           nummer="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label sicherheit --json number --jq '.[0].number' 2>/dev/null || true)"
           if [ -n "${nummer}" ] && [ "${nummer}" != "null" ]; then
             gh issue comment "${nummer}" --repo "$GITHUB_REPOSITORY" --body-file /tmp/bsi-bericht.md
