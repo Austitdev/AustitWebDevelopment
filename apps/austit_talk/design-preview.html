@@ -162,17 +162,7 @@
 	.eintrag.aktiv .vorschau { color: #97a0aa; }
 	.eintrag.ungelesen .vorschau b { color: var(--text); }
 	.schloss { flex: none; width: 13px; height: 13px; color: #6f93b8; }
-	.verborgen {
-		display: inline-flex; align-items: center; gap: 6px;
-		font-style: italic; color: #6b7179 !important;
-	}
-	.verborgen b { font-weight: 400; }
-	.verborgen svg.gesperrt { width: 12px; height: 12px; color: #6f93b8; }
-	.verborgen .verdeckt {
-		width: 92px; height: 7px;
-		border-radius: 4px;
-		background: repeating-linear-gradient(90deg, #33373d 0 14px, transparent 14px 18px);
-	}
+	.verborgen { display: none; }
 	.avatar {
 		grid-row: span 2;
 		position: relative;
@@ -547,12 +537,12 @@
 			<div class="eintrag aktiv">
 				<div class="avatar blau">2<span class="anwesend"></span></div>
 				<div class="zeile1"><span class="name">2. Klasse Informatik</span><svg class="schloss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span class="zeit">08:41</span></div>
-				<span class="vorschau verborgen"><svg class="gesperrt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><b>Nachricht verborgen</b><span class="verdeckt" aria-hidden="true"></span></span>
+				<span class="vorschau verborgen"></span>
 			</div>
 			<div class="eintrag">
 				<div class="avatar tuerkis">P</div>
 				<div class="zeile1"><span class="name">Projekt Webseite</span><svg class="schloss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span class="zeit">Gestern</span></div>
-				<span class="vorschau verborgen"><svg class="gesperrt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><b>Nachricht verborgen</b></span>
+				<span class="vorschau verborgen"></span>
 			</div>
 			<div class="eintrag ungelesen">
 				<div class="avatar blau">K<span class="anwesend"></span></div>
