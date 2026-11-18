@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<!--
+ - SPDX-FileCopyrightText: 2026 austit.de
+ - SPDX-License-Identifier: AGPL-3.0-or-later
+
+ Designvorschau der austit Oberflaeche. Eigenstaendige Datei ohne Abhaengigkeiten:
+ zeigt die Workspace-Shell, die Talk-Oberflaeche (spreed) im austit-Design und
+ die austit Talk Verwaltung. Wird nicht vom Server ausgeliefert, sie dient als Diskussionsgrundlage fuer das Design.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>austit – Designvorschau</title>
+<style>
+	:root {
+		--austit-accent: #2563eb;
+		--austit-accent-soft: rgba(37, 99, 235, .12);
+		--austit-bg: #f3f4f6;
+		--austit-surface: #fff;
+		--austit-surface-hover: #e8eaee;
+		--austit-border: #e3e5e8;
+		--austit-text: #1f2328;
+		--austit-muted: #5f6672;
+		--austit-radius: 12px;
+		--austit-radius-s: 8px;
+		--austit-shadow: 0 1px 2px rgba(15,23,42,.06), 0 4px 12px rgba(15,23,42,.06);
+		--sidebar-w: 88px;
+		--header-h: 56px;
+	}
+	.dunkel {
+		--austit-accent: #3b82f6;
+		--austit-accent-soft: rgba(59, 130, 246, .24);
+		--austit-bg: #0b1120;
+		--austit-surface: #111a2b;
+		--austit-surface-hover: #172338;
+		--austit-border: #1e2a3f;
+		--austit-text: #e6edf6;
+		--austit-muted: #8b98ad;
+		--austit-shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.25);
+	}
+	* { box-sizing: border-box; }
+	body {
+		margin: 0;
+		background: var(--austit-bg);
+		color: var(--austit-text);
+		font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+		font-size: 14px;
+	}
+	.hinweis {
+		max-width: 1080px;
+		margin: 28px auto 0;
+		padding: 18px 24px;
+		border: 1px solid var(--austit-border);
+		border-radius: var(--austit-radius);
+		background: var(--austit-surface);
+		box-shadow: var(--austit-shadow);
+	}
+	.hinweis h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: -.02em; }
+	.hinweis p { margin: 0; color: var(--austit-muted); }
+	.leiste {
+		max-width: 1080px;
+		margin: 14px auto 0;
+		display: flex;
+		gap: 10px;
+		align-items: center;
+	}
+	.knopf {
+		padding: 8px 16px;
+		border: 1px solid var(--austit-border);
+		border-radius: 20px;
+		background: var(--austit-surface);
+		color: var(--austit-text);
+		font: inherit;
+		cursor: pointer;
+	}
+	.knopf.aktiv { background: var(--austit-accent); border-color: var(--austit-accent); color: #fff; }
+	.ansicht { display: none; }
+	.ansicht.aktiv { display: block; }
+
+	/* ---------- Shell ---------- */
+	.shell {
+		max-width: 1080px;
+		height: 640px;
+		margin: 18px auto 40px;
+		display: grid;
+		grid-template-columns: var(--sidebar-w) 1fr;
+		border: 1px solid var(--austit-border);
+		border-radius: var(--austit-radius);
+		background: var(--austit-surface);
+		box-shadow: var(--austit-shadow);
+		overflow: hidden;
+	}
+	.schiene {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+		padding: 10px 0;
+		background: var(--austit-surface);
+		border-right: 1px solid var(--austit-border);
+	}
+	.marke {
+		width: 38px; height: 38px;
+		display: grid; place-items: center;
+		border-radius: 10px;
+		background: var(--austit-accent);
+		color: #fff;
+		font-weight: 800;
+		font-size: 20px;
+		margin: 8px 0 16px;
+	}
+	.navpunkt {
+		width: 60px;
+		padding: 9px 0 7px;
+		display: grid;
+		justify-items: center;
+		gap: 3px;
+		border-radius: var(--austit-radius-s);
+		color: var(--austit-muted);
+		font-size: 15px;
+		cursor: pointer;
+	}
+	.navpunkt span:last-child { font-size: 10px; letter-spacing: .02em; }
+	.navpunkt:hover { background: var(--austit-surface-hover); }
+	.navpunkt.aktiv { background: var(--austit-accent-soft); color: var(--austit-accent); }
+	.haupt { display: flex; flex-direction: column; min-width: 0; }
+	.kopf {
+		height: var(--header-h);
+		flex: none;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 0 20px;
+		border-bottom: 1px solid var(--austit-border);
+	}
+	.kopf h2 { margin: 0; font-size: 16px; letter-spacing: -.01em; flex: 1; }
+	.kopf .suche {
+		padding: 7px 12px;
+		border: 1px solid var(--austit-border);
+		border-radius: 999px;
+		color: var(--austit-muted);
+		background: var(--austit-bg);
+		min-width: 220px;
+	}
+	.kopf .avatar {
+		width: 30px; height: 30px;
+		display: grid; place-items: center;
+		border-radius: 50%;
+		background: var(--austit-accent);
+		color: #fff;
+		font-weight: 700;
+	}
+	.inhalt { flex: 1; min-height: 0; display: flex; }
+
+	/* ---------- Talk ---------- */
+	.talk {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		background: var(--austit-bg);
+	}
+	.gespraeche {
+		display: flex;
+		flex-direction: column;
+		border-right: 1px solid var(--austit-border);
+		background: var(--austit-surface);
+		min-width: 230px;
+	}
+	.gespraeche h3 {
+		margin: 0;
+		padding: 8px 16px 4px;
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: .1em;
+		color: var(--austit-muted);
+	}
+	.gespraech-eintrag {
+		display: grid;
+		grid-template-columns: 34px 1fr auto;
+		gap: 10px;
+		align-items: center;
+		padding: 9px 14px;
+		border-radius: 10px;
+		cursor: pointer;
+	}
+	.gespraech-eintrag:hover { background: var(--austit-surface-hover); }
+	.gespraech-eintrag.aktiv { background: var(--austit-accent-soft); }
+	.gespraech-eintrag strong { display: block; font-size: 13px; font-weight: 600; }
+	.gespraech-eintrag small { display: block; color: var(--austit-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+	.geheim-badge {
+		grid-column: 3; grid-row: 1;
+		font-size: 9px; font-weight: 700;
+		color: #fff; background: var(--austit-accent);
+		border-radius: 4px; padding: 2px 5px;
+		letter-spacing: .04em;
+	}
+	.uhr-badge {
+		grid-column: 3; grid-row: 2;
+		font-size: 10px; color: var(--austit-muted);
+	}
+	.initial {
+		width: 32px; height: 32px;
+		border-radius: 50%;
+		display: grid; place-items: center;
+		color: #fff; font-weight: 700; font-size: 13px;
+		background: var(--austit-accent);
+	}
+	.initial.grau { background: var(--austit-muted); }
+	.chat-kopf {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 18px;
+		background: var(--austit-surface);
+		border-bottom: 1px solid var(--austit-border);
+	}
+	.chat-kopf .titel { flex: 1; }
+	.chat-kopf .titel strong { display: block; font-size: 14px; }
+	.chat-kopf .titel small { color: var(--austit-muted); font-size: 11px; }
+	.schloss {
+		font-size: 10px; font-weight: 700;
+		color: #fff; background: var(--austit-accent);
+		border-radius: 4px; padding: 2px 6px;
+		letter-spacing: .04em;
+	}
+	.verlauf {
+		flex: 1;
+		overflow: auto;
+		padding: 18px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.msg {
+		display: grid;
+		grid-template-columns: 30px 1fr;
+		gap: 10px;
+		max-width: 78%;
+	}
+	.msg .blase {
+		grid-column: 2;
+		padding: 9px 13px;
+		border-radius: 14px;
+		border-bottom-left-radius: 4px;
+		background: var(--austit-surface);
+		border: 1px solid var(--austit-border);
+		box-shadow: var(--austit-shadow);
+		font-size: 13px;
+	}
+	.msg .autor { grid-column: 2; color: var(--austit-muted); font-size: 10px; margin-bottom: 2px; }
+	.msg.eigen { margin-left: auto; grid-template-columns: 1fr; }
+	.msg.eigen .blase {
+		grid-column: 1;
+		background: var(--austit-accent);
+		border-color: var(--austit-accent);
+		color: #fff;
+		border-radius: 14px;
+		border-bottom-right-radius: 4px;
+	}
+	.bild {
+		width: 220px; height: 130px;
+		border-radius: 8px;
+		background: linear-gradient(120deg, var(--austit-accent), #16a085);
+		display: grid; place-items: center;
+		color: rgba(255,255,255,.85); font-size: 11px;
+	}
+	.bild small { display: block; color: rgba(255,255,255,.7); font-size: 9px; margin-top: 8px; }
+	.zeit { display: block; margin-top: 4px; font-size: 9px; color: var(--austit-muted); text-align: right; }
+	.msg.eigen .zeit { color: rgba(255,255,255,.7); }
+	.eingabe {
+		margin: 12px 18px 16px;
+		padding: 10px 16px;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		border: 1px solid var(--austit-border);
+		border-radius: 14px;
+		background: var(--austit-surface);
+		box-shadow: var(--austit-shadow);
+	}
+	.eingabe .text { flex: 1; color: var(--austit-muted); }
+	.eingabe .senden {
+		background: var(--austit-accent);
+		border: 0;
+		color: #fff;
+		border-radius: 8px;
+		padding: 7px 14px;
+		font: inherit;
+	}
+	.ablauf-note {
+		margin: 0 18px 10px;
+		font-size: 11px;
+		color: var(--austit-muted);
+	}
+
+	/* ---------- Startseite ---------- */
+	.start-karten { padding: 24px; display: grid; gap: 14px; }
+	.bande {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		min-height: 130px;
+		padding: 24px 30px;
+		border-radius: var(--austit-radius);
+		background: var(--austit-accent);
+		box-shadow: var(--austit-shadow);
+		position: relative;
+	}
+	.bande::after { content: ""; position: absolute; inset: auto 30px 0; height: 3px; border-radius: 3px 3px 0 0; background: linear-gradient(90deg, var(--austit-accent), #16a085); opacity: .8; }
+	.bande h2 { margin: 0; color: #fff; font-size: clamp(22px, 4vw, 32px); letter-spacing: -.03em; }
+	.bande p { margin: 8px 0 0; color: rgba(255,255,255,.85); }
+	.bande .kugel { width: 76px; height: 76px; border: 14px solid rgba(255,255,255,.25); border-radius: 50%; }
+	.kacheln { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+	.kachel {
+		display: grid;
+		grid-template-columns: 36px 1fr;
+		align-items: center;
+		gap: 2px 10px;
+		padding: 16px;
+		border: 1px solid var(--austit-border);
+		border-radius: var(--austit-radius);
+		background: var(--austit-surface);
+		box-shadow: var(--austit-shadow);
+	}
+	.kachel .icon {
+		grid-row: span 2;
+		width: 36px; height: 36px;
+		display: grid; place-items: center;
+		border-radius: var(--austit-radius-s);
+		background: var(--austit-accent-soft);
+		color: var(--austit-accent);
+		font-size: 16px;
+	}
+	.kachel small { color: var(--austit-muted); font-size: 12px; }
+
+	/* ---------- austit Talk Verwaltung ---------- */
+	.verwaltung { flex: 1; overflow: auto; background: #f5f9fd; color: #16243a; padding: 28px 32px; }
+	.dunkel .verwaltung { background: #0d1526; color: #e6edf6; }
+	.held {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		min-height: 150px;
+		padding: 26px 30px;
+		border-radius: var(--austit-radius);
+		background: linear-gradient(120deg, #2f8fd0, #2563eb);
+		box-shadow: var(--austit-shadow);
+		position: relative;
+	}
+	.held::after { content: ""; position: absolute; inset: auto 30px 0; height: 3px; border-radius: 3px 3px 0 0; background: linear-gradient(90deg, #2f8fd0, #16a085); opacity: .85; }
+	.held h2 { margin: 0; color: #fff; font-size: clamp(24px, 4vw, 36px); letter-spacing: -.04em; }
+	.held p { margin: 8px 0 6px; color: rgba(255,255,255,.86); font-size: 13px; }
+	.held .kicker { color: rgba(255,255,255,.8); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 6px; }
+	.statistik { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+	.stat {
+		display: grid;
+		grid-template-columns: 36px 1fr;
+		gap: 2px 10px;
+		align-items: center;
+		padding: 14px;
+		border: 1px solid #d9e6f2;
+		border-radius: var(--austit-radius);
+		background: #fff;
+		box-shadow: var(--austit-shadow);
+		font-size: 13px;
+	}
+	.dunkel .stat { border-color: #1e2a3f; background: #111a2b; }
+	.stat .icon { grid-row: span 2; width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--austit-radius-s); background: rgba(47,143,208,.12); color: #2f8fd0; }
+	.stat small { color: #5a6b7e; font-size: 11px; }
+	.dunkel .stat small { color: #8b98ad; }
+	.panel-reihe { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; }
+	.panel {
+		padding: 22px;
+		border: 1px solid #d9e6f2;
+		border-radius: var(--austit-radius);
+		background: #fff;
+		box-shadow: var(--austit-shadow);
+	}
+	.dunkel .panel { border-color: #1e2a3f; background: #111a2b; color: #e6edf6; }
+	.panel h3 { margin: 0 0 14px; font-size: 17px; letter-spacing: -.02em; }
+	.gruppe-kopf { margin: 18px 0 6px; color: #5a6b7e; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+	.dunkel .gruppe-kopf { color: #8b98ad; }
+	.regel {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		min-height: 44px;
+		border-bottom: 1px solid #d9e6f2;
+		font-size: 13px;
+	}
+	.dunkel .regel { border-color: #1e2a3f; }
+	.schalter {
+		position: relative;
+		width: 38px; height: 22px;
+		border-radius: 20px;
+		background: #eef5fb;
+	}
+	.schalter::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+	.schalter.an { background: #2f8fd0; }
+	.schalter.an::after { transform: translateX(16px); }
+	.nutzer {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 0;
+		border-bottom: 1px solid #d9e6f2;
+		font-size: 13px;
+	}
+	.dunkel .nutzer { border-color: #1e2a3f; }
+	.nutzer .avatar-klein { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #2f8fd0; color: #fff; font-weight: 700; }
+	.nutzer .name { flex: 1; }
+	.nutzer .name small { display: block; color: #5a6b7e; font-size: 11px; }
+	.dunkel .nutzer .name small { color: #8b98ad; }
+	.nutzer .mini-schalter { width: 34px; height: 20px; }
+	.nutzer .mini-schalter::after { width: 14px; height: 14px; }
+	.nutzer .mini-schalter.an::after { transform: translateX(14px); }
+</style>
+</head>
+<body>
+
+<div class="hinweis">
+	<h1>austit – Designvorschau</h1>
+	<p>Nicht funktionsfähiger Entwurf: Workspace-Shell, Talk im austit-Design und die austit Talk Verwaltung. Umschalten zwischen Hell- und Dunkel-Design oben rechts.</p>
+</div>
+
+<div class="leiste">
+	<button class="knopf aktiv" data-ansicht="shell-start">Startseite</button>
+	<button class="knopf" data-ansicht="shell-talk">Talk</button>
+	<button class="knopf" data-ansicht="shell-verwaltung">austit Talk Verwaltung</button>
+	<button class="knopf" id="helldunkel">◐ Hell/Dunkel</button>
+</div>
+
+<div class="ansicht aktiv" id="shell-start">
+	<div class="shell">
+		<nav class="schiene">
+			<div class="marke">A</div>
+			<div class="navpunkt aktiv">💬<span>Talk</span></div>
+			<div class="navpunkt">📁<span>Dateien</span></div>
+			<div class="navpunkt">🗓<span>Kalender</span></div>
+			<div class="navpunkt">📔<span>Notizbücher</span></div>
+			<div class="navpunkt">📷<span>Fotos</span></div>
+			<div class="navpunkt">⚙<span>Einstellungen</span></div>
+		</nav>
+		<div class="haupt">
+			<header class="kopf">
+				<h2>Start</h2>
+				<div class="suche">🔍 Suche …</div>
+				<div class="avatar">D</div>
+			</header>
+			<div class="inhalt" style="display:block">
+				<div class="start-karten">
+					<div class="bande">
+						<div>
+							<h2>Willkommen in deiner austit Cloud</h2>
+							<p>Dein Workspace für Arbeit, Dokumente und Kommunikation.</p>
+						</div>
+						<div class="kugel"></div>
+					</div>
+					<div class="kacheln">
+						<div class="kachel"><div class="icon">＋</div><strong>Neues Dokument</strong><small>In den Dateien anlegen</small></div>
+						<div class="kachel"><div class="icon">🎥</div><strong>Besprechung starten</strong><small>Talk-Gespräch öffnen</small></div>
+						<div class="kachel"><div class="icon">📔</div><strong>Notizbuch öffnen</strong><small>Klassennotizbücher</small></div>
+						<div class="kachel"><div class="icon">✉</div><strong>E-Mail schreiben</strong><small>Mail-Postfach öffnen</small></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="ansicht" id="shell-talk">
+	<div class="shell">
+		<nav class="schiene">
+			<div class="marke">A</div>
+			<div class="navpunkt aktiv">💬<span>Talk</span></div>
+			<div class="navpunkt">📁<span>Dateien</span></div>
+			<div class="navpunkt">🗓<span>Kalender</span></div>
+			<div class="navpunkt">📔<span>Notizbücher</span></div>
+			<div class="navpunkt">📷<span>Fotos</span></div>
+			<div class="navpunkt">⚙<span>Einstellungen</span></div>
+		</nav>
+		<div class="haupt">
+			<header class="kopf">
+				<h2>Talk</h2>
+			</header>
+			<div class="inhalt">
+				<aside class="gespraeche">
+					<h3>Gespräche</h3>
+					<div class="gespraech-eintrag aktiv">
+						<div class="initial">2</div>
+						<div><strong>2. Klasse Informatik</strong><small>Franzi: Danke euch!</small></div>
+						<span class="geheim-badge">GEHEIM</span>
+						<span class="uhr-badge">⏳ 1 Std.</span>
+					</div>
+					<div class="gespraech-eintrag">
+						<div class="initial grau">L</div>
+						<div><strong>Laura M.</strong><small>Bis morgen!</small></div>
+						<span class="uhr-badge">14:32</span>
+					</div>
+					<div class="gespraech-eintrag">
+						<div class="initial grau">J</div>
+						<div><strong>Jonas K.</strong><small>OK</small></div>
+						<span class="uhr-badge">12:08</span>
+					</div>
+					<div class="gespraech-eintrag">
+						<div class="initial">P</div>
+						<div><strong>Projekt Webseite</strong><small>Herr Baur: Termin …</small></div>
+						<span class="geheim-badge">GEHEIM</span>
+						<span class="uhr-badge">⏳ 24 Std.</span>
+					</div>
+				</aside>
+				<div class="talk">
+					<div class="chat-kopf">
+						<div class="initial">2</div>
+						<div class="titel">
+							<strong>2. Klasse Informatik</strong>
+							<small>6 Teilnehmer · Nachrichten und Dateien laufen nach 1 Stunde ab</small>
+						</div>
+						<span class="schloss">🔒 Geheime Unterhaltung</span>
+					</div>
+					<div class="verlauf">
+						<div class="msg">
+							<div class="autor">Franzi · 14:03</div>
+							<div class="blase">Hey zusammen, die Bilder von heute sind drin 👍</div>
+						</div>
+						<div class="msg eigen">
+							<div class="blase">
+								<div class="bild">IMG-bild-vorschau<br><small>nur im Chat sichtbar · verschlüsselt · läuft nach 1 Std. ab</small></div>
+								So sieht ein geteiltes Bild in einer geheimen Unterhaltung aus
+								<span class="zeit">14:04</span>
+							</div>
+						</div>
+						<div class="msg">
+							<div class="autor">Jonas · 14:06</div>
+							<div class="blase">Danke! Kann man das auch in den Dateien finden?</div>
+						</div>
+						<div class="msg eigen">
+							<div class="blase">Nein - geschützte Dateien erscheinen ausschließlich hier im Chat.<span class="zeit">14:07</span></div>
+						</div>
+					</div>
+					<div class="ablauf-note">🔒 Nachrichten dieser Unterhaltung werden automatisch nach 1 Stunde gelöscht</div>
+					<div class="eingabe">
+						<span>📎</span>
+						<div class="text">Nachricht schreiben …</div>
+						<span>😊</span>
+						<button class="senden">Senden</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="ansicht" id="shell-verwaltung">
+	<div class="shell">
+		<nav class="schiene">
+			<div class="marke">A</div>
+			<div class="navpunkt">💬<span>Talk</span></div>
+			<div class="navpunkt">📁<span>Dateien</span></div>
+			<div class="navpunkt">🗓<span>Kalender</span></div>
+			<div class="navpunkt">📔<span>Notizbücher</span></div>
+			<div class="navpunkt aktiv">⚙<span>Verwaltung</span></div>
+		</nav>
+		<div class="haupt">
+			<header class="kopf">
+				<h2>austit Talk</h2>
+				<div class="avatar">D</div>
+			</header>
+			<div class="verwaltung">
+				<div class="held">
+					<div>
+						<p class="kicker">austit Talk Verwaltung</p>
+						<h2>Verwalte deine geheimen Unterhaltungen</h2>
+						<p>Festgelegte Talk-Einstellungen, freigegebene Administrator:innen und Ablaufzeiten.</p>
+					</div>
+				</div>
+				<div class="statistik">
+					<div class="stat"><div class="icon">🔒</div><strong>2</strong><small>Geheime Unterhaltungen</small></div>
+					<div class="stat"><div class="icon">👥</div><strong>18</strong><small>Administrator:innen</small></div>
+					<div class="stat"><div class="icon">✓</div><strong>6</strong><small>Im Zugriff</small></div>
+				</div>
+				<div class="panel-reihe">
+					<div class="panel">
+						<h3>Einstellungen</h3>
+						<div class="gruppe-kopf">Gespräche</div>
+						<div class="regel">Dateien in Gesprächen<div class="schalter an"></div></div>
+						<div class="regel">Dateien in öffentlichen Shares<div class="schalter"></div></div>
+						<div class="regel">Passwörter erzwingen<div class="schalter an"></div></div>
+						<div class="gruppe-kopf">Anrufe</div>
+						<div class="regel">Ende-zu-Ende-Verschlüsselung<div class="schalter an"></div></div>
+						<div class="regel">Lobby bei Inaktivität<div class="schalter"></div></div>
+					</div>
+					<div class="panel">
+						<h3>Zugriff</h3>
+						<div class="regel" style="border-bottom:0">🔍 <span style="color:#5a6b7e">Administrator suchen</span></div>
+						<div class="nutzer">
+							<div class="avatar-klein">F</div>
+							<div class="name"><strong>Franziska Berger</strong><small>f.berber@austit.de</small></div>
+							<div class="schalter mini-schalter an"></div>
+						</div>
+						<div class="nutzer">
+							<div class="avatar-klein">H</div>
+							<div class="name"><strong>Herr Baur</strong><small>h.baur@austit.de</small></div>
+							<div class="schalter mini-schalter"></div>
+						</div>
+						<div class="nutzer">
+							<div class="avatar-klein">L</div>
+							<div class="name"><strong>Laura Maier</strong><small>l.maier@austit.de</small></div>
+							<div class="schalter mini-schalter an"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.querySelectorAll('.knopf[data-ansicht]').forEach(function (knopf) {
+	knopf.addEventListener('click', function () {
+		document.querySelectorAll('.knopf[data-ansicht]').forEach(function (k) { k.classList.remove('aktiv') });
+		knopf.classList.add('aktiv');
+		document.querySelectorAll('.ansicht').forEach(function (a) { a.classList.remove('aktiv') });
+		document.getElementById(knopf.dataset.ansicht).classList.add('aktiv');
+	});
+});
+document.getElementById('helldunkel').addEventListener('click', function () {
+	document.body.classList.toggle('dunkel');
+});
+</script>
+</body>
+</html>
