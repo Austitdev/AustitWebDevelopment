@@ -21,8 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  bsi:
-    name: BSI-Sicherheitsluecken-bericht (CERT-Bund)
+  sicherheit:
+    name: Sicherheitsbericht (BSI, NVD, CISA)
     runs-on: ubuntu-latest
     steps:
       - name: Meldungen abrufen, filtern und als PDF ausgeben
@@ -33,33 +33,33 @@ jobs:
           fi
           pip install --quiet fpdf2
           python3 - <<'PYEOF'
+          import datetime
           import email.utils
           import html
+          import json
           import re
+          import time
           import urllib.request
 
           from fpdf import FPDF
 
-          import glob
-          import os
-
-          def schrift(name):
-              for wurzel in ('/usr/share/fonts', '~/.fonts'):
-                  funde = glob.glob(os.path.expanduser(wurzel) + '/**/' + name, recursive=True)
-                  if funde:
-                      return funde[0]
-              raise SystemExit('Schrift nicht gefunden: ' + name)
-
-          FEED = 'https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_CSW.xml'
           ALTER_TAGE = 14
           SCHLUESSELWOERTER = [
               'php', 'java', 'kotlin', 'nextcloud', 'apache', 'nginx',
               'mariadb', 'mysql', 'postgres', 'redis', 'android', 'docker',
               'gradle', 'maven', 'node.js', 'npm',
           ]
+          NVD_SUCHBEGRIFFE = [
+              'php', 'kotlin', 'nextcloud', 'apache http', 'nginx',
+              'mariadb', 'redis', 'android',
+          ]
+          KOPF = {'User-Agent': 'austit-security-workflow'}
 
           def tilde(text):
               return html.unescape(re.sub('<[^<]+?>', '', text)).strip()
+
+          def druckbar(text):
+              return ''.join(z for z in text if z in '\t\n' or ord(z) >= 32 and ord(z) <= 8700)
 
           def kurz(link):
               ohne = re.sub(r'^https?://(www\.)?', '', link).rstrip('/')
@@ -76,40 +76,140 @@ jobs:
                   stuecke.append(wort)
               return ' '.join(stuecke)
 
-          anfrage = urllib.request.Request(FEED, headers={'User-Agent': 'austit-security-workflow'})
-          roh = urllib.request.urlopen(anfrage, timeout=60).read().decode('utf-8', 'ignore')
-          eintraege = re.findall(r'<item>(.*?)</item>', roh, re.S)
+          def schrift(name):
+              import glob
+              import os
+              for wurzel in ('/usr/share/fonts', '~/.fonts'):
+                  funde = glob.glob(os.path.expanduser(wurzel) + '/**/' + name, recursive=True)
+                  if funde:
+                      return funde[0]
+              raise SystemExit('Schrift nicht gefunden: ' + name)
 
-          jetzt = email.utils.parsedate_to_datetime(email.utils.formatdate()).timestamp()
-          frist = jetzt - ALTER_TAGE * 86400
+          jetzt_utc = datetime.datetime.now(datetime.timezone.utc)
+          frist = jetzt_utc - datetime.timedelta(days=ALTER_TAGE)
+          funde = {}
 
-          treffer = []
-          for eintrag in eintraege:
-              titel = re.search(r'<title>(.*?)</title>', eintrag, re.S)
-              datum = re.search(r'<pubDate>(.*?)</pubDate>', eintrag, re.S)
-              link = re.search(r'<link>(.*?)</link>', eintrag, re.S)
-              beschreibung = re.search(r'<description>(.*?)</description>', eintrag, re.S)
-              if not (titel and datum):
+          def merken(quelle, schluessel, titel, datum, link, beschreibung):
+              if not schluessel or schluessel in funde:
+                  return
+              funde[schluessel] = {
+                  'quelle': quelle,
+                  'titel': titel,
+                  'datum': datum,
+                  'link': link,
+                  'beschreibung': beschreibung,
+              }
+
+          # --- BSI: CERT-Bund-Sicherheitswarnungen ---
+          BSI = 'https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_CSW.xml'
+          try:
+              roh = urllib.request.urlopen(urllib.request.Request(BSI, headers=KOPF), timeout=60).read().decode('utf-8', 'ignore')
+              for eintrag in re.findall(r'<item>(.*?)</item>', roh, re.S):
+                  titel = re.search(r'<title>(.*?)</title>', eintrag, re.S)
+                  datum = re.search(r'<pubDate>(.*?)</pubDate>', eintrag, re.S)
+                  link = re.search(r'<link>(.*?)</link>', eintrag, re.S)
+                  beschreibung = re.search(r'<description>(.*?)</description>', eintrag, re.S)
+                  if not (titel and datum):
+                      continue
+                  try:
+                      zeit = email.utils.parsedate_to_datetime(datum.group(1)).timestamp()
+                  except (TypeError, ValueError):
+                      continue
+                  if zeit < frist.timestamp():
+                      continue
+                  haufen = ' '.join(filter(None, [
+                      tilde(titel.group(1)),
+                      tilde(beschreibung.group(1)) if beschreibung else '',
+                  ])).lower()
+                  if any(wort in haufen for wort in SCHLUESSELWOERTER):
+                      merken(
+                          'BSI',
+                          (link.group(1) if link else tilde(titel.group(1))),
+                          tilde(titel.group(1)),
+                          datum.group(1),
+                          tilde(link.group(1)) if link else BSI,
+                          tilde(beschreibung.group(1)) if beschreibung else '',
+                      )
+          except Exception as fehler:
+              print('BSI-Feed fehlgeschlagen: %s' % fehler)
+
+          # --- NVD: neue CVEs zu Suchbegriffen des Stacks ---
+          seit = frist.strftime('%Y-%m-%dT%H:%M:%S.000')
+          bis = jetzt_utc.strftime('%Y-%m-%dT%H:%M:%S.000')
+          for begriff in NVD_SUCHBEGRIFFE:
+              url = ('https://services.nvd.nist.gov/rest/json/cves/2.0'
+                     '?keywordSearch=%s&pubStartDate=%s&pubEndDate=%s&resultsPerPage=50'
+                     % (urllib.parse.quote(begriff), seit, bis))
+              try:
+                  antwort = json.loads(urllib.request.urlopen(
+                      urllib.request.Request(url, headers=KOPF), timeout=120).read())
+              except Exception as fehler:
+                  print('NVD (%s) fehlgeschlagen: %s' % (begriff, fehler))
+                  time.sleep(7)
                   continue
-              zeit = email.utils.parsedate_to_datetime(datum.group(1)).timestamp()
-              if zeit < frist:
-                  continue
-              haufen = ' '.join(filter(None, [
-                  tilde(titel.group(1)),
-                  tilde(beschreibung.group(1)) if beschreibung else '',
-              ])).lower()
-              if any(wort in haufen for wort in SCHLUESSELWOERTER):
-                  treffer.append({
-                      'titel': tilde(titel.group(1)),
-                      'datum': datum.group(1),
-                      'link': tilde(link.group(1)) if link else FEED,
-                      'beschreibung': tilde(beschreibung.group(1)) if beschreibung else '',
-                  })
+              for eintrag in antwort.get('vulnerabilities', []):
+                  cve = eintrag.get('cve', {})
+                  kennung = cve.get('id', '')
+                  if not kennung:
+                      continue
+                  texte = [x.get('value', '') for x in cve.get('descriptions', []) if x.get('lang') == 'en']
+                  beschreibung = texte[0] if texte else ''
+                  verweise = cve.get('references', [])
+                  link = ('https://nvd.nist.gov/vuln/detail/' + kennung)
+                  merken(
+                      'NVD',
+                      kennung,
+                      '%s (%s)' % (kennung, begriff),
+                      cve.get('published', '')[:16],
+                      link,
+                      beschreibung,
+                  )
+              time.sleep(7)
 
-          zeilen = ['## BSI-Hinweise der letzten %d Tage mit Bezug zum austit-Stack\n' % ALTER_TAGE]
+          # --- CISA: aktiv ausgenutzte Schwachstellen (KEV) ---
+          KEV = 'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json'
+          try:
+              kev = json.loads(urllib.request.urlopen(
+                  urllib.request.Request(KEV, headers=KOPF), timeout=120).read())
+              for eintrag in kev.get('vulnerabilities', []):
+                  hinzugefuegt = eintrag.get('dateAdded', '')
+                  try:
+                      wenn = datetime.datetime.strptime(hinzugefuegt, '%Y-%m-%d')
+                  except ValueError:
+                      continue
+                  if wenn.replace(tzinfo=datetime.timezone.utc) < frist:
+                      continue
+                  haufen = ' '.join([
+                      eintrag.get('vendorProject', ''),
+                      eintrag.get('product', ''),
+                      eintrag.get('vulnerabilityName', ''),
+                  ]).lower()
+                  if not any(wort in haufen for wort in SCHLUESSELWOERTER):
+                      continue
+                  merken(
+                      'CISA KEV',
+                      eintrag.get('cveID', ''),
+                      '%s — %s %s' % (eintrag.get('cveID', '?'), eintrag.get('vendorProject', ''), eintrag.get('product', '')),
+                      hinzugefuegt,
+                      'https://www.cisa.gov/known-exploited-vulnerabilities-catalog',
+                      eintrag.get('shortDescription', ''),
+                  )
+          except Exception as fehler:
+              print('CISA-KEV fehlgeschlagen: %s' % fehler)
+
+          treffer = sorted(funde.values(), key=lambda t: (t['quelle'], t['datum']), reverse=True)
+          quellen = []
+          for t in treffer:
+              if t['quelle'] not in quellen:
+                  quellen.append(t['quelle'])
+
+          zeilen = ['## Sicherheitshinweise der letzten %d Tage mit Bezug zum austit-Stack\n' % ALTER_TAGE]
+          zeilen.append('Quellen: BSI (CERT-Bund), NVD, CISA KEV\n')
           if treffer:
-              for t in treffer:
-                  zeilen.append('- [%s](%s) — %s\n' % (t['titel'], t['link'], t['datum']))
+              for quelle in quellen:
+                  zeilen.append('\n### %s\n' % quelle)
+                  for t in [x for x in treffer if x['quelle'] == quelle]:
+                      zeilen.append('- [%s](%s) — %s\n' % (t['titel'], t['link'], t['datum']))
           else:
               zeilen.append('Keine relevanten Hinweise im Zeitraum.\n')
           with open('/tmp/bsi-bericht.md', 'w', encoding='utf-8') as f:
@@ -121,32 +221,38 @@ jobs:
           pdf.add_font('dejavu', 'B', schrift('DejaVuSans-Bold.ttf'))
           pdf.add_page()
           pdf.set_font('dejavu', 'B', 20)
-          pdf.cell(0, 10, 'austit Cloud — BSI-Sicherheitsbericht', new_x='LMARGIN', new_y='NEXT')
+          pdf.cell(0, 10, 'austit Cloud — Sicherheitsbericht', new_x='LMARGIN', new_y='NEXT')
           pdf.set_font('dejavu', '', 11)
-          pdf.cell(0, 8, 'CERT-Bund-Sicherheitswarnungen mit Bezug zum eigenen Stack', new_x='LMARGIN', new_y='NEXT')
-          pdf.cell(0, 8, 'Zeitraum: letzte %d Tage — Quelle: www.bsi.bund.de' % ALTER_TAGE, new_x='LMARGIN', new_y='NEXT')
+          pdf.cell(0, 8, 'Sicherheitshinweise mit Bezug zum eigenen Stack', new_x='LMARGIN', new_y='NEXT')
+          pdf.cell(0, 8, 'Quellen: BSI (CERT-Bund), NVD und CISA KEV', new_x='LMARGIN', new_y='NEXT')
+          pdf.cell(0, 8, 'Zeitraum: letzte %d Tage' % ALTER_TAGE, new_x='LMARGIN', new_y='NEXT')
           pdf.ln(6)
           if treffer:
               pdf.set_font('dejavu', 'B', 13)
               pdf.cell(0, 8, '%d relevante Meldungen' % len(treffer), new_x='LMARGIN', new_y='NEXT')
               pdf.ln(2)
-              for t in treffer:
+              for quelle in quellen:
                   pdf.set_x(pdf.l_margin)
-                  pdf.set_font('dejavu', 'B', 11)
-                  pdf.multi_cell(0, 6, brechen(t['titel']), new_x='LMARGIN', new_y='NEXT')
-                  pdf.set_x(pdf.l_margin)
-                  pdf.set_font('dejavu', '', 9)
-                  pdf.multi_cell(0, 5, t['datum'], new_x='LMARGIN', new_y='NEXT')
-                  pdf.set_x(pdf.l_margin)
-                  pdf.multi_cell(0, 5, brechen(kurz(t['link'])), new_x='LMARGIN', new_y='NEXT')
-                  if t['beschreibung']:
+                  pdf.set_font('dejavu', 'B', 12)
+                  pdf.cell(0, 9, quelle, new_x='LMARGIN', new_y='NEXT')
+                  pdf.ln(1)
+                  for t in [x for x in treffer if x['quelle'] == quelle]:
                       pdf.set_x(pdf.l_margin)
-                      pdf.multi_cell(0, 5, brechen(t['beschreibung']), new_x='LMARGIN', new_y='NEXT')
-                  pdf.ln(4)
+                      pdf.set_font('dejavu', 'B', 11)
+                      pdf.multi_cell(0, 6, brechen(druckbar(t['titel'])), new_x='LMARGIN', new_y='NEXT')
+                      pdf.set_x(pdf.l_margin)
+                      pdf.set_font('dejavu', '', 9)
+                      pdf.multi_cell(0, 5, t['datum'], new_x='LMARGIN', new_y='NEXT')
+                      pdf.set_x(pdf.l_margin)
+                      pdf.multi_cell(0, 5, brechen(kurz(t['link'])), new_x='LMARGIN', new_y='NEXT')
+                      if t['beschreibung']:
+                          pdf.set_x(pdf.l_margin)
+                          pdf.multi_cell(0, 5, brechen(druckbar(t['beschreibung'])), new_x='LMARGIN', new_y='NEXT')
+                      pdf.ln(4)
           else:
               pdf.set_font('dejavu', '', 12)
               pdf.cell(0, 8, 'Keine relevanten Meldungen im Zeitraum.', new_x='LMARGIN', new_y='NEXT')
-          pdf.output('/tmp/bsi-sicherheitsbericht.pdf')
+          pdf.output('/tmp/sicherheitsbericht.pdf')
 
           with open('/tmp/bsi-treffer', 'w') as f:
               f.write(str(len(treffer)))
@@ -156,8 +262,8 @@ jobs:
       - name: PDF als Artefakt bereitstellen
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: bsi-sicherheitsbericht
-          path: /tmp/bsi-sicherheitsbericht.pdf
+          name: sicherheitsbericht
+          path: /tmp/sicherheitsbericht.pdf
           retention-days: 30
 
       - name: Treffer in Sammel-Issue festhalten
@@ -171,12 +277,12 @@ jobs:
             echo "Keine relevanten Treffer, kein Issue noetig."
             exit 0
           fi
-          gh label create sicherheit --repo "$GITHUB_REPOSITORY" --color 0b65da --description "BSI-Sicherheitsberichte" 2>/dev/null || true
+          gh label create sicherheit --repo "$GITHUB_REPOSITORY" --color 0b65da --description "Sicherheitsberichte" 2>/dev/null || true
           nummer="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label sicherheit --json number --jq '.[0].number' 2>/dev/null || true)"
           if [ -n "${nummer}" ] && [ "${nummer}" != "null" ]; then
             gh issue comment "${nummer}" --repo "$GITHUB_REPOSITORY" --body-file /tmp/bsi-bericht.md
           else
             gh issue create --repo "$GITHUB_REPOSITORY" --label sicherheit \
-              --title "[Sicherheit] Relevante BSI-Hinweise" \
+              --title "[Sicherheit] Relevante Sicherheitshinweise (BSI, NVD, CISA)" \
               --body-file /tmp/bsi-bericht.md
           fi
