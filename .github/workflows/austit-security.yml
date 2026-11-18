@@ -1,0 +1,131 @@
+# SPDX-FileCopyrightText: 2026 austit.de
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: austit Sicherheit
+
+on:
+  schedule:
+    - cron: '20 6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'apps/**/composer.lock'
+      - 'apps/**/package.json'
+      - 'apps/**/package-lock.json'
+      - 'apps/**/gradle.lockfile'
+      - 'apps/**/pom.xml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: austit-security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  abhaengigkeiten:
+    name: Abhaengigkeiten (PHP, JavaScript, Java/Kotlin)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: OSV-Scanner ueber alle Lockdateien
+        uses: google/osv-scanner-action@6bc832ee85d316ab9aeccf71929026841bd0e1ee # v2.7.1
+        with:
+          scan-args: |-
+            --recursive
+            --skip-git-ignore
+            ./
+
+  bsi:
+    name: BSI-Hinweise (CERT-Bund)
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Feeds abrufen und auf relevante Hinweise filtern
+        run: |
+          set -euo pipefail
+          python3 - <<'PYEOF'
+          import email.utils
+          import html
+          import re
+          import urllib.request
+
+          FEED = 'https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_CSW.xml'
+          ALTER_TAGE = 14
+          SCHLUESSELWOERTER = [
+              'php', 'java', 'kotlin', 'nextcloud', 'apache', 'nginx',
+              'mariadb', 'mysql', 'postgres', 'redis', 'android', 'docker',
+              'gradle', 'maven', 'node.js', 'npm',
+          ]
+
+          def tilde(text):
+              return html.unescape(re.sub('<[^<]+?>', '', text))
+
+          anfrage = urllib.request.Request(FEED, headers={'User-Agent': 'austit-security-workflow'})
+          roh = urllib.request.urlopen(anfrage, timeout=60).read().decode('utf-8', 'ignore')
+          eintraege = re.findall(r'<item>(.*?)</item>', roh, re.S)
+
+          frist = email.utils.parsedate_to_datetime(
+              email.utils.formatdate()
+          ).timestamp() - ALTER_TAGE * 86400
+
+          treffer = []
+          for eintrag in eintraege:
+              titel = re.search(r'<title>(.*?)</title>', eintrag, re.S)
+              datum = re.search(r'<pubDate>(.*?)</pubDate>', eintrag, re.S)
+              link = re.search(r'<link>(.*?)</link>', eintrag, re.S)
+              beschreibung = re.search(r'<description>(.*?)</description>', eintrag, re.S)
+              if not (titel and datum):
+                  continue
+              zeit = email.utils.parsedate_to_datetime(datum.group(1)).timestamp()
+              if zeit < frist:
+                  continue
+              text = ' '.join(filter(None, [titel.group(1), beschreibung.group(1) if beschreibung else ''])).lower()
+              if any(wort in text for wort in SCHLUESSELWOERTER):
+                  treffer.append({
+                      'titel': tilde(titel.group(1)),
+                      'datum': datum.group(1),
+                      'link': tilde(link.group(1)) if link else FEED,
+                      'beschreibung': tilde(beschreibung.group(1))[:500] if beschreibung else '',
+                  })
+
+          bericht = ['## BSI-Hinweise der letzten %d Tage mit Bezug zum Stack\n' % ALTER_TAGE]
+          if treffer:
+              for t in treffer:
+                  bericht.append('- [%s](%s) — %s\n' % (t['titel'], t['link'], t['datum']))
+          else:
+              bericht.append('Keine relevanten Hinweise im Feedszeitraum.\n')
+          with open('/tmp/bsi-bericht.md', 'w', encoding='utf-8') as f:
+              f.write('\n'.join(bericht))
+          with open('/tmp/bsi-treffer', 'w') as f:
+              f.write(str(len(treffer)))
+          print('\n'.join(bericht))
+          PYEOF
+
+      - name: Treffer in Sammel-Issue festhalten
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          anzahl="$(cat /tmp/bsi-treffer)"
+          echo "Relevante Hinweise: ${anzahl}"
+          if [ "${anzahl}" = "0" ]; then
+            echo "Keine relevanten Treffer, kein Issue noetig."
+            exit 0
+          fi
+          titel="[Sicherheit] Relevante BSI-Hinweise"
+          nummer="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label sicherheit --json number --jq '.[0].number || ""')"
+          if [ -n "${nummer}" ]; then
+            gh issue comment "${nummer}" --repo "$GITHUB_REPOSITORY" --body-file /tmp/bsi-bericht.md
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --label sicherheit --title "${titel}" --body-file /tmp/bsi-bericht.md
+          fi
