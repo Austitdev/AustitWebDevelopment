@@ -49,11 +49,13 @@ jobs:
               'mariadb', 'mysql', 'postgres', 'redis', 'android', 'docker',
               'gradle', 'maven', 'node.js', 'npm',
               'libresign', 'phpseclib', 'jsign', 'openssl', 'stripe', 'sepa',
+              'totp', 'twofactor', 'two-factor', 'social login', 'sociallogin', 'oauth', 'oidc',
           ]
           NVD_SUCHBEGRIFFE = [
               'php', 'kotlin', 'nextcloud', 'apache http', 'nginx',
               'mariadb', 'redis', 'android',
               'libresign', 'phpseclib', 'jsign', 'openssl', 'stripe', 'sepa',
+              'totp', 'oauth', 'social login',
           ]
           KOPF = {'User-Agent': 'austit-security-workflow'}
 
