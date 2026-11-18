@@ -36,8 +36,12 @@
 	*::-webkit-scrollbar-thumb { border-radius: 8px; background: #3a3f46; border: 2px solid transparent; background-clip: content-box; }
 	*::-webkit-scrollbar-thumb:hover { background: #4a5059; background-clip: content-box; }
 	*::-webkit-scrollbar-track { background: transparent; }
+	html { height: 100%; }
 	body {
 		margin: 0;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
 		background: var(--chat-bg);
 		color: var(--text);
 		font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
@@ -46,7 +50,8 @@
 		-webkit-font-smoothing: antialiased;
 	}
 	svg { display: block; }
-	.rumpf { display: flex; height: 100vh; }
+	.rumpf { display: flex; flex: 1 1 auto; min-height: 0; }
+	.vorschau-kopf { flex: none; }
 
 	/* ---------- Vorschau-Kopf mit Ladescreen ---------- */
 	.vorschau-kopf {
@@ -592,7 +597,7 @@
 	</div>
 </div>
 
-<div class="rumpf" style="height: calc(100vh - 150px)">
+<div class="rumpf">
 	<!-- Schiene: alle Apps der austit Cloud -->
 	<nav class="schiene">
 		<div class="kachelmarke">
