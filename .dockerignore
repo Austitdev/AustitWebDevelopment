@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 austit.de
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Was NICHT ins Test-Image gehoert (Context = Repo-Wurzel, Dockerfile austit-dev/).
+
+# Versionierung und IDE
+.git
+.gitignore
+.idea
+.vscode
+*.md.license
+
+# Laufzeitdaten und Benutzereinstellungen der Cloud
+data/
+config/config.php
+custom_apps/
+apps/*/vendor/
+
+# Node/Build-Artefakte
+node_modules/
+apps/austit_notebook/node_modules
+apps/austit_notebook/dist
+
+# Lokale Dev-Umgebung wird ueber Bind-Mounts benutzt, nicht eingebrannt
+austit-dev/docker-compose.yml
+austit-dev/entrypoint.sh
+austit-dev/dev.config.php
+austit-dev/apache-dev.conf
+
+# Testsystem
+austit-dev/docker-compose.test.yml

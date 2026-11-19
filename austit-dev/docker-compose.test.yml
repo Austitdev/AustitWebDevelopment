@@ -1,0 +1,41 @@
+# Testsystem der austit Cloud: baut das Image aus dem Repo (Dockerfile im
+# gleichen Ordner) und startet Instanz und Cron. Kein externer Dienst -
+# die Test-Instanz nutzt SQLite, Admin-Zugang und Daten liegen in Volumes.
+#
+# Start:   docker compose -f austit-dev/docker-compose.test.yml up -d --build
+# Aufruf:  http://localhost:8081  (Login: admin / admin)
+# Stop:    docker compose -f austit-dev/docker-compose.test.yml down
+name: austit-cloud-test
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: austit-dev/Dockerfile
+    image: austit-cloud:test
+    environment:
+      # Login-Zugang der Erstinstallation (nachtraeglich in der Cloud aenderbar)
+      AUSTIT_ADMIN_USER: admin
+      AUSTIT_ADMIN_PASS: admin
+      AUSTIT_TRUSTED_DOMAIN: localhost
+    ports:
+      - "127.0.0.1:8081:80"
+      - "[::1]:8081:80"
+    volumes: &app-volumes
+      - data:/var/www/html/data
+      - custom-apps:/var/www/html/custom_apps
+    restart: unless-stopped
+
+  # Hintergrundaufgaben jede Minute: Nachrichtenauf/beiablauf in Talk und
+  # Purge der geheimen Unterhaltungen laufen ausschliesslich im Cron-Modus.
+  cron:
+    image: austit-cloud:test
+    entrypoint: ["/bin/sh", "/var/www/html/austit-dev/cron.sh"]
+    depends_on:
+      - app
+    volumes: *app-volumes
+    restart: unless-stopped
+
+volumes:
+  data:
+  custom-apps:
