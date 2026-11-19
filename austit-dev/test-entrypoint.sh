@@ -90,4 +90,12 @@ occ app:enable austit_talk
 # austit_medien benoetigt yt-dlp + ffmpeg aus dem Image (siehe Dockerfile).
 occ app:enable austit_medien
 
+# Eigener App-Store (liegt im privaten Austit_Esign-Repo): Wenn die App im
+# custom_apps-Volume liegt (z. B. per Release-Tarball von GitHub oder
+# docker cp hineinkopiert), wird sie aktiviert und erscheint danach in der
+# Verwaltung als 'Austit Store'; der Apps-Kachel leitet darauf um.
+if [ -d custom_apps/austit_store ]; then
+	occ app:enable austit_store
+fi
+
 exec apache2-foreground
