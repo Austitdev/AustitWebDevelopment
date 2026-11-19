@@ -79,13 +79,16 @@ class TubeSearchTest extends TestCase {
 	}
 
 	public function testExtractVideosDeduplicatesIds(): void {
-		$renderer = [
-			'videoId' => 'ddddddddddd',
-			'title' => ['runs' => [['text' => 'Duplikat']]],
-			'lengthText' => ['simpleText' => '2:00'],
+		$entry = [
+			'videoRenderer' => [
+				'videoId' => 'ddddddddddd',
+				'title' => ['runs' => [['text' => 'Duplikat']]],
+				'lengthText' => ['simpleText' => '2:00'],
+			],
 		];
-		$result = $this->search->extractVideos([$renderer, $renderer]);
+		$result = $this->search->extractVideos([$entry, $entry]);
 		$this->assertCount(1, $result);
+		$this->assertSame('ddddddddddd', $result[0]['id']);
 	}
 
 	public function testExtractVideosWithEmptyData(): void {
