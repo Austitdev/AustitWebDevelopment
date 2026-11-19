@@ -31,7 +31,7 @@ class MarkdownParserTest extends TestCase {
 		$this->assertCount(3, $result['blocks']);
 		$this->assertSame('heading', $result['blocks'][0]['type']);
 		$this->assertSame(1, $result['blocks'][0]['attrs']['level']);
-		$this->assertSame(['type' => 'text', 'text' => 'Ein Absatz mit', ], $result['blocks'][1]['content'][0]);
+		$this->assertSame(['type' => 'text', 'text' => 'Ein Absatz mit '], $result['blocks'][1]['content'][0]);
 	}
 
 	public function testBoldAndItalicMarks(): void {
