@@ -11,6 +11,7 @@ namespace OCA\AustitNotebook\Controller;
 
 use OCA\AustitNotebook\AppInfo\Application;
 use OCA\AustitNotebook\Service\ConflictException;
+use OCA\AustitNotebook\Service\ImportService;
 use OCA\AustitNotebook\Service\NotebookException;
 use OCA\AustitNotebook\Service\NotebookService;
 use OCA\AustitNotebook\Service\SyncService;
@@ -33,6 +34,7 @@ class ApiController extends Controller {
 		IRequest $request,
 		private NotebookService $service,
 		private SyncService $sync,
+		private ImportService $importService,
 		private IUserSession $userSession,
 		private LoggerInterface $logger,
 	) {
@@ -196,6 +198,22 @@ class ApiController extends Controller {
 				}
 			}
 		}, Http::STATUS_CREATED);
+	}
+
+	#[NoAdminRequired]
+	#[FrontpageRoute(verb: 'POST', url: '/api/import')]
+	public function importNotebook(): JSONResponse {
+		$upload = $this->request->getUploadedFile('zip');
+		if (!is_array($upload) || ($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || !is_uploaded_file($upload['tmp_name'])) {
+			return new JSONResponse(['message' => 'Die ZIP-Datei konnte nicht hochgeladen werden.'], Http::STATUS_BAD_REQUEST);
+		}
+		$name = pathinfo((string)$upload['name'], PATHINFO_FILENAME);
+		$notebookName = trim((string)($this->request->getParam('name') ?? ''));
+		if ($notebookName === '') {
+			$notebookName = $name;
+		}
+
+		return $this->run(fn () => $this->importService->importZip($this->userId(), (string)$upload['tmp_name'], $notebookName), Http::STATUS_CREATED);
 	}
 
 	#[NoAdminRequired]

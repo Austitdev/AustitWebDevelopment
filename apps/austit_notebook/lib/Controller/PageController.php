@@ -40,4 +40,20 @@ class PageController extends Controller {
 		Util::addStyle(Application::APP_ID, 'notebook');
 		return new TemplateResponse(Application::APP_ID, 'main');
 	}
+
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[FrontpageRoute(verb: 'GET', url: '/import')]
+	public function import(): TemplateResponse {
+		$appBase = $this->urlGenerator->linkToRoute(Application::APP_ID . '.page.index');
+		$this->initialState->provideInitialState('config', [
+			'apiBase' => rtrim($appBase, '/') . '/api',
+		]);
+		Util::addScript(Application::APP_ID, 'import');
+		Util::addStyle(Application::APP_ID, 'import');
+		return new TemplateResponse(Application::APP_ID, 'import', [
+			'apiBase' => rtrim($appBase, '/') . '/api',
+			'appBase' => $appBase,
+		]);
+	}
 }

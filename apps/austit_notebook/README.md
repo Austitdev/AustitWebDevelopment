@@ -19,6 +19,16 @@ unbegrenzte Fläche für frei platzierten Text, Bilder und Handschrift.
 Seiten liegen als `.anote`-Dateien (JSON) unter `Notizbücher/<Notizbuch>/<Abschnitt>/` im Speicher
 des Nutzers, eingefügte Bilder im Ordner `.medien` des Abschnitts.
 
+## OneNote-Import (Markdown-Zip)
+
+Unter `/apps/austit_notebook/import` liegt eine Importseite: Ein mit dem
+[onenote-md-exporter](https://github.com/alxnbl/onenote-md-exporter)
+erstelltes ZIP (Markdown je Seite, Bilder daneben) wird zu einem Notizbuch:
+Verzeichnisse im Archiv werden zu Abschnitten, jede Markdown-Datei zu einer
+Seite mit Text (Überschriften, Listen, Zitate, Code, Hervorhebungen) und
+eingefügten Bildern unter dem Text. API: `POST api/import` (Multipart-Feld
+`zip`, optional `name` für den Notizbuchnamen).
+
 ## Zusammenarbeit
 
 Wer dieselbe Seite geöffnet hat, bearbeitet sie gemeinsam: Änderungen werden als Yjs-Updates über

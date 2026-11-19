@@ -1,0 +1,65 @@
+/*
+ * austit Notizbuch – Importseite.
+ *
+ * SPDX-FileCopyrightText: 2026 austit.de
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+#austit-notebook-import {
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+.anb-import-card {
+	border: 1px solid var(--color-border, #ddd);
+	border-radius: 12px;
+	padding: 20px;
+	margin-bottom: 24px;
+	background: var(--color-main-background, #fff);
+}
+
+.anb-import-hint {
+	font-size: 0.9em;
+	color: var(--color-text-maxcontrast, #666);
+	line-height: 1.5;
+}
+
+.anb-import-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 12px;
+	margin: 16px 0;
+}
+
+.anb-import-grid label {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	font-size: 0.85em;
+	color: var(--color-text-maxcontrast, #666);
+}
+
+.anb-import-grid input {
+	padding: 8px;
+	border: 1px solid var(--color-border, #ccc);
+	border-radius: 8px;
+	font-size: 1em;
+}
+
+.anb-import-actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.anb-import-msg {
+	font-size: 0.9em;
+	color: var(--color-text-maxcontrast, #444);
+	white-space: pre-wrap;
+}
+
+.anb-import-msg a.button,
+.anb-import-msg a.primary {
+	display: inline-block;
+	margin-top: 8px;
+}
