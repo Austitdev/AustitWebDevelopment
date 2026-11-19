@@ -1,6 +1,7 @@
 # Testsystem der austit Cloud: baut das Image aus dem Repo (Dockerfile im
-# gleichen Ordner) und startet Instanz, MariaDB und Cron - produktionsnah
-# wie auf dem VPS, nur ohne Collabora. Admin-Zugang und Daten liegen in Volumes.
+# gleichen Ordner) und startet Instanz, MariaDB, Collabora (Office) und Cron -
+# produktionsnah wie auf dem VPS. Admin-Zugang und Daten liegen in Volumes.
+# Collabora laeuft auf Port 9981, damit die Dev-Umgebung (9980) parallel laufen kann.
 #
 # Start:   docker compose -f austit-dev/docker-compose.test.yml up -d --build
 # Aufruf:  http://localhost:8081  (Login: admin / admin)
@@ -55,8 +56,25 @@ services:
       retries: 12
     restart: unless-stopped
 
+  # Office-Bearbeitung (docx, xlsx, pptx, odt, ...), gleiche Version wie auf dem VPS.
+  collabora:
+    image: collabora/code:26.04.5.1.1
+    environment:
+      aliasgroup1: http://app:80
+      DONT_GEN_SSL_CERT: "1"
+      extra_params: >-
+        --o:ssl.enable=false
+        --o:net.frame_ancestors=localhost:8081
+        --o:help_url=https://austit.de
+        --o:user_interface.brandProductName=AUSTIT
+        --o:user_interface.brandProductURL=https://austit.de
+    ports:
+      - "127.0.0.1:9981:9980"
+      - "[::1]:9981:9980"
+    restart: unless-stopped
+
   # Hintergrundaufgaben jede Minute: Nachrichtenauf/beiablauf in Talk und
-  # Purge der geheimen Unterhaltungen laufen ausschliesslich im Cron-Modus.
+  # Purge der geheimen Unterhaltungen laufen ausschliesslich im Cron-Modus,
   cron:
     image: austit-cloud:test
     entrypoint: ["/bin/sh", "/var/www/html/austit-dev/cron.sh"]
