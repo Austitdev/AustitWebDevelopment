@@ -10,7 +10,7 @@
 #
 # Build aus dem Wurzelverzeichnis des Repos:
 #   docker build -f austit-dev/Dockerfile -t austit-cloud:test .
-# Start (allein lauffaehig, SQLite, keine externe Datenbank):
+# Start (mit MariaDB und Cron):
 #   docker compose -f austit-dev/docker-compose.test.yml up -d
 # Aufruf: http://localhost:8081  (Login: admin / admin)
 
@@ -27,7 +27,7 @@ COPY austit-dev/austit.config.php /var/www/html/config/austit.config.php
 COPY austit-dev/php-austit.ini /usr/local/etc/php/conf.d/zz-austit.ini
 COPY austit-dev/apache-austit.conf /etc/apache2/conf-enabled/zz-austit.conf
 
-# Installations-Start fuer das Testsystem (SQLite, occ-Setup, Apps aktivieren).
+# Installations-Start fuer das Testsystem (MariaDB, occ-Setup, Apps aktivieren).
 COPY austit-dev/test-entrypoint.sh /usr/local/bin/austit-test-entrypoint.sh
 RUN chmod +x /usr/local/bin/austit-test-entrypoint.sh \
 	&& chmod -R a+rX /var/www/html

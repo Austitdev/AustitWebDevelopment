@@ -3,12 +3,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Startskript der Test-Instanz: installiert die austit Cloud beim ersten Start
-# in eine lokale SQLite-Datenbank und startet danach Apache. Kein externer
-# Datenbank- oder Redis-Dienst noetig; Admin-Zugang und vertraute Domain
-# koennen ueber Umgebungsvariablen gesetzt werden:
-#   AUSTIT_ADMIN_USER   (Standard: admin)
-#   AUSTIT_ADMIN_PASS   (Standard: admin)
+# in die MariaDB-Datenbank des Compose-Netzwerks und startet danach Apache -
+# so wie im Produktivbetrieb. Admin-Zugang und vertraute Domain koennen ueber
+# Umgebungsvariablen gesetzt werden:
+#   AUSTIT_ADMIN_USER     (Standard: admin)
+#   AUSTIT_ADMIN_PASS     (Standard: admin)
 #   AUSTIT_TRUSTED_DOMAIN (Standard: localhost)
+# Die Datenbank-Zugangsdaten muessen mit dem db-Service der Compose-Datei
+# uebereinstimmen (Standard dort: nextcloud/nextcloud/nextcloud auf Host db).
 set -e
 cd /var/www/html
 
@@ -21,6 +23,10 @@ occ() {
 ADMIN_USER="${AUSTIT_ADMIN_USER:-admin}"
 ADMIN_PASS="${AUSTIT_ADMIN_PASS:-admin}"
 TRUSTED_DOMAIN="${AUSTIT_TRUSTED_DOMAIN:-localhost}"
+DB_HOST="${AUSTIT_DB_HOST:-db}"
+DB_NAME="${AUSTIT_DB_NAME:-nextcloud}"
+DB_USER="${AUSTIT_DB_USER:-nextcloud}"
+DB_PASS="${AUSTIT_DB_PASS:-nextcloud}"
 
 chown www-data:www-data data custom_apps
 chmod -R a+rwX data
@@ -29,14 +35,16 @@ chmod a+rw config/config.php 2>/dev/null || true
 
 if ! grep -q "'installed' => true" config/config.php 2>/dev/null; then
 	occ maintenance:install \
-		--database sqlite \
+		--database mysql --database-host "$DB_HOST" \
+		--database-name "$DB_NAME" --database-user "$DB_USER" \
+		--database-pass "$DB_PASS" \
 		--admin-user "$ADMIN_USER" --admin-pass "$ADMIN_PASS" \
 		--data-dir /var/www/html/data
 	occ config:system:set trusted_domains 0 --value="$TRUSTED_DOMAIN"
 	occ config:system:set overwrite.cli.url --value="http://${TRUSTED_DOMAIN}:8081"
 fi
 
-# Hintergrundaufen laufen im cron-Service (docker-compose.test.yml);
+# Hintergrundaufgaben laufen im cron-Service (docker-compose.test.yml);
 # als Modus genuegt cron damit Talk den Nachrichtenauf/beiablauf anbietet.
 occ background:cron
 

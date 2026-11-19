@@ -1,6 +1,6 @@
 # Testsystem der austit Cloud: baut das Image aus dem Repo (Dockerfile im
-# gleichen Ordner) und startet Instanz und Cron. Kein externer Dienst -
-# die Test-Instanz nutzt SQLite, Admin-Zugang und Daten liegen in Volumes.
+# gleichen Ordner) und startet Instanz, MariaDB und Cron - produktionsnah
+# wie auf dem VPS, nur ohne Collabora. Admin-Zugang und Daten liegen in Volumes.
 #
 # Start:   docker compose -f austit-dev/docker-compose.test.yml up -d --build
 # Aufruf:  http://localhost:8081  (Login: admin / admin)
@@ -13,17 +13,46 @@ services:
       context: ..
       dockerfile: austit-dev/Dockerfile
     image: austit-cloud:test
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
       # Login-Zugang der Erstinstallation (nachtraeglich in der Cloud aenderbar)
       AUSTIT_ADMIN_USER: admin
       AUSTIT_ADMIN_PASS: admin
       AUSTIT_TRUSTED_DOMAIN: localhost
+      # Datenbank-Zugang, identisch zum db-Service unten
+      AUSTIT_DB_HOST: db
+      AUSTIT_DB_NAME: nextcloud
+      AUSTIT_DB_USER: nextcloud
+      AUSTIT_DB_PASS: nextcloud
     ports:
       - "127.0.0.1:8081:80"
       - "[::1]:8081:80"
     volumes: &app-volumes
       - data:/var/www/html/data
       - custom-apps:/var/www/html/custom_apps
+    restart: unless-stopped
+
+  # Produktionsnahe Datenbank wie auf dem VPS.
+  db:
+    image: mariadb:11.8
+    command:
+      - --transaction-isolation=READ-COMMITTED
+      - --innodb-buffer-pool-size=256M
+      - --skip-name-resolve
+    environment:
+      MARIADB_DATABASE: nextcloud
+      MARIADB_USER: nextcloud
+      MARIADB_PASSWORD: nextcloud
+      MARIADB_ROOT_PASSWORD: nextcloud-root
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     restart: unless-stopped
 
   # Hintergrundaufgaben jede Minute: Nachrichtenauf/beiablauf in Talk und
@@ -39,3 +68,4 @@ services:
 volumes:
   data:
   custom-apps:
+  db:
