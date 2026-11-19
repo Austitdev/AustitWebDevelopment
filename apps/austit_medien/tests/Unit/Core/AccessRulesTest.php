@@ -30,9 +30,9 @@ class AccessRulesTest extends TestCase {
 		$this->assertFalse($rules->maySearch());
 	}
 
-	public function testMaySearchDeniedWithoutConfig(): void {
+	public function testMaySearchAllowedForEveryoneWithoutConfig(): void {
 		$rules = new AccessRules([], ['schueler'], false);
-		$this->assertFalse($rules->maySearch());
+		$this->assertTrue($rules->maySearch());
 	}
 
 	public function testVideoAllowedFromList(): void {

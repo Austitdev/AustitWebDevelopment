@@ -54,7 +54,7 @@
 					<option value="2160">2160p</option>
 				</select>
 			</label>
-			<label>Gruppen mit freier Suche (Komma-getrennt)
+			<label>Suche einschränken auf Gruppen (Komma-getrennt, leer = alle dürfen suchen)
 				<input type="text" id="am-search-groups" placeholder="z. B. lehrkraefte, klasse-10a" />
 			</label>
 			<label>Freigegebene Kanäle (Kanal-IDs, Komma-getrennt)

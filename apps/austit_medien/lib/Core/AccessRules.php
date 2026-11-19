@@ -36,7 +36,11 @@ class AccessRules {
 		}
 		$groups = $this->config['searchGroups'] ?? [];
 		if (!is_array($groups)) {
-			return false;
+			return true;
+		}
+		// Leere Liste: alle Nutzer duerfen suchen; gefuellte Liste: nur diese Gruppen.
+		if ($groups === []) {
+			return true;
 		}
 		foreach ($groups as $group) {
 			if (in_array((string)$group, $this->userGroups, true)) {

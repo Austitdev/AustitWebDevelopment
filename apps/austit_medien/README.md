@@ -17,8 +17,9 @@ YouTube ausdrücklich gesperrt ist, sowie Schulen.
   von Nextcloud-Abhängigkeiten und unit-testbar. Der dünne Adapter
   (`lib/Service/MediaService.php`) behandelt nur Konfiguration, Rechte und
   Cache im App-Data-Verzeichnis.
-- **Zugriffsmodell**: Freigabeliste (Videos + Kanäle) als Standard; freie
-  Suche nur für konfigurierte Gruppen (`searchGroups`) und Administratoren.
+- **Zugriffsmodell**: Freigabeliste (Videos + Kanäle) als Standard; Suche
+  können alle Nutzer, wahlbar nur für konfigurierte Gruppen (`searchGroups`,
+  leer = alle).
 
 ## Voraussetzungen auf dem Server
 
@@ -35,7 +36,7 @@ Einlesen in den App-Data-Cache vollständig im Speicher liegt.
 Über die App-Oberfläche (Administratoren):
 
 - Maximale Auflösung (`maxHeight`, 144–2160)
-- Gruppen mit freier Suche (`searchGroups`)
+- Gruppen, deren Mitglieder suchen dürfen (`searchGroups`, leer = alle)
 - Freigegebene Kanäle (`channels`)
 - Videos freigeben/entfernen (`videos`)
 
@@ -43,7 +44,7 @@ Einlesen in den App-Data-Cache vollständig im Speicher liegt.
 
 | Methode | Route | Zweck |
 | --- | --- | --- |
-| GET | `/apps/austit_medien/api/search?q=` | Live-Suche (nur freigegebene Suchgruppen/Admins) |
+| GET | `/apps/austit_medien/api/search?q=` | Live-Suche (alle, außer auf Gruppen eingeschränkt) |
 | GET | `/apps/austit_medien/api/video/{id}` | Metadaten + Status |
 | GET | `/apps/austit_medien/api/thumb/{id}` | Thumbnail |
 | GET | `/apps/austit_medien/api/stream/{id}` | MP4-Stream inkl. Range-Requests |
