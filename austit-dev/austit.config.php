@@ -25,6 +25,7 @@ $CONFIG = [
 		'spreed',
 		'austit_talk',
 		'austit_notebook',
+		'austit_medien',
 		'austit_shell',
 		'austit_updates',
 		'austit_store',

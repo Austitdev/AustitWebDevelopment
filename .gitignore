@@ -19,6 +19,7 @@ node_modules/
 /apps*/*
 !/apps/admin_audit
 !/apps/austit_notebook
+!/apps/austit_medien
 !/apps/austit_shell
 !/apps/austit_talk
 !/apps/austit_updates

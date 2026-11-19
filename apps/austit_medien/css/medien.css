@@ -1,0 +1,231 @@
+/**
+ * austit Medien – App-Design im austit Look (dunkle Glasflächen, Akzent #0080ff).
+ *
+ * SPDX-FileCopyrightText: 2026 austit.de
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+#austit-medien {
+	max-width: 960px;
+	margin: 0 auto;
+}
+
+.am-kopf h2 {
+	color: var(--austit-text, #f0f3f6);
+}
+
+.am-hinweis {
+	font-size: 0.9em;
+	color: var(--color-text-maxcontrast, #8b9299);
+	line-height: 1.5;
+}
+
+.am-kachel {
+	background: color-mix(in srgb, var(--austit-flaeche, #1a1d21) 88%, transparent);
+	border: 1px solid color-mix(in srgb, var(--austit-akzent, #0080ff) 18%, transparent);
+	border-radius: var(--border-radius-large, 18px);
+	padding: 20px;
+	margin-bottom: 20px;
+	backdrop-filter: blur(14px);
+}
+
+html.austit-shell .am-kachel,
+html .am-kachel {
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.am-kachel h3 {
+	margin-top: 0;
+}
+
+.am-suche-form {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.am-suche-form input[type='search'] {
+	flex: 1 1 260px;
+}
+
+input[type='text'],
+input[type='search'],
+select {
+	background: var(--austit-flaeche-dunkel, #17191c);
+	border: 1px solid color-mix(in srgb, var(--austit-akzent, #0080ff) 22%, transparent);
+	border-radius: 10px;
+	padding: 8px 12px;
+	color: var(--austit-text, #f0f3f6);
+}
+
+input:focus,
+select:focus {
+	border-color: var(--austit-akzent, #0080ff);
+	outline: none;
+}
+
+label {
+	display: block;
+	color: var(--color-text-maxcontrast, #8b9299);
+	font-size: 0.9em;
+	margin-bottom: 10px;
+}
+
+label input,
+label select {
+	width: 100%;
+	margin-top: 4px;
+}
+
+.am-button {
+	background: linear-gradient(135deg, var(--austit-akzent, #0080ff), color-mix(in srgb, var(--austit-akzent, #0080ff) 70%, #003c7d));
+	color: #fff;
+	border: none;
+	border-radius: 10px;
+	padding: 8px 16px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: filter 0.15s ease, transform 0.05s ease;
+}
+
+.am-button:hover {
+	filter: brightness(1.15);
+}
+
+.am-button:active {
+	transform: translateY(1px);
+}
+
+.am-button:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.am-button-klein {
+	padding: 5px 12px;
+	font-size: 0.85em;
+	border-radius: 8px;
+}
+
+.am-gefahr {
+	background: linear-gradient(135deg, #c53030, #8c2020);
+}
+
+.am-liste {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 10px;
+}
+
+.am-liste-eintrag {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	background: color-mix(in srgb, var(--austit-flaeche-dunkel, #17191c) 85%, transparent);
+	border: 1px solid color-mix(in srgb, var(--austit-akzent, #0080ff) 12%, transparent);
+	border-radius: 12px;
+	padding: 10px 14px;
+}
+
+.am-video-thumb {
+	width: 120px;
+	height: 68px;
+	object-fit: cover;
+	border-radius: 8px;
+	background: #000;
+	flex-shrink: 0;
+}
+
+.am-video-info {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.am-video-titel {
+	color: var(--austit-text, #f0f3f6);
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.am-video-kanal,
+.am-kanal {
+	color: var(--color-text-maxcontrast, #8b9299);
+	font-size: 0.85em;
+}
+
+.am-video-aktionen {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.am-video-status,
+.am-video-ok {
+	font-size: 0.8em;
+	color: var(--color-text-maxcontrast, #8b9299);
+	padding: 4px 10px;
+	border-radius: 999px;
+	border: 1px solid color-mix(in srgb, var(--austit-akzent, #0080ff) 25%, transparent);
+}
+
+.am-video-ok {
+	color: var(--austit-akzent, #0080ff);
+}
+
+.am-video-error {
+	color: #ff8080;
+	border-color: #ff8080;
+}
+
+.am-player-kopf {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+
+#am-player {
+	width: 100%;
+	max-height: 70vh;
+	border-radius: 12px;
+	background: #000;
+}
+
+.am-status {
+	margin-top: 10px;
+	font-size: 0.85em;
+	color: var(--color-text-maxcontrast, #8b9299);
+}
+
+.am-einstellungen,
+.am-freigabe-hinzufuegen {
+	border-top: 1px solid color-mix(in srgb, var(--austit-akzent, #0080ff) 12%, transparent);
+	padding-top: 14px;
+	margin-top: 14px;
+}
+
+.am-aktionen {
+	margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+	.am-liste-eintrag {
+		flex-wrap: wrap;
+	}
+
+	.am-video-thumb {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 9;
+	}
+}

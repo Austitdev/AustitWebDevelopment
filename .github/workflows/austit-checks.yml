@@ -36,13 +36,14 @@ jobs:
         run: composer i
 
       - name: PHP syntax check
-        run: find apps/austit_talk apps/austit_notebook apps/austit_shell apps/austit_updates -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+        run: find apps/austit_talk apps/austit_notebook apps/austit_medien apps/austit_shell apps/austit_updates -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 
       - name: Coding standard
         run: |
           lib/composer/bin/php-cs-fixer fix --dry-run --diff --config .php-cs-fixer.dist.php \
             apps/austit_talk \
             apps/austit_notebook \
+            apps/austit_medien \
             apps/austit_shell \
             apps/austit_updates \
             || ( echo 'Please run `composer run cs:fix` to format your code' && exit 1 )
@@ -77,13 +78,14 @@ jobs:
           # Talk is not part of this repository; its tables are needed by the tests
           curl -fL -o /tmp/spreed.tar.gz https://github.com/nextcloud-releases/spreed/releases/download/v25.0.8/spreed-v25.0.8.tar.gz
           tar -xzf /tmp/spreed.tar.gz -C apps/
-          ./occ app:enable spreed austit_talk austit_notebook austit_shell austit_updates
+          ./occ app:enable spreed austit_talk austit_notebook austit_medien austit_shell austit_updates
 
       - name: PHPUnit
         run: |
           lib/composer/bin/phpunit --configuration tests/phpunit-autotest.xml \
             apps/austit_talk \
             apps/austit_notebook \
+            apps/austit_medien \
             apps/austit_shell \
             apps/austit_updates
 

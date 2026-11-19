@@ -16,6 +16,13 @@
 
 FROM nextcloud:35.0.2-apache
 
+# yt-dlp + ffmpeg: Download-Engine der App austit_medien (YouTube-Proxy,
+# Videos werden einmalig in den Cloud-Cache geladen und daraus gestreamt).
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends ffmpeg python3 python3-pip \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& (pip3 install --break-system-packages yt-dlp || pip3 install yt-dlp)
+
 # Server-Fork inkl. austit-Apps, Theme und austit-dev-Hilfsdateien.
 COPY . /var/www/html/
 

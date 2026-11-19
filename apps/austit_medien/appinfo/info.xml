@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+ - SPDX-FileCopyrightText: 2026 austit.de
+ - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<info>
+	<id>austit_medien</id>
+	<name>austit Medien</name>
+	<summary>YouTube und Mediatheken über die eigene Cloud bereitstellen</summary>
+	<description><![CDATA[Suche und Wiedergabe von YouTube-Videos über die eigene Cloud-Infrastruktur: Die Browser der Nutzer sprechen ausschließlich mit der Cloud, YouTube sieht nur den Server. Videos werden mit yt-dlp einmalig in den Cache geladen und daraus gestreamt; Freigabelisten und gruppenbezogene freie Suche steuern den Zugriff.]]></description>
+	<version>0.1.0</version>
+	<licence>agpl</licence>
+	<author>austit</author>
+	<namespace>AustitMedien</namespace>
+	<category>tools</category>
+	<bugs>https://cloud.austit.de</bugs>
+	<dependencies>
+		<nextcloud min-version="28" max-version="35"/>
+	</dependencies>
+	<navigations>
+		<navigation>
+			<name>austit Medien</name>
+			<route>austit_medien.page.index</route>
+			<icon>app.svg</icon>
+			<order>5</order>
+		</navigation>
+	</navigations>
+</info>

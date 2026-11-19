@@ -87,5 +87,7 @@ occ app:enable austit_updates
 occ app:enable austit_shell
 occ app:enable austit_notebook
 occ app:enable austit_talk
+# austit_medien benoetigt yt-dlp + ffmpeg aus dem Image (siehe Dockerfile).
+occ app:enable austit_medien
 
 exec apache2-foreground
